@@ -1,0 +1,21 @@
+[gd_scene load_steps=4 format=3 uid="uid://8r38rbtaivjs"]
+
+[ext_resource type="Texture2D" uid="uid://d3ibuql3pb48g" path="res://assets/blue_hex_outline.png" id="1_cwr6n"]
+[ext_resource type="Script" path="res://scripts/SelectionTile.gd" id="1_xiceb"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_fsk1q"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_cwr6n")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[node name="SelectionTile" type="Node2D"]
+script = ExtResource("1_xiceb")
+
+[node name="Sprite" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_fsk1q")

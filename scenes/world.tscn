@@ -1,0 +1,55 @@
+[gd_scene load_steps=8 format=3 uid="uid://d1t087k7mdxvb"]
+
+[ext_resource type="Script" path="res://world.gd" id="1_4avd2"]
+[ext_resource type="Texture2D" uid="uid://bu0j2ljbdu4jy" path="res://assets/kam_hero_tiles_2px_outline.png" id="1_7kdkn"]
+[ext_resource type="Script" path="res://scripts/ArenaTileMap.gd" id="3_rf75t"]
+[ext_resource type="PackedScene" uid="uid://d1g51gpcf38kc" path="res://scenes/player.tscn" id="4_w5wpr"]
+[ext_resource type="PackedScene" uid="uid://dvuatsyki3ehj" path="res://scenes/selection.tscn" id="5_0ab0n"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_s34qc"]
+texture = ExtResource("1_7kdkn")
+texture_region_size = Vector2i(128, 128)
+use_texture_padding = false
+0:0/next_alternative_id = 4
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+3:1/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_ce3eq"]
+tile_shape = 3
+tile_layout = 5
+tile_offset_axis = 1
+tile_size = Vector2i(128, 128)
+sources/0 = SubResource("TileSetAtlasSource_s34qc")
+
+[node name="World" type="Node2D"]
+script = ExtResource("1_4avd2")
+
+[node name="ArenaTileMap" type="TileMap" parent="."]
+unique_name_in_owner = true
+tile_set = SubResource("TileSet_ce3eq")
+format = 2
+layer_0/name = "ground"
+layer_0/tile_data = PackedInt32Array(65537, 0, 0, 0, 0, 0, -1, 0, 0, -65538, 0, 0, 65538, 0, 0, 1, 0, 0, -65536, 0, 0, -65537, 0, 0, -131074, 0, 0, -196610, 0, 0, -131073, 0, 0, -131072, 0, 0, -65535, 0, 0, -65534, 0, 0, 2, 0, 0, 3, 0, 0, 65539, 0, 0, -131071, 0, 0, -196607, 0, 0, -196608, 0, 0, -262144, 0, 0, -196609, 0, 0, -262146, 0, 0, -327682, 0, 0, -262145, 0, 0, -196606, 0, 0, -131070, 0, 0, -131069, 0, 0, -65533, 0, 0, 4, 0, 0, 65540, 0, 0, 65541, 0, 0, 5, 0, 0, -65531, 0, 0, -65532, 0, 0, -131067, 0, 0, -196603, 0, 0, -196604, 0, 0, -131068, 0, 0, -196605, 0, 0, -262142, 0, 0, -262143, 0, 0, -327680, 0, 0, -327681, 0, 0, -393216, 0, 0, -393215, 0, 0, -327679, 0, 0, -393214, 0, 0, -327677, 0, 0, -262141, 0, 0, -327678, 0, 0, -262140, 0, 0, -262147, 0, 0, -196611, 0, 0, -131075, 0, 0, -65539, 0, 0, 131076, 0, 0, 131075, 0, 0, 131074, 0, 0, 131073, 0, 0, 65536, 0, 0, 65535, 0, 0, -2, 0, 0, 196611, 0, 0, 196610, 0, 0, 262146, 0, 0, 262145, 0, 0, 327681, 0, 0, 327680, 0, 0, 393215, 0, 0, 393214, 0, 0, 327677, 0, 0, 262141, 0, 0, 262140, 0, 0, 196604, 0, 0, 196603, 0, 0, 131066, 0, 0, 393213, 0, 0, 327676, 0, 0, 262139, 0, 0, 196602, 0, 0, 131067, 0, 0, 65530, 0, 0, -6, 0, 0, -65542, 0, 0, -5, 0, 0, 65532, 0, 0, 131068, 0, 0, 196605, 0, 0, 327678, 0, 0, 327679, 0, 0, 262142, 0, 0, 131069, 0, 0, 65531, 0, 0, -65541, 0, 0, -65540, 0, 0, -131077, 0, 0, -131076, 0, 0, -196612, 0, 0, -4, 0, 0, -3, 0, 0, 65533, 0, 0, 65534, 0, 0, 131071, 0, 0, 196607, 0, 0, 196606, 0, 0, 131070, 0, 0, 262143, 0, 0, 196608, 0, 0, 262144, 0, 0, 131072, 0, 0, 196609, 0, 0)
+layer_1/name = "walls"
+layer_1/navigation_enabled = false
+layer_1/tile_data = PackedInt32Array(393218, 65536, 1, 327682, 65536, 1, 327683, 65536, 1, 262147, 65536, 1, 262148, 65536, 1, 196612, 65536, 1, 196613, 65536, 1, 131077, 65536, 1, 131078, 65536, 1, 65542, 65536, 1, 6, 65536, 1, -65530, 65536, 1, -131066, 65536, 1, -196602, 65536, 1, -262139, 65536, 1, -327676, 65536, 1, -393213, 65536, 1, -458750, 65536, 1, -458751, 65536, 1, -458752, 65536, 1, -393217, 65536, 1, -393218, 65536, 1, -393219, 65536, 1, -327683, 65536, 1, -327684, 65536, 1, -262148, 65536, 1, -262149, 65536, 1, -196613, 65536, 1, -196614, 65536, 1, -131078, 65536, 1, -131079, 65536, 1, -65543, 65536, 1, -7, 65536, 1, 65529, 65536, 1, 131065, 65536, 1, 196601, 65536, 1, 393217, 65536, 1, 393216, 65536, 1, 458751, 65536, 1, 458750, 65536, 1, 458749, 65536, 1, 393212, 65536, 1, 327675, 65536, 1, 262138, 65536, 1)
+script = ExtResource("3_rf75t")
+
+[node name="Selection" parent="ArenaTileMap" instance=ExtResource("5_0ab0n")]
+
+[node name="Players" type="Node" parent="ArenaTileMap"]
+
+[node name="Player1" parent="ArenaTileMap/Players" instance=ExtResource("4_w5wpr")]
+
+[node name="Player2" parent="ArenaTileMap/Players" instance=ExtResource("4_w5wpr")]
+tile_position = Vector2i(1, 1)
+
+[node name="Camera" type="Camera2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(64, 2.08165e-12)

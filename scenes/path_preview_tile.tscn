@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=3 uid="uid://haetij8q55v2"]
+
+[ext_resource type="Texture2D" uid="uid://cam3m1mp28bqu" path="res://assets/white_hex_outline.png" id="1_tcj7e"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_jitg5"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_tcj7e")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[node name="PathPreviewTile" type="Node2D"]
+
+[node name="Sprite" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_jitg5")

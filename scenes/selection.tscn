@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3 uid="uid://dvuatsyki3ehj"]
+
+[ext_resource type="Script" path="res://scripts/Selection.gd" id="1_s6fr0"]
+[ext_resource type="PackedScene" uid="uid://8r38rbtaivjs" path="res://scenes/selection_tile.tscn" id="2_i14iy"]
+
+[node name="Selection" type="Node"]
+script = ExtResource("1_s6fr0")
+
+[node name="SelectionTile" parent="." instance=ExtResource("2_i14iy")]
+visible = false
