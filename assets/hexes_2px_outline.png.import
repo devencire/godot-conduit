@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d3ibuql3pb48g"
-path="res://.godot/imported/blue_hex_outline.png-def30dde1f03f8fdd8ebea89f156c167.ctex"
+uid="uid://bu0j2ljbdu4jy"
+path="res://.godot/imported/hexes_2px_outline.png-23cb26cc3497a9ee9fabb37b6033db3e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/blue_hex_outline.png"
-dest_files=["res://.godot/imported/blue_hex_outline.png-def30dde1f03f8fdd8ebea89f156c167.ctex"]
+source_file="res://assets/hexes_2px_outline.png"
+dest_files=["res://.godot/imported/hexes_2px_outline.png-23cb26cc3497a9ee9fabb37b6033db3e.ctex"]
 
 [params]
 

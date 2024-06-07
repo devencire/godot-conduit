@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bu0j2ljbdu4jy"
-path="res://.godot/imported/kam_hero_tiles_2px_outline.png-70b8dae9b9825b2c9f47ae392dce4884.ctex"
+uid="uid://itqbo3pb5lwx"
+path="res://.godot/imported/white_hex_outline_small.png-15b0a2628ef83392c7f8b26e35d34ed7.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/kam_hero_tiles_2px_outline.png"
-dest_files=["res://.godot/imported/kam_hero_tiles_2px_outline.png-70b8dae9b9825b2c9f47ae392dce4884.ctex"]
+source_file="res://assets/white_hex_outline_small.png"
+dest_files=["res://.godot/imported/white_hex_outline_small.png-15b0a2628ef83392c7f8b26e35d34ed7.ctex"]
 
 [params]
 

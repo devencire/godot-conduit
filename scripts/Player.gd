@@ -2,22 +2,28 @@ class_name Player
 
 extends Node
 
-@export var team: Constants.Team
-
 var arena_tilemap: ArenaTileMap
+var players: Players
 @onready var sprite: AnimatedSprite2D = $Sprite
+
+# Which team the player is a member of.
+@export var team: Constants.Team
 
 # Where the Player is in the ArenaTileMap, in tile coordinates.
 @export var tile_position: Vector2i:
 	set(new_tile_position):
 		tile_position = new_tile_position
 		move_sprite_to_tile_position()
-		if arena_tilemap:
-			arena_tilemap.update_obstacles()
+		if players:
+			players.player_moved()
+
+# Whether the Player is the Beacon, powering all aligned tiles.
+@export var is_beacon: bool
 
 func _ready():
-	$Sprite.modulate = Constants.team_color(team)
+	sprite.modulate = Constants.team_color(team)
 
+	players = get_parent()
 	arena_tilemap = find_parent('ArenaTileMap')
 	move_sprite_to_tile_position()
 	

@@ -1,4 +1,4 @@
-class_name SelectionTile
+class_name PoweredTile
 
 extends Node2D
 

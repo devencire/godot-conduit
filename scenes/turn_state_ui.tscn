@@ -1,6 +1,6 @@
 [gd_scene load_steps=6 format=3 uid="uid://c04vm1q3ssoxd"]
 
-[ext_resource type="Script" path="res://scenes/TurnStateUI.gd" id="1_nrhjs"]
+[ext_resource type="Script" path="res://scripts/TurnStateUI.gd" id="1_n4y0m"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_76cn4"]
 font_size = 32
@@ -16,7 +16,7 @@ font_size = 32
 
 [node name="TurnStateUI" type="Node2D"]
 position = Vector2(-1, 0)
-script = ExtResource("1_nrhjs")
+script = ExtResource("1_n4y0m")
 
 [node name="TeamIndicator" type="Label" parent="."]
 anchors_preset = -1

@@ -87,7 +87,7 @@ func try_move_selected_player(destination_cell: Vector2i):
 	var cell_path := arena_tilemap.get_cell_path(selected_player.tile_position, destination_cell)
 	if cell_path.size() == 0:
 		return # there is no valid path
-	if not %TurnState.try_spend_power(1):
+	if not turn_state.try_spend_power(1):
 		deselect_player()
 		return # couldn't afford it, turn has ended
 	selected_player.tile_position = cell_path[0]
