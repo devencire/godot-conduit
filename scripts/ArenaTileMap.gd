@@ -71,6 +71,22 @@ func get_aligned_cells(center_cell: Vector2i) -> Array[Vector2i]:
 			aligned_cells.append(current_cell)
 	return aligned_cells
 
+## Returns the cells `range` away in the six directions from `center_cell`.
+## Cells that are, or are blocked by, non-pathable tiles are not returned.
+func get_aligned_cells_at_range(center_cell: Vector2i, range: int) -> Array[Vector2i]:
+	var aligned_cells: Array[Vector2i] = []
+	for hex_cell_neighbor in hex_cell_neighbors:
+		var current_cell := center_cell
+		var obstructed := false
+		for n in range:
+			current_cell = get_neighbor_cell(current_cell, hex_cell_neighbor)
+			if get_cell_source_id(GROUND_LAYER, current_cell) == -1:
+				obstructed = true
+				break
+		if not obstructed:
+			aligned_cells.append(current_cell)
+	return aligned_cells
+
 ## Remove all existing pathfinding obstacles and create up-to-date ones.
 ## TODO do this incrementally instead?
 func update_obstacles(players: Array[Player]):

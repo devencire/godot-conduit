@@ -1,8 +1,9 @@
-[gd_scene load_steps=5 format=3 uid="uid://d1g51gpcf38kc"]
+[gd_scene load_steps=6 format=3 uid="uid://d1g51gpcf38kc"]
 
 [ext_resource type="Script" path="res://scripts/Player.gd" id="1_4vrrm"]
 [ext_resource type="Texture2D" uid="uid://rcrm0go6mclm" path="res://assets/player.png" id="2_bdnyk"]
 [ext_resource type="PackedScene" uid="uid://8r38rbtaivjs" path="res://scenes/selection_tile.tscn" id="3_77lfk"]
+[ext_resource type="Script" path="res://scripts/Hammer.gd" id="4_vjob8"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_8dflb"]
 animations = [{
@@ -24,3 +25,7 @@ sprite_frames = SubResource("SpriteFrames_8dflb")
 
 [node name="SelectionTile" parent="." instance=ExtResource("3_77lfk")]
 visible = false
+
+[node name="Hammer" type="Node" parent="." node_paths=PackedStringArray("player")]
+script = ExtResource("4_vjob8")
+player = NodePath("..")

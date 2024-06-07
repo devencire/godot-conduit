@@ -2,6 +2,10 @@ class_name Player
 
 extends Node
 
+signal was_moved(player: Player)
+signal was_selected(player: Player)
+signal was_deselected(player: Player)
+
 var arena_tilemap: ArenaTileMap
 var players: Players
 var turn_state: TurnState
@@ -22,8 +26,7 @@ var path_preview: Node
 	set(new_tile_position):
 		tile_position = new_tile_position
 		_move_sprite_to_tile_position()
-		if players:
-			players.player_moved()
+		was_moved.emit(self)
 
 # Whether the Player is the Beacon, powering all aligned tiles.
 @export var is_beacon: bool
@@ -36,8 +39,11 @@ static var next_id := 1
 	set(new_selected):
 		selected = new_selected
 		_update_selection_tile()
-		if not selected:
+		if selected:
+			was_selected.emit(self)
+		else:
 			_clear_path_preview()
+			was_deselected.emit(self)
 
 func _ready():
 	# TODO there's got to be a better way of sharing these?
