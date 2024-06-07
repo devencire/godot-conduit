@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://d1t087k7mdxvb"]
+[gd_scene load_steps=15 format=3 uid="uid://d1t087k7mdxvb"]
 
 [ext_resource type="Script" path="res://world.gd" id="1_4avd2"]
 [ext_resource type="Texture2D" uid="uid://bu0j2ljbdu4jy" path="res://assets/hexes_2px_outline.png" id="1_7kdkn"]
@@ -9,6 +9,7 @@
 [ext_resource type="Script" path="res://scripts/DebugShowTileLabel.gd" id="7_23lak"]
 [ext_resource type="PackedScene" uid="uid://c04vm1q3ssoxd" path="res://scenes/turn_state_ui.tscn" id="7_p4op4"]
 [ext_resource type="PackedScene" uid="uid://dxxmf1dm70jy3" path="res://scenes/powered_tiles.tscn" id="8_h1dur"]
+[ext_resource type="Script" path="res://scripts/EventLog.gd" id="10_7koks"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_s34qc"]
 texture = ExtResource("1_7kdkn")
@@ -33,6 +34,10 @@ sources/0 = SubResource("TileSetAtlasSource_s34qc")
 
 [sub_resource type="LabelSettings" id="LabelSettings_8os5q"]
 font_size = 24
+
+[sub_resource type="Theme" id="Theme_f63g6"]
+default_font_size = 24
+RichTextLabel/fonts/normal_font = null
 
 [node name="World" type="Node2D"]
 script = ExtResource("1_4avd2")
@@ -75,6 +80,21 @@ position = Vector2(64, -128)
 
 [node name="TurnStateUI" parent="Camera" instance=ExtResource("7_p4op4")]
 position = Vector2(-961, -800)
+
+[node name="EventLog" type="RichTextLabel" parent="."]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(750, 240)
+offset_left = 228.0
+offset_top = -907.0
+offset_right = 978.0
+offset_bottom = -667.0
+focus_mode = 2
+theme = SubResource("Theme_f63g6")
+bbcode_enabled = true
+text = "[b]The game begins![/b]"
+scroll_following = true
+selection_enabled = true
+script = ExtResource("10_7koks")
 
 [connection signal="changed" from="TurnState" to="Camera/TurnStateUI" method="_on_turn_state_changed"]
 [connection signal="changed" from="ArenaTileMap/Players" to="ArenaTileMap" method="_on_players_changed"]

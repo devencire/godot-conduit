@@ -49,7 +49,7 @@ func get_cell_path(start: Vector2i, end: Vector2i) -> Array[Vector2i]:
 func get_hovered_cell(event: InputEventMouse) -> Vector2i:
 	return local_to_map(make_input_local(event).position)
 	
-const hex_cell_neighbors := [
+const hex_cell_neighbors: Array[TileSet.CellNeighbor] = [
 	TileSet.CELL_NEIGHBOR_TOP_SIDE,
 	TileSet.CELL_NEIGHBOR_TOP_RIGHT_SIDE,
 	TileSet.CELL_NEIGHBOR_BOTTOM_RIGHT_SIDE,
@@ -58,21 +58,21 @@ const hex_cell_neighbors := [
 	TileSet.CELL_NEIGHBOR_TOP_LEFT_SIDE
 ]
 
+## Returns the cells in the lines in the six directions from `center_cell`.
+## Lines are blocked only by non-pathable tiles (i.e. walls but not players).
 func get_aligned_cells(center_cell: Vector2i) -> Array[Vector2i]:
 	var aligned_cells: Array[Vector2i] = [center_cell]
 	for hex_cell_neighbor in hex_cell_neighbors:
-		print(hex_cell_neighbor)
 		var current_cell := center_cell
 		while true:
 			current_cell = get_neighbor_cell(current_cell, hex_cell_neighbor)
-			print(current_cell, get_cell_source_id(GROUND_LAYER, current_cell))
 			if get_cell_source_id(GROUND_LAYER, current_cell) == -1:
 				break
 			aligned_cells.append(current_cell)
 	return aligned_cells
 
-### Remove all existing pathfinding obstacles and create up-to-date ones.
-### TODO do this incrementally instead?
+## Remove all existing pathfinding obstacles and create up-to-date ones.
+## TODO do this incrementally instead?
 func update_obstacles(players: Array[Player]):
 	if not astar:
 		return

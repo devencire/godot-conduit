@@ -20,7 +20,13 @@ var players: Players
 # Whether the Player is the Beacon, powering all aligned tiles.
 @export var is_beacon: bool
 
+# A name, just used for debugging for now
+@export var debug_name: String
+static var next_id := 1
+
 func _ready():
+	debug_name = 'Player %s' % next_id
+	next_id += 1
 	sprite.modulate = Constants.team_color(team)
 
 	players = get_parent()
