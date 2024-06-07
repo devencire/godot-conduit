@@ -16,10 +16,7 @@ var arena_tilemap: ArenaTileMap
 			arena_tilemap.update_obstacles()
 
 func _ready():
-	if team == Constants.Team.ONE:
-		$Sprite.modulate = '#0000ff'
-	else:
-		$Sprite.modulate = '#ff0000'
+	$Sprite.modulate = Constants.team_color(team)
 
 	arena_tilemap = find_parent('ArenaTileMap')
 	move_sprite_to_tile_position()

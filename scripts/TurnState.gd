@@ -11,9 +11,7 @@ signal changed(state: TurnState)
 @export var copied_excess_power: int
 @export var base_turn_power: int
 
-func _ready():
-	start_turn(Constants.Team.ONE)
-
+## Starts a new turn for the given `team`.
 func start_turn(team: Constants.Team) -> void:
 	active_team = team
 	
@@ -27,5 +25,17 @@ func start_turn(team: Constants.Team) -> void:
 	var secret_available_excess_power := randi_range(0, Constants.MAX_EXCESS_POWER)
 	
 	total_available_power = copied_excess_power + base_turn_power + secret_available_excess_power
+	power_used = 0
 	
 	changed.emit(self)
+
+## Spends the `amount` of power and returns `true`,
+## or if there's not enough power, starts the opposing team's turn and returns `false`.
+func try_spend_power(amount: int) -> bool:
+	if power_used + amount > total_available_power:
+		start_turn(Constants.other_team(active_team))
+		return false
+	else:
+		power_used += amount
+		changed.emit(self)
+		return true

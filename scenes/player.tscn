@@ -14,7 +14,7 @@ animations = [{
 "speed": 5.0
 }]
 
-[node name="Player1" type="Node" groups=["players"]]
+[node name="Player" type="Node" groups=["players"]]
 script = ExtResource("1_4vrrm")
 
 [node name="Sprite" type="AnimatedSprite2D" parent="."]

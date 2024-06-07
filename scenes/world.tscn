@@ -1,11 +1,11 @@
-[gd_scene load_steps=10 format=3 uid="uid://d1t087k7mdxvb"]
+[gd_scene load_steps=11 format=3 uid="uid://d1t087k7mdxvb"]
 
 [ext_resource type="Script" path="res://world.gd" id="1_4avd2"]
 [ext_resource type="Texture2D" uid="uid://bu0j2ljbdu4jy" path="res://assets/kam_hero_tiles_2px_outline.png" id="1_7kdkn"]
 [ext_resource type="Script" path="res://scripts/TurnState.gd" id="2_7l4uc"]
 [ext_resource type="Script" path="res://scripts/ArenaTileMap.gd" id="3_rf75t"]
-[ext_resource type="PackedScene" uid="uid://d1g51gpcf38kc" path="res://scenes/player.tscn" id="4_w5wpr"]
 [ext_resource type="PackedScene" uid="uid://dvuatsyki3ehj" path="res://scenes/selection.tscn" id="5_0ab0n"]
+[ext_resource type="Script" path="res://scripts/DebugShowTileLabel.gd" id="7_23lak"]
 [ext_resource type="PackedScene" uid="uid://c04vm1q3ssoxd" path="res://scenes/turn_state_ui.tscn" id="7_p4op4"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_s34qc"]
@@ -29,10 +29,14 @@ tile_offset_axis = 1
 tile_size = Vector2i(128, 128)
 sources/0 = SubResource("TileSetAtlasSource_s34qc")
 
+[sub_resource type="LabelSettings" id="LabelSettings_8os5q"]
+font_size = 24
+
 [node name="World" type="Node2D"]
 script = ExtResource("1_4avd2")
 
 [node name="TurnState" type="Node" parent="."]
+unique_name_in_owner = true
 script = ExtResource("2_7l4uc")
 
 [node name="ArenaTileMap" type="TileMap" parent="."]
@@ -49,12 +53,16 @@ script = ExtResource("3_rf75t")
 [node name="Selection" parent="ArenaTileMap" instance=ExtResource("5_0ab0n")]
 
 [node name="Players" type="Node" parent="ArenaTileMap"]
+unique_name_in_owner = true
 
-[node name="Player1" parent="ArenaTileMap/Players" instance=ExtResource("4_w5wpr")]
-
-[node name="Player2" parent="ArenaTileMap/Players" instance=ExtResource("4_w5wpr")]
-team = 1
-tile_position = Vector2i(1, 1)
+[node name="DebugShowTileLabel" type="Label" parent="ArenaTileMap"]
+offset_left = 722.0
+offset_top = 486.0
+offset_right = 895.0
+offset_bottom = 520.0
+text = "Hovered tile: {}"
+label_settings = SubResource("LabelSettings_8os5q")
+script = ExtResource("7_23lak")
 
 [node name="Camera" type="Camera2D" parent="."]
 unique_name_in_owner = true
@@ -64,3 +72,4 @@ position = Vector2(64, -128)
 position = Vector2(-961, -800)
 
 [connection signal="changed" from="TurnState" to="Camera/TurnStateUI" method="_on_turn_state_changed"]
+[connection signal="child_order_changed" from="ArenaTileMap/Players" to="ArenaTileMap" method="_on_players_child_order_changed"]

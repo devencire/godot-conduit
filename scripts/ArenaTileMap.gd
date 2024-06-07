@@ -10,15 +10,12 @@ var disabled_point_ids: Array[int] = []
 func _ready():
 	astar = _build_astar()
 	update_obstacles()
-	print(astar.get_point_ids())
-	print(disabled_point_ids)
 
 func _build_astar() -> AStar2D:
 	var cells := get_used_cells(GROUND_LAYER)
 	var astar := AStar2D.new()
 	astar.reserve_space(cells.size())
 	for cell in cells:
-		print(cell, map_to_local(cell), _cell_to_astar_id(cell))
 		astar.add_point(_cell_to_astar_id(cell), map_to_local(cell))
 	for cell in cells:
 		var cell_id := _cell_to_astar_id(cell)
@@ -62,9 +59,15 @@ func update_obstacles():
 	for disabled_point_id in disabled_point_ids:
 		astar.set_point_disabled(disabled_point_id, false)
 	disabled_point_ids = []
-		
-	var players := find_children("*", "Player")
+	
+	if not $Players:
+		return
+	var players := $Players.get_children()
 	for player in players:
 		var astar_id := _cell_to_astar_id((player as Player).tile_position)
 		astar.set_point_disabled(astar_id, true)
 		disabled_point_ids.append(astar_id)
+
+
+func _on_players_child_order_changed():
+	update_obstacles()
