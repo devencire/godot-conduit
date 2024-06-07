@@ -65,7 +65,6 @@ func update_obstacles():
 		
 	var players := find_children("*", "Player")
 	for player in players:
-		if player is Player:
-			var astar_id := _cell_to_astar_id(player.tile_position)
-			astar.set_point_disabled(astar_id, true)
-			disabled_point_ids.append(astar_id)
+		var astar_id := _cell_to_astar_id((player as Player).tile_position)
+		astar.set_point_disabled(astar_id, true)
+		disabled_point_ids.append(astar_id)

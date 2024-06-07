@@ -1,0 +1,55 @@
+[gd_scene load_steps=5 format=3 uid="uid://c04vm1q3ssoxd"]
+
+[ext_resource type="Script" path="res://scenes/TurnStateUI.gd" id="1_nrhjs"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_rs8d1"]
+font_size = 24
+
+[sub_resource type="LabelSettings" id="LabelSettings_ajpyq"]
+font_size = 24
+
+[sub_resource type="LabelSettings" id="LabelSettings_17700"]
+font_size = 32
+
+[node name="TurnStateUI" type="Node2D"]
+script = ExtResource("1_nrhjs")
+
+[node name="CopiedExcessPower" type="Label" parent="."]
+offset_left = 8.0
+offset_top = 133.0
+offset_right = 372.0
+offset_bottom = 178.0
+text = "Copied excess power: {}"
+label_settings = SubResource("LabelSettings_rs8d1")
+
+[node name="BaseTurnPower" type="Label" parent="."]
+offset_left = 8.0
+offset_top = 164.0
+offset_right = 372.0
+offset_bottom = 209.0
+text = "Base turn power: {}"
+label_settings = SubResource("LabelSettings_ajpyq")
+
+[node name="MaximumRandomPower" type="Label" parent="."]
+offset_left = 7.0
+offset_top = 196.0
+offset_right = 371.0
+offset_bottom = 241.0
+text = "Maximum random power: {}"
+label_settings = SubResource("LabelSettings_ajpyq")
+
+[node name="KnownRemainingPower" type="Label" parent="."]
+offset_left = 10.0
+offset_top = 16.0
+offset_right = 374.0
+offset_bottom = 61.0
+text = "Known remaining power: {}"
+label_settings = SubResource("LabelSettings_17700")
+
+[node name="MaximumRemainingPower" type="Label" parent="."]
+offset_left = 9.0
+offset_top = 65.0
+offset_right = 428.0
+offset_bottom = 110.0
+text = "Maximum remaining power: {}"
+label_settings = SubResource("LabelSettings_17700")

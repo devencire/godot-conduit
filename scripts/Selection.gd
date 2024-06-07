@@ -36,7 +36,7 @@ func _unhandled_input(event):
 		var players := get_tree().get_nodes_in_group('players')
 		for player in players:
 			if player is Player:
-				if player.tile_position == clicked_cell:
+				if player.team == Constants.CONTROLLED_TEAM and player.tile_position == clicked_cell:
 					select_player(player)
 					return
 

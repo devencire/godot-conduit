@@ -2,6 +2,8 @@ class_name Player
 
 extends Node
 
+@export var team: Constants.Team
+
 var arena_tilemap: ArenaTileMap
 @onready var sprite: AnimatedSprite2D = $Sprite
 
@@ -12,9 +14,13 @@ var arena_tilemap: ArenaTileMap
 		move_sprite_to_tile_position()
 		if arena_tilemap:
 			arena_tilemap.update_obstacles()
-		
 
 func _ready():
+	if team == Constants.Team.ONE:
+		$Sprite.modulate = '#0000ff'
+	else:
+		$Sprite.modulate = '#ff0000'
+
 	arena_tilemap = find_parent('ArenaTileMap')
 	move_sprite_to_tile_position()
 	
