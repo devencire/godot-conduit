@@ -39,7 +39,7 @@ font_size = 24
 default_font_size = 24
 RichTextLabel/fonts/normal_font = null
 
-[node name="World" type="Node2D"]
+[node name="MatchRoot" type="Node2D"]
 script = ExtResource("1_4avd2")
 
 [node name="TurnState" type="Node" parent="."]

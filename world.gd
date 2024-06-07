@@ -1,4 +1,10 @@
+class_name MatchRoot
+
 extends Node2D
+
+@onready var turn_state: TurnState = $TurnState
+@onready var arena_tilemap: ArenaTileMap = $ArenaTileMap
+@onready var event_log: EventLog = $EventLog
 
 const player_scene := preload("res://scenes/player.tscn")
 
@@ -14,7 +20,7 @@ func _ready():
 	add_player(Constants.Team.TWO, Vector2i(2, -1))
 	add_player(Constants.Team.TWO, Vector2i(2, -3), true)
 
-	$TurnState.start_turn(Constants.Team.ONE)
+	turn_state.start_turn(Constants.Team.ONE)
 
 func add_player(team: Constants.Team, tile_position: Vector2i, is_beacon: bool = false):
 	var player := player_scene.instantiate()

@@ -1,7 +1,8 @@
-[gd_scene load_steps=4 format=3 uid="uid://d1g51gpcf38kc"]
+[gd_scene load_steps=5 format=3 uid="uid://d1g51gpcf38kc"]
 
 [ext_resource type="Script" path="res://scripts/Player.gd" id="1_4vrrm"]
 [ext_resource type="Texture2D" uid="uid://rcrm0go6mclm" path="res://assets/player.png" id="2_bdnyk"]
+[ext_resource type="PackedScene" uid="uid://8r38rbtaivjs" path="res://scenes/selection_tile.tscn" id="3_77lfk"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_8dflb"]
 animations = [{
@@ -20,3 +21,6 @@ script = ExtResource("1_4vrrm")
 [node name="Sprite" type="AnimatedSprite2D" parent="."]
 position = Vector2(2.08165e-12, 2.08165e-12)
 sprite_frames = SubResource("SpriteFrames_8dflb")
+
+[node name="SelectionTile" parent="." instance=ExtResource("3_77lfk")]
+visible = false
