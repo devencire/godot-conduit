@@ -7,6 +7,8 @@ const CONTROLLED_TEAM := Team.ONE
 const BASE_TURN_POWER := 5
 const MAX_EXCESS_POWER := 6
 
+const OFF_ARENA := Vector2i(-40, -40)
+
 static func team_name(team: Team) -> String:
 	if team == Constants.Team.ONE:
 		return 'Blue'

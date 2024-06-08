@@ -49,6 +49,11 @@ func get_cell_path(start: Vector2i, end: Vector2i) -> Array[Vector2i]:
 		cells.append(_astar_id_to_cell(id))
 	return cells.slice(1)
 
+## Returns true if the cell contains ground (even if there's an obstacle).
+func is_cell_pathable(cell: Vector2i) -> bool:
+	var id := _cell_to_astar_id(cell)
+	return astar.has_point(id)
+
 ## Get the cell for the mouse position of an InputEventMouse.
 func get_hovered_cell(event: InputEventMouse) -> Vector2i:
 	return local_to_map(make_input_local(event).position)

@@ -16,13 +16,16 @@ func _player_was_selected(_player: Player) -> void:
 	_draw_target_selection_preview()
 
 func _player_was_deselected(_player: Player) -> void:
-	selected_target = null
+	_clear_selected_target()
 	_clear_target_preview()
 
 func _player_was_moved(_player: Player) -> void:
-	if not player.selected:
-		return
+	if player.selected:
+		_clear_selected_target()
+
+func _clear_selected_target() -> void:
 	selected_target = null
+	player.moving = true
 	_draw_target_selection_preview()
 
 func _unhandled_input(event):
@@ -44,9 +47,7 @@ func _unhandled_input(event):
 		else:
 			# they may have clicked their target again to deselect them
 			if selected_target.cell == clicked_cell:
-				selected_target = null
-				_draw_target_selection_preview()
-				player.moving = true
+				_clear_selected_target()
 				return
 			# they may have clicked a direction to push their target in
 			var valid_push_targets = get_valid_push_targets()
@@ -128,8 +129,14 @@ func try_push(push_target: ValidTarget):
 		player.event_log.log('[b][color=%s]%s[/color] tried to push [color=%s]%s[/color] but ran out of power![/b]' % [Constants.team_color(player.team), player.debug_name, Constants.team_color(push_target.player.team), push_target.player.debug_name])
 		player.selected = false
 		return
+	if not player.arena_tilemap.is_cell_pathable(push_target.cell):
+		# obviously this will want to be something else eventually
+		push_target.player.tile_position = Constants.OFF_ARENA
+		push_target.player.queue_free()
+		
+		player.event_log.log('[color=%s]%s[/color] pushed [color=%s]%s[/color] off the arena' % [Constants.team_color(player.team), player.debug_name, Constants.team_color(push_target.player.team), push_target.player.debug_name])
+		_clear_selected_target()
+		return
 	push_target.player.tile_position = push_target.cell
 	player.event_log.log('[color=%s]%s[/color] pushed [color=%s]%s[/color] into %s' % [Constants.team_color(player.team), player.debug_name, Constants.team_color(push_target.player.team), push_target.player.debug_name, push_target.cell])
-	selected_target = null
-	_draw_target_selection_preview()
-	player.moving = true
+	_clear_selected_target()
