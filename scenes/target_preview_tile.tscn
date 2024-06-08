@@ -1,16 +1,25 @@
-[gd_scene load_steps=4 format=3 uid="uid://iwgvddraoxrk"]
+[gd_scene load_steps=5 format=3 uid="uid://iwgvddraoxrk"]
 
 [ext_resource type="Script" path="res://scripts/TargetPreviewTile.gd" id="1_nebr4"]
-[ext_resource type="Texture2D" uid="uid://cam3m1mp28bqu" path="res://assets/white_hex_outline.png" id="1_vf43r"]
+[ext_resource type="Texture2D" uid="uid://ctmavr76f0sh7" path="res://assets/small_arrow.png" id="2_5tjd7"]
+[ext_resource type="Texture2D" uid="uid://d2814aoeu5n55" path="res://assets/player_target.png" id="3_aflp4"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_jitg5"]
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("1_vf43r")
+"texture": ExtResource("2_5tjd7")
 }],
 "loop": true,
-"name": &"default",
+"name": &"arrow",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_aflp4")
+}],
+"loop": true,
+"name": &"blank",
 "speed": 5.0
 }]
 
@@ -19,3 +28,4 @@ script = ExtResource("1_nebr4")
 
 [node name="Sprite" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_jitg5")
+animation = &"blank"

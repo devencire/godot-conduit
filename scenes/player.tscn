@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://scripts/Player.gd" id="1_4vrrm"]
 [ext_resource type="Texture2D" uid="uid://rcrm0go6mclm" path="res://assets/player.png" id="2_bdnyk"]
 [ext_resource type="PackedScene" uid="uid://8r38rbtaivjs" path="res://scenes/selection_tile.tscn" id="3_77lfk"]
-[ext_resource type="Script" path="res://scripts/Hammer.gd" id="4_vjob8"]
+[ext_resource type="Script" path="res://scripts/Hammer.gd" id="4_ek61n"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_8dflb"]
 animations = [{
@@ -27,5 +27,5 @@ sprite_frames = SubResource("SpriteFrames_8dflb")
 visible = false
 
 [node name="Hammer" type="Node" parent="." node_paths=PackedStringArray("player")]
-script = ExtResource("4_vjob8")
+script = ExtResource("4_ek61n")
 player = NodePath("..")

@@ -38,12 +38,15 @@ static var next_id := 1
 @export var selected: bool:
 	set(new_selected):
 		selected = new_selected
+		moving = true
 		_update_selection_tile()
 		if selected:
 			was_selected.emit(self)
 		else:
 			_clear_path_preview()
 			was_deselected.emit(self)
+
+@export var moving: bool
 
 func _ready():
 	# TODO there's got to be a better way of sharing these?
@@ -61,7 +64,7 @@ func _ready():
 	_move_sprite_to_tile_position()
 
 func _unhandled_input(event):
-	if not selected:
+	if not selected or not moving:
 		return
 
 	if event is InputEventMouseMotion:

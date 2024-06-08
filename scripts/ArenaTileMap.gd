@@ -39,8 +39,12 @@ func _astar_id_to_cell(id: int) -> Vector2i:
 
 ## Gets the shortest path of cells from start to end, or an empty array if there is no such path.
 func get_cell_path(start: Vector2i, end: Vector2i) -> Array[Vector2i]:
-	var id_path := Array(astar.get_id_path(_cell_to_astar_id(start), _cell_to_astar_id(end)))
 	var cells: Array[Vector2i] = []
+	var start_id := _cell_to_astar_id(start)
+	var end_id := _cell_to_astar_id(end)
+	if not astar.has_point(start_id) or not astar.has_point(end_id):
+		return cells
+	var id_path := Array(astar.get_id_path(start_id, end_id))
 	for id in id_path:
 		cells.append(_astar_id_to_cell(id))
 	return cells.slice(1)
@@ -72,19 +76,20 @@ func get_aligned_cells(center_cell: Vector2i) -> Array[Vector2i]:
 	return aligned_cells
 
 ## Returns the cells `range` away in the six directions from `center_cell`.
-## Cells that are, or are blocked by, non-pathable tiles are not returned.
-func get_aligned_cells_at_range(center_cell: Vector2i, range: int) -> Array[Vector2i]:
-	var aligned_cells: Array[Vector2i] = []
+## Keys are directions (as `TileSet.CellNeighbor`), values are cell positions.
+## Cells for directions that are, or are blocked by, non-pathable tiles are not returned.
+func get_aligned_cells_at_range(center_cell: Vector2i, distance: int) -> Dictionary:
+	var aligned_cells: Dictionary = {} # Dictionary[TileSet.CellNeighbor, Vector2i]
 	for hex_cell_neighbor in hex_cell_neighbors:
 		var current_cell := center_cell
 		var obstructed := false
-		for n in range:
+		for n in distance:
 			current_cell = get_neighbor_cell(current_cell, hex_cell_neighbor)
 			if get_cell_source_id(GROUND_LAYER, current_cell) == -1:
 				obstructed = true
 				break
 		if not obstructed:
-			aligned_cells.append(current_cell)
+			aligned_cells[hex_cell_neighbor] = current_cell
 	return aligned_cells
 
 ## Remove all existing pathfinding obstacles and create up-to-date ones.

@@ -25,3 +25,19 @@ static func other_team(team: Team) -> Team:
 	if team == Team.ONE:
 		return Team.TWO
 	return Team.ONE
+
+static func adjacent_directions(direction: TileSet.CellNeighbor) -> Array[TileSet.CellNeighbor]:
+	match direction:
+		TileSet.CELL_NEIGHBOR_TOP_SIDE:
+			return [TileSet.CELL_NEIGHBOR_TOP_LEFT_SIDE, TileSet.CELL_NEIGHBOR_TOP_RIGHT_SIDE]
+		TileSet.CELL_NEIGHBOR_TOP_RIGHT_SIDE:
+			return [TileSet.CELL_NEIGHBOR_TOP_SIDE, TileSet.CELL_NEIGHBOR_BOTTOM_RIGHT_SIDE]
+		TileSet.CELL_NEIGHBOR_BOTTOM_RIGHT_SIDE:
+			return [TileSet.CELL_NEIGHBOR_TOP_RIGHT_SIDE, TileSet.CELL_NEIGHBOR_BOTTOM_SIDE]
+		TileSet.CELL_NEIGHBOR_BOTTOM_SIDE:
+			return [TileSet.CELL_NEIGHBOR_BOTTOM_RIGHT_SIDE, TileSet.CELL_NEIGHBOR_BOTTOM_LEFT_SIDE]
+		TileSet.CELL_NEIGHBOR_BOTTOM_LEFT_SIDE:
+			return [TileSet.CELL_NEIGHBOR_BOTTOM_SIDE, TileSet.CELL_NEIGHBOR_TOP_LEFT_SIDE]
+		TileSet.CELL_NEIGHBOR_TOP_LEFT_SIDE:
+			return [TileSet.CELL_NEIGHBOR_BOTTOM_LEFT_SIDE, TileSet.CELL_NEIGHBOR_TOP_SIDE]
+	return [] # this should never happen
