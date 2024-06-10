@@ -126,3 +126,6 @@ func _update_selection_tile():
 	selection_tile.team = turn_state.active_team
 	if selected:
 		selection_tile.position = arena_tilemap.map_to_local(tile_position)
+
+func is_powered_by_team_beacon() -> bool:
+	return is_beacon or arena_tilemap.are_cells_aligned(tile_position, players.beacon_for_team(team).tile_position)

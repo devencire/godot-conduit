@@ -97,6 +97,9 @@ func get_aligned_cells_at_range(center_cell: Vector2i, distance: int) -> Diction
 			aligned_cells[hex_cell_neighbor] = current_cell
 	return aligned_cells
 
+func are_cells_aligned(first: Vector2i, second: Vector2i) -> bool:
+	return first.x == second.x or first.y == second.y or first.x - first.y == second.x - second.y
+
 ## Remove all existing pathfinding obstacles and create up-to-date ones.
 ## TODO do this incrementally instead?
 func update_obstacles(players: Array[Player]):

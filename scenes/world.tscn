@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://d1t087k7mdxvb"]
+[gd_scene load_steps=16 format=3 uid="uid://d1t087k7mdxvb"]
 
 [ext_resource type="Script" path="res://world.gd" id="1_4avd2"]
 [ext_resource type="Texture2D" uid="uid://bu0j2ljbdu4jy" path="res://assets/hexes_2px_outline.png" id="1_7kdkn"]
@@ -10,6 +10,7 @@
 [ext_resource type="PackedScene" uid="uid://c04vm1q3ssoxd" path="res://scenes/turn_state_ui.tscn" id="7_p4op4"]
 [ext_resource type="PackedScene" uid="uid://dxxmf1dm70jy3" path="res://scenes/powered_tiles.tscn" id="8_h1dur"]
 [ext_resource type="Script" path="res://scripts/EventLog.gd" id="10_7koks"]
+[ext_resource type="Script" path="res://scripts/EndTurnButton.gd" id="11_pmq2q"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_s34qc"]
 texture = ExtResource("1_7kdkn")
@@ -84,10 +85,10 @@ position = Vector2(-961, -800)
 [node name="EventLog" type="RichTextLabel" parent="."]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(750, 240)
-offset_left = 228.0
-offset_top = -907.0
-offset_right = 978.0
-offset_bottom = -667.0
+offset_left = 218.0
+offset_top = -906.0
+offset_right = 968.0
+offset_bottom = -666.0
 focus_mode = 2
 theme = SubResource("Theme_f63g6")
 bbcode_enabled = true
@@ -96,7 +97,17 @@ scroll_following = true
 selection_enabled = true
 script = ExtResource("10_7koks")
 
+[node name="EndTurnButton" type="Button" parent="."]
+offset_left = -242.0
+offset_top = -857.0
+offset_right = -167.0
+offset_bottom = -826.0
+scale = Vector2(2, 2)
+text = "End turn"
+script = ExtResource("11_pmq2q")
+
 [connection signal="changed" from="TurnState" to="Camera/TurnStateUI" method="_on_turn_state_changed"]
 [connection signal="changed" from="ArenaTileMap/Players" to="ArenaTileMap" method="_on_players_changed"]
 [connection signal="changed" from="ArenaTileMap/Players" to="ArenaTileMap/PoweredTiles" method="_on_players_changed"]
 [connection signal="child_order_changed" from="ArenaTileMap/Players" to="ArenaTileMap/Players" method="_on_child_order_changed"]
+[connection signal="pressed" from="EndTurnButton" to="EndTurnButton" method="_on_pressed"]

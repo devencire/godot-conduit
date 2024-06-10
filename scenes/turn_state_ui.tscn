@@ -73,6 +73,6 @@ offset_left = 7.0
 offset_top = 105.0
 offset_right = 478.0
 offset_bottom = 150.0
-text = "Maximum remaining power: {}"
+text = "Maximum possible remaining power: {}"
 label_settings = SubResource("LabelSettings_17700")
 metadata/_edit_use_anchors_ = true

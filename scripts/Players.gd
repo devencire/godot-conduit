@@ -34,3 +34,9 @@ func player_in_cell(cell: Vector2i, team: Constants.Team = Constants.Team.NONE) 
 		if player.tile_position == cell:
 			return player
 	return null
+
+func beacon_for_team(team: Constants.Team) -> Player:
+	for player in all_players:
+		if player.team == team and player.is_beacon:
+			return player
+	return null # this shouldn't happen

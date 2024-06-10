@@ -14,7 +14,6 @@ func _on_players_changed(players: Array[Player]):
 	draw_powered_tiles(players)
 
 func draw_powered_tiles(players: Array[Player]):
-	print('draw_powered_tiles ', players)
 	var powered_cell_teams := {}  # Dictionary[Vector2i, Constants.Team]
 	for player in players:
 		if player.is_beacon:
