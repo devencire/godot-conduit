@@ -33,7 +33,7 @@ func _unhandled_input(event):
 		return
 	
 	if event is InputEventMouseButton:
-		if not event.pressed:
+		if not event.pressed or not event.button_index == MOUSE_BUTTON_LEFT:
 			return
 		var clicked_cell := player.arena_tilemap.get_hovered_cell(event)
 		if not selected_target:
@@ -54,6 +54,7 @@ func _unhandled_input(event):
 			for push_target in valid_push_targets:
 				if push_target.cell == clicked_cell:
 					try_push(push_target)
+					get_viewport().set_input_as_handled()
 			
 		
 func _draw_target_selection_preview():
@@ -124,19 +125,67 @@ func get_valid_push_targets() -> Array[ValidTarget]:
 		valid_targets.append(target)
 	return valid_targets
 
+class PushAction:
+	var player: Player
+	var direction: TileSet.CellNeighbor
+	var force: int # this is just a number of tiles for now
+
 func try_push(push_target: ValidTarget):
 	if not player.turn_state.try_spend_power(2):
 		player.event_log.log('[b][color=%s]%s[/color] tried to push [color=%s]%s[/color] but ran out of power![/b]' % [Constants.team_color(player.team), player.debug_name, Constants.team_color(push_target.player.team), push_target.player.debug_name])
 		player.selected = false
 		return
-	if not player.arena_tilemap.is_cell_pathable(push_target.cell):
-		# obviously this will want to be something else eventually
-		push_target.player.tile_position = Constants.OFF_ARENA
-		push_target.player.queue_free()
-		
-		player.event_log.log('[color=%s]%s[/color] pushed [color=%s]%s[/color] off the arena' % [Constants.team_color(player.team), player.debug_name, Constants.team_color(push_target.player.team), push_target.player.debug_name])
-		_clear_selected_target()
-		return
-	push_target.player.tile_position = push_target.cell
-	player.event_log.log('[color=%s]%s[/color] pushed [color=%s]%s[/color] into %s' % [Constants.team_color(player.team), player.debug_name, Constants.team_color(push_target.player.team), push_target.player.debug_name, push_target.cell])
+	var push_action := PushAction.new()
+	push_action.player = push_target.player
+	push_action.direction = push_target.direction
+	push_action.force = 1
+	var push_outcomes := resolve_push(push_action)
+	for outcome in push_outcomes:
+		match outcome.type:
+			PushOutcomeType.MOVED_TO:
+				player.event_log.log('[color=%s]%s[/color] pushed [color=%s]%s[/color] into %s' % [Constants.team_color(player.team), player.debug_name, Constants.team_color(outcome.player.team), outcome.player.debug_name, outcome.player.tile_position])
+			PushOutcomeType.OUT_OF_ARENA:
+				player.event_log.log('[color=%s]%s[/color] pushed [color=%s]%s[/color] off the arena!' % [Constants.team_color(player.team), player.debug_name, Constants.team_color(outcome.player.team), outcome.player.debug_name])
 	_clear_selected_target()
+
+enum PushOutcomeType { MOVED_TO, OUT_OF_ARENA }
+
+class PushOutcome:
+	var player: Player
+	var type: PushOutcomeType
+
+# TODO move this out of this specific weapon, it's a generic mechanic
+func resolve_push(push_action: PushAction) -> Array[PushOutcome]:
+	var new_push_results: Array[PushOutcome] = []
+	while push_action.force > 0:
+		var next_cell := player.arena_tilemap.get_neighbor_cell(push_action.player.tile_position, push_action.direction)
+		if not player.arena_tilemap.is_cell_pathable(next_cell):
+			# obviously this will want to be something else eventually
+			push_action.player.tile_position = Constants.OFF_ARENA
+			push_action.player.queue_free()
+			var push_outcome := PushOutcome.new()
+			push_outcome.player = push_action.player
+			push_outcome.type = PushOutcomeType.OUT_OF_ARENA
+			return [push_outcome]
+		var player_in_next_cell := player.players.player_in_cell(next_cell)
+		if player_in_next_cell:
+			# finish pushing `push_action.player`, so they end in the cell about to be vacated
+			push_action.player.tile_position = next_cell
+			# now also push the player already in that cell, transferring all remaining force to them
+			var new_push_action := PushAction.new()
+			new_push_action.player = player_in_next_cell
+			new_push_action.direction = push_action.direction
+			new_push_action.force = push_action.force
+			new_push_results = resolve_push(new_push_action)
+			break
+		# push `push_action.player` one tile
+		push_action.player.tile_position = next_cell
+		# we've used up some force, we'll loop to push further if force remains
+		push_action.force -= 1
+	var push_outcome := PushOutcome.new()
+	push_outcome.player = push_action.player
+	push_outcome.type = PushOutcomeType.MOVED_TO
+	# if this player was pushed into another player,
+	# prepend this result so it gets listed first
+	new_push_results.push_front(push_outcome)
+	return new_push_results

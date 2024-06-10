@@ -80,10 +80,9 @@ func _unhandled_input(event):
 			_clear_path_preview()
 	
 	if event is InputEventMouseButton:
-		if not event.pressed:
-			return
-		var clicked_cell := arena_tilemap.get_hovered_cell(event)
-		_try_move_selected_player(clicked_cell)
+		if event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+			var clicked_cell := arena_tilemap.get_hovered_cell(event)
+			_try_move_selected_player(clicked_cell)
 
 func _update_path_preview(cell_path: Array[Vector2i]):
 	# TODO retain and re-use the preview tiles for performance?
