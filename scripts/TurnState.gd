@@ -3,6 +3,7 @@ class_name TurnState
 extends Node
 
 signal changed(state: TurnState)
+signal new_turn_started(state: TurnState)
 
 @export var active_team: Constants.Team
 
@@ -28,6 +29,7 @@ func start_turn(team: Constants.Team) -> void:
 	power_used = 0
 	
 	changed.emit(self)
+	new_turn_started.emit(self)
 
 ## Spends the `amount` of power and returns `true`,
 ## or if there's not enough power, starts the opposing team's turn and returns `false`.

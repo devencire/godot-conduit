@@ -3,17 +3,25 @@ class_name PoweredTiles
 extends Node
 
 var arena_tilemap: ArenaTileMap
+@onready var players: Players = %Players
+@onready var turn_state: TurnState = %TurnState
 
 var powered_tile_scene := preload("res://scenes/powered_tile.tscn")
 var powered_tile_container: Node
 
+var pulse_tween: Tween
+
 func _ready():
 	arena_tilemap = find_parent('ArenaTileMap') as ArenaTileMap
 
-func _on_players_changed(players: Array[Player]):
-	draw_powered_tiles(players)
+func _on_players_changed(_players: Array[Player]):
+	draw_powered_tiles()
 
-func draw_powered_tiles(players: Array[Player]):
+func _on_turn_state_new_turn_started(state):
+	draw_powered_tiles() # bleh probably shouldn't use % for this
+
+func draw_powered_tiles():
+	var players := players.all_players
 	var powered_cell_teams := {}  # Dictionary[Vector2i, Constants.Team]
 	for player in players:
 		if player.is_beacon:
@@ -29,9 +37,27 @@ func draw_powered_tiles(players: Array[Player]):
 		powered_tile_container.queue_free()
 		
 	powered_tile_container = Node.new()
+	var active_team_container := Node2D.new()
+	var other_team_container := Node2D.new()
 	for cell in powered_cell_teams:
 		var powered_tile: PoweredTile = powered_tile_scene.instantiate()
 		powered_tile.position = arena_tilemap.map_to_local(cell)
 		powered_tile.team = powered_cell_teams[cell]
-		powered_tile_container.add_child(powered_tile)
+		if powered_tile.team == turn_state.active_team or powered_tile.team == Constants.Team.NONE:
+			active_team_container.add_child(powered_tile)
+		else:
+			other_team_container.add_child(powered_tile)
+	powered_tile_container.add_child(active_team_container)
+	powered_tile_container.add_child(other_team_container)
 	add_child(powered_tile_container)
+	
+	if pulse_tween:
+		pulse_tween.kill() # I hope this means it gets freed
+	
+	pulse_tween = create_tween()
+	pulse_tween.tween_property(active_team_container, 'modulate', Color.hex(0xffffffa0), 1).set_trans(Tween.TRANS_BOUNCE)
+	pulse_tween.tween_property(active_team_container, 'modulate', Color.hex(0xffffffff), 1).set_trans(Tween.TRANS_BOUNCE)
+	pulse_tween.tween_callback(func(): print('bounce complete'))
+	pulse_tween.set_loops()
+	
+	other_team_container.modulate = Color.hex(0xffffff80)

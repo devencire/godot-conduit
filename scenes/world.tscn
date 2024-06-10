@@ -107,6 +107,7 @@ text = "End turn"
 script = ExtResource("11_pmq2q")
 
 [connection signal="changed" from="TurnState" to="Camera/TurnStateUI" method="_on_turn_state_changed"]
+[connection signal="new_turn_started" from="TurnState" to="ArenaTileMap/PoweredTiles" method="_on_turn_state_new_turn_started"]
 [connection signal="changed" from="ArenaTileMap/Players" to="ArenaTileMap" method="_on_players_changed"]
 [connection signal="changed" from="ArenaTileMap/Players" to="ArenaTileMap/PoweredTiles" method="_on_players_changed"]
 [connection signal="child_order_changed" from="ArenaTileMap/Players" to="ArenaTileMap/Players" method="_on_child_order_changed"]
