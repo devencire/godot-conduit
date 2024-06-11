@@ -84,13 +84,20 @@ func _unhandled_input(event):
 			var clicked_cell := arena_tilemap.get_hovered_cell(event)
 			_try_move_selected_player(clicked_cell)
 
+# TODO replace this once move costs are worked out
+const MOVE_COST := 1
+
 func _update_path_preview(cell_path: Array[Vector2i]):
 	# TODO retain and re-use the preview tiles for performance?
 	_clear_path_preview()
 	path_preview = Node.new()
+	var total_power_cost := 0
 	for cell in cell_path:
-		var preview_tile = path_preview_tile_scene.instantiate()
+		total_power_cost += MOVE_COST
+		var preview_tile: PathPreviewTile = path_preview_tile_scene.instantiate()
 		preview_tile.position = arena_tilemap.map_to_local(cell)
+		preview_tile.power_cost = total_power_cost
+		preview_tile.success_chance = turn_state.chance_that_power_available(total_power_cost)
 		path_preview.add_child(preview_tile)
 	add_child(path_preview)
 

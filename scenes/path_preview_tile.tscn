@@ -1,6 +1,7 @@
-[gd_scene load_steps=3 format=3 uid="uid://haetij8q55v2"]
+[gd_scene load_steps=5 format=3 uid="uid://haetij8q55v2"]
 
 [ext_resource type="Texture2D" uid="uid://cam3m1mp28bqu" path="res://assets/white_hex_outline.png" id="1_tcj7e"]
+[ext_resource type="Script" path="res://scripts/PathPreviewTile.gd" id="1_v1bwt"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_jitg5"]
 animations = [{
@@ -13,7 +14,30 @@ animations = [{
 "speed": 5.0
 }]
 
+[sub_resource type="LabelSettings" id="LabelSettings_hq0gl"]
+font_size = 24
+
 [node name="PathPreviewTile" type="Node2D"]
+script = ExtResource("1_v1bwt")
 
 [node name="Sprite" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_jitg5")
+
+[node name="EnergyCostLabel" type="Label" parent="."]
+offset_left = -19.0
+offset_top = -40.0
+offset_right = 21.0
+offset_bottom = -6.0
+text = "1⚡"
+label_settings = SubResource("LabelSettings_hq0gl")
+horizontal_alignment = 1
+
+[node name="SuccessChanceLabel" type="Label" parent="."]
+modulate = Color(0, 1, 0, 1)
+offset_left = -30.0
+offset_top = 10.0
+offset_right = 33.0
+offset_bottom = 44.0
+text = "100%"
+label_settings = SubResource("LabelSettings_hq0gl")
+horizontal_alignment = 1

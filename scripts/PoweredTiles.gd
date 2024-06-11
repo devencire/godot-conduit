@@ -14,10 +14,10 @@ var pulse_tween: Tween
 func _ready():
 	arena_tilemap = find_parent('ArenaTileMap') as ArenaTileMap
 
-func _on_players_changed(_players: Array[Player]):
+func _on_players_changed(_players):
 	draw_powered_tiles()
 
-func _on_turn_state_new_turn_started(state):
+func _on_turn_state_new_turn_started(_state):
 	draw_powered_tiles() # bleh probably shouldn't use % for this
 
 func draw_powered_tiles():
@@ -57,7 +57,6 @@ func draw_powered_tiles():
 	pulse_tween = create_tween()
 	pulse_tween.tween_property(active_team_container, 'modulate', Color.hex(0xffffffa0), 1).set_trans(Tween.TRANS_BOUNCE)
 	pulse_tween.tween_property(active_team_container, 'modulate', Color.hex(0xffffffff), 1).set_trans(Tween.TRANS_BOUNCE)
-	pulse_tween.tween_callback(func(): print('bounce complete'))
 	pulse_tween.set_loops()
 	
 	other_team_container.modulate = Color.hex(0xffffff80)

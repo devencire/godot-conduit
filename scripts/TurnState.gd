@@ -42,6 +42,17 @@ func try_spend_power(amount: int) -> bool:
 		changed.emit(self)
 		return true
 
+# Returns the probability of the turn containing enough power for an action costing `power_cost`, between 0 and 1.
+func chance_that_power_available(power_cost: int) -> float:
+	var known_remaining_power := base_turn_power + copied_excess_power - power_used # will be negative if some unknown power has been used
+	var unknown_power_use := power_cost - known_remaining_power
+	if unknown_power_use <= 0:
+		return 1.0
+	var max_remaining_power := known_remaining_power + Constants.MAX_EXCESS_POWER
+	if max_remaining_power < power_cost:
+		return 0.0
+	return 1.0 - (float(power_cost - maxi(0, known_remaining_power)) / mini(Constants.MAX_EXCESS_POWER, max_remaining_power))
+
 ## Ends the current turn and starts the opposing team's turn.
 func end_turn() -> void:
 	start_turn(Constants.other_team(active_team))
