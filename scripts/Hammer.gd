@@ -128,6 +128,10 @@ func _draw_hit_direction_selection_preview():
 	attack_dialog.power_cost = base_attack_cost
 	attack_dialog.success_chance = base_attack_chance
 	attack_dialog.overcharge_activated = selected_target.overcharged
+	if selected_target.overcharged:
+		attack_dialog.max_power_cost = attack_dialog.power_cost
+		while attack_dialog.max_power_cost + OVERCHARGED_EXTRA_TILE_COST <= player.turn_state.max_remaining_power:
+			attack_dialog.max_power_cost += OVERCHARGED_EXTRA_TILE_COST
 	attack_dialog.set_overcharge.connect(_set_overcharge)
 	target_preview.add_child(attack_dialog)
 	add_child(target_preview)

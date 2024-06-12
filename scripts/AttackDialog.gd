@@ -5,6 +5,7 @@ extends PanelContainer
 signal set_overcharge(toggled_on: bool)
 
 @export var power_cost: int = 1
+@export var max_power_cost: int = -1 # not used unless set to other than -1
 @export var success_chance: float = 1.0 # between 0 and 1
 @export var overcharge_activated: bool:
 	set(on):
@@ -13,7 +14,10 @@ signal set_overcharge(toggled_on: bool)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	%PowerCostLabel.text = str(power_cost) + '⚡'
+	if max_power_cost == -1:
+		%PowerCostLabel.text = str(power_cost) + '⚡'
+	else:
+		%PowerCostLabel.text = str(power_cost) + '-' + str(max_power_cost) + '⚡'
 	%SuccessChanceLabel.text = str(roundi(success_chance * 100)) + '% chance'
 	%SuccessChanceLabel.modulate = Constants.success_chance_color(success_chance)
 

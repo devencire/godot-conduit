@@ -12,6 +12,10 @@ signal new_turn_started(state: TurnState)
 @export var copied_excess_power: int
 @export var base_turn_power: int
 
+@export var max_remaining_power: int:
+	get:
+		return copied_excess_power + base_turn_power + Constants.MAX_EXCESS_POWER - power_used
+
 ## Starts a new turn for the given `team`.
 func start_turn(team: Constants.Team) -> void:
 	active_team = team
