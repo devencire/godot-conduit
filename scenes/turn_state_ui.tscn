@@ -37,7 +37,7 @@ offset_left = 6.0
 offset_top = 173.0
 offset_right = 370.0
 offset_bottom = 218.0
-text = "Copied excess power: {}"
+text = "Copied excess power: {}⚡"
 label_settings = SubResource("LabelSettings_rs8d1")
 metadata/_edit_use_anchors_ = true
 
@@ -46,7 +46,7 @@ offset_left = 6.0
 offset_top = 204.0
 offset_right = 370.0
 offset_bottom = 249.0
-text = "Base turn power: {}"
+text = "Base turn power: {}⚡"
 label_settings = SubResource("LabelSettings_ajpyq")
 metadata/_edit_use_anchors_ = true
 
@@ -55,7 +55,7 @@ offset_left = 5.0
 offset_top = 236.0
 offset_right = 369.0
 offset_bottom = 281.0
-text = "Maximum random power: {}"
+text = "Maximum random power: {}⚡"
 label_settings = SubResource("LabelSettings_ajpyq")
 metadata/_edit_use_anchors_ = true
 
@@ -64,7 +64,7 @@ offset_left = 8.0
 offset_top = 56.0
 offset_right = 427.0
 offset_bottom = 101.0
-text = "Known remaining power: {}"
+text = "Known remaining power: {}⚡"
 label_settings = SubResource("LabelSettings_17700")
 metadata/_edit_use_anchors_ = true
 
@@ -73,7 +73,7 @@ offset_left = 7.0
 offset_top = 105.0
 offset_right = 478.0
 offset_bottom = 150.0
-text = "Maximum possible remaining power: {}"
+text = "Maximum possible remaining power: {}⚡"
 label_settings = SubResource("LabelSettings_17700")
 metadata/_edit_use_anchors_ = true
 

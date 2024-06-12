@@ -110,6 +110,8 @@ func _move_sprite_to_tile_position():
 	if arena_tilemap and sprite:
 		sprite.position = arena_tilemap.map_to_local(tile_position)
 
+const BASE_MOVE_COST := 1
+
 ## Try to move the selected player to `destination_cell`.
 ## May move the player less tiles, or zero tiles, if power runs out during the move.
 ## Ends the turn if power runs out.
@@ -118,16 +120,22 @@ func _try_move_selected_player(destination_cell: Vector2i):
 	if cell_path.size() == 0:
 		return # there is no valid path
 	var walked_path: Array[Vector2i] = []
+	var power_spent := 0
 	while cell_path.size() > 0:
-		if not turn_state.try_spend_power(1):
-			event_log.log('[b][color=%s]%s[/color] tried to move to %s but ran out of power![/b]' % [Constants.team_color(team).to_html(), debug_name, cell_path[0]])
+		if not turn_state.try_spend_power(BASE_MOVE_COST):
+			if walked_path.size() == 0:
+				event_log.log('[b]%s tried to move but ran out of power![/b]' % Constants.bbcode_player_name(self))
+			else:
+				event_log.log('[b]%s ran out of power after spending %s⚡ to move %s spaces![/b]' % [Constants.bbcode_player_name(self), power_spent, walked_path.size()])
 			selected = false
 			break
+		power_spent += BASE_MOVE_COST
 		walked_path.push_back(cell_path[0])
-		event_log.log('[color=%s]%s[/color] moved to %s' % [Constants.team_color(team).to_html(), debug_name, cell_path[0]])
 		cell_path = cell_path.slice(1)
-	walk_path(walked_path)
+	if walked_path.size() > 0:
+		walk_path(walked_path)
 	if selected:
+		event_log.log('%s spent %s⚡ to move %s spaces' % [Constants.bbcode_player_name(self), power_spent, walked_path.size()])
 		_update_selection_tile()
 		_clear_path_preview()
 

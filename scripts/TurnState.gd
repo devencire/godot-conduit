@@ -12,6 +12,10 @@ signal new_turn_started(state: TurnState)
 @export var copied_excess_power: int
 @export var base_turn_power: int
 
+@export var known_remaining_power: int:
+	get:
+		return copied_excess_power + base_turn_power - power_used
+
 @export var max_remaining_power: int:
 	get:
 		return copied_excess_power + base_turn_power + Constants.MAX_EXCESS_POWER - power_used
@@ -31,6 +35,8 @@ func start_turn(team: Constants.Team) -> void:
 	
 	total_available_power = copied_excess_power + base_turn_power + secret_available_excess_power
 	power_used = 0
+	
+	%EventLog.log.call_deferred('[b]%s starts their turn with %s-%s⚡ available[/b]' % [Constants.bbcode_team_name(team), known_remaining_power, max_remaining_power])
 	
 	changed.emit(self)
 	new_turn_started.emit(self)

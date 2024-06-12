@@ -48,3 +48,9 @@ static func success_chance_color(success_chance: float) -> Color:
 	var green := maxf(0, 1 + (success_chance - 0.5) * 2)
 	var red := maxf(0, 1 - (success_chance - 0.5) * 2)
 	return Color(red, green, 0)
+
+static func bbcode_team_name(team: Team) -> String:
+	return '[color=%s]Team %s[/color]' % [team_color(team).to_html(), team_name(team)]
+
+static func bbcode_player_name(player: Player) -> String:
+	return '[color=%s]%s[/color]' % [team_color(player.team).to_html(), player.debug_name]

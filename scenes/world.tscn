@@ -46,6 +46,13 @@ script = ExtResource("1_4avd2")
 [node name="TurnState" type="Node" parent="."]
 unique_name_in_owner = true
 script = ExtResource("2_7l4uc")
+active_team = null
+power_used = null
+total_available_power = null
+copied_excess_power = null
+base_turn_power = null
+known_remaining_power = null
+max_remaining_power = null
 
 [node name="ArenaTileMap" type="TileMap" parent="."]
 unique_name_in_owner = true

@@ -187,7 +187,7 @@ class PushAction:
 func try_push(push_target: ValidTarget, overcharged: bool):
 	var attack_cost := ATTACK_COST
 	if not player.turn_state.try_spend_power(attack_cost):
-		player.event_log.log('[b][color=%s]%s[/color] tried to push [color=%s]%s[/color] but didn\'t have %s⚡![/b]' % [Constants.team_color(player.team).to_html(), player.debug_name, Constants.team_color(push_target.player.team).to_html(), push_target.player.debug_name, attack_cost])
+		player.event_log.log('[b]%s tried to push %s back but didn\'t have %s⚡![/b]' % [Constants.bbcode_player_name(player), Constants.bbcode_player_name(push_target.player), attack_cost])
 		player.selected = false
 		return
 	var push_action := PushAction.new()
@@ -200,15 +200,15 @@ func try_push(push_target: ValidTarget, overcharged: bool):
 			attack_cost += OVERCHARGED_EXTRA_TILE_COST
 	var push_outcomes := resolve_push(push_action)
 	if overcharged:
-		player.event_log.log('[b][color=%s]%s[/color] spent %s⚡ on an overcharged push![/b]' % [Constants.team_color(player.team).to_html(), player.debug_name, attack_cost])
+		player.event_log.log('[b]%s spent %s⚡ on an overcharged push![/b]' % [Constants.bbcode_player_name(player), attack_cost])
 	else:
-		player.event_log.log('[color=%s]%s[/color] spent %s⚡ on a push' % [Constants.team_color(player.team).to_html(), player.debug_name, attack_cost])
+		player.event_log.log('%s spent %s⚡ on a push' % [Constants.bbcode_player_name(player), attack_cost])
 	for outcome in push_outcomes:
 		match outcome.type:
 			PushOutcomeType.MOVED_TO:
-				player.event_log.log('[color=%s]%s[/color] pushed [color=%s]%s[/color] into %s' % [Constants.team_color(player.team).to_html(), player.debug_name, Constants.team_color(outcome.player.team).to_html(), outcome.player.debug_name, outcome.player.tile_position])
+				player.event_log.log('%s pushed %s back %s spaces' % [Constants.bbcode_player_name(player), Constants.bbcode_player_name(outcome.player), outcome.distance])
 			PushOutcomeType.OUT_OF_ARENA:
-				player.event_log.log('[color=%s]%s[/color] pushed [color=%s]%s[/color] off the arena!' % [Constants.team_color(player.team).to_html(), player.debug_name, Constants.team_color(outcome.player.team).to_html(), outcome.player.debug_name])
+				player.event_log.log('%s pushed %s back %s spaces, off the arena!' % [Constants.bbcode_player_name(player), Constants.bbcode_player_name(outcome.player), outcome.distance])
 	if overcharged:
 		player.selected = false
 		return
@@ -219,12 +219,15 @@ enum PushOutcomeType { MOVED_TO, OUT_OF_ARENA }
 class PushOutcome:
 	var player: Player
 	var type: PushOutcomeType
+	var distance: int
 
 # TODO move this out of this specific weapon, it's a generic mechanic
 func resolve_push(push_action: PushAction) -> Array[PushOutcome]:
 	var new_push_results: Array[PushOutcome] = []
 	var current_cell := push_action.player.tile_position
+	var distance := 0
 	while push_action.force > 0:
+		distance += 1
 		current_cell = player.arena_tilemap.get_neighbor_cell(current_cell, push_action.direction)
 		if not player.arena_tilemap.is_cell_pathable(current_cell):
 			# obviously this will want to be something else eventually
@@ -234,6 +237,7 @@ func resolve_push(push_action: PushAction) -> Array[PushOutcome]:
 			var push_outcome := PushOutcome.new()
 			push_outcome.player = push_action.player
 			push_outcome.type = PushOutcomeType.OUT_OF_ARENA
+			push_outcome.distance = distance
 			return [push_outcome]
 		var player_in_next_cell := player.players.player_in_cell(current_cell)
 		if player_in_next_cell:
@@ -253,6 +257,7 @@ func resolve_push(push_action: PushAction) -> Array[PushOutcome]:
 	var push_outcome := PushOutcome.new()
 	push_outcome.player = push_action.player
 	push_outcome.type = PushOutcomeType.MOVED_TO
+	push_outcome.distance = distance
 	# if this player was pushed into another player,
 	# prepend this result so it gets listed first
 	new_push_results.push_front(push_outcome)
