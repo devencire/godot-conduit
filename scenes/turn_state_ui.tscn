@@ -78,6 +78,7 @@ label_settings = SubResource("LabelSettings_17700")
 metadata/_edit_use_anchors_ = true
 
 [node name="ActualRemainingPower" type="Label" parent="."]
+visible = false
 modulate = Color(0.498039, 0.501961, 0.498039, 1)
 anchors_preset = -1
 anchor_left = -0.0247253

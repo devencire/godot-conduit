@@ -219,20 +219,20 @@ class PushOutcome:
 # TODO move this out of this specific weapon, it's a generic mechanic
 func resolve_push(push_action: PushAction) -> Array[PushOutcome]:
 	var new_push_results: Array[PushOutcome] = []
+	var current_cell := push_action.player.tile_position
 	while push_action.force > 0:
-		var next_cell := player.arena_tilemap.get_neighbor_cell(push_action.player.tile_position, push_action.direction)
-		if not player.arena_tilemap.is_cell_pathable(next_cell):
+		current_cell = player.arena_tilemap.get_neighbor_cell(current_cell, push_action.direction)
+		if not player.arena_tilemap.is_cell_pathable(current_cell):
 			# obviously this will want to be something else eventually
-			push_action.player.tile_position = Constants.OFF_ARENA
-			push_action.player.queue_free()
+			#push_action.player.tile_position = Constants.OFF_ARENA
+			#push_action.player.queue_free()
+			push_action.player.push_to(current_cell)
 			var push_outcome := PushOutcome.new()
 			push_outcome.player = push_action.player
 			push_outcome.type = PushOutcomeType.OUT_OF_ARENA
 			return [push_outcome]
-		var player_in_next_cell := player.players.player_in_cell(next_cell)
+		var player_in_next_cell := player.players.player_in_cell(current_cell)
 		if player_in_next_cell:
-			# finish pushing `push_action.player`, so they end in the cell about to be vacated
-			push_action.player.tile_position = next_cell
 			# now also push the player already in that cell, transferring all remaining force to them
 			var new_push_action := PushAction.new()
 			new_push_action.player = player_in_next_cell
@@ -241,10 +241,11 @@ func resolve_push(push_action: PushAction) -> Array[PushOutcome]:
 			new_push_action.force = maxi(push_action.force - 1, 1)
 			new_push_results = resolve_push(new_push_action)
 			break
-		# push `push_action.player` one tile
-		push_action.player.tile_position = next_cell
 		# we've used up some force, we'll loop to push further if force remains
 		push_action.force -= 1
+	
+	push_action.player.push_to(current_cell)
+	
 	var push_outcome := PushOutcome.new()
 	push_outcome.player = push_action.player
 	push_outcome.type = PushOutcomeType.MOVED_TO

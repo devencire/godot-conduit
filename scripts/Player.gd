@@ -25,7 +25,7 @@ var path_preview: Node
 @export var tile_position: Vector2i:
 	set(new_tile_position):
 		tile_position = new_tile_position
-		_move_sprite_to_tile_position()
+		#_move_sprite_to_tile_position()
 		was_moved.emit(self)
 
 # Whether the Player is the Beacon, powering all aligned tiles.
@@ -117,14 +117,16 @@ func _try_move_selected_player(destination_cell: Vector2i):
 	var cell_path := arena_tilemap.get_cell_path(tile_position, destination_cell)
 	if cell_path.size() == 0:
 		return # there is no valid path
+	var walked_path: Array[Vector2i] = []
 	while cell_path.size() > 0:
 		if not turn_state.try_spend_power(1):
 			event_log.log('[b][color=%s]%s[/color] tried to move to %s but ran out of power![/b]' % [Constants.team_color(team).to_html(), debug_name, cell_path[0]])
 			selected = false
 			return # couldn't afford it, turn has ended
-		tile_position = cell_path[0]
+		walked_path.push_back(cell_path[0])
 		event_log.log('[color=%s]%s[/color] moved to %s' % [Constants.team_color(team).to_html(), debug_name, cell_path[0]])
 		cell_path = cell_path.slice(1)
+	walk_path(walked_path)
 	_update_selection_tile()
 	_clear_path_preview()
 
@@ -141,3 +143,35 @@ func is_powered_by_team_beacon() -> bool:
 	if not beacon_player:
 		return false
 	return arena_tilemap.are_cells_aligned(tile_position, beacon_player.tile_position)
+
+var tween: Tween
+
+const WALK_DURATION_PER_TILE := 0.2
+
+func walk_path(cell_path: Array[Vector2i]) -> void:
+	# TEMP: reset the position so we're always animating from the last true location
+	_move_sprite_to_tile_position()
+	if tween:
+		tween.kill()
+	tween = create_tween()
+	for cell in cell_path:
+		var position := arena_tilemap.map_to_local(cell)
+		tween.tween_property(sprite, 'position', position, WALK_DURATION_PER_TILE).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	tile_position = cell_path.back()
+
+const PUSH_DURATION := 0.2
+
+func push_to(cell: Vector2i) -> void:
+	# TEMP: reset the position so we're always animating from the last true location
+	_move_sprite_to_tile_position()
+	if tween:
+		tween.kill()
+	tween = create_tween()
+	var position := arena_tilemap.map_to_local(cell)
+	tween.tween_property(sprite, 'position', position, PUSH_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	if arena_tilemap.is_cell_pathable(cell):
+		tile_position = cell
+	else:
+		tile_position = Constants.OFF_ARENA
+		# TODO not just eradicate the player probably
+		tween.tween_callback(queue_free)
