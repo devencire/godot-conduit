@@ -1,0 +1,54 @@
+[gd_scene load_steps=4 format=3 uid="uid://bcnjeg326gugc"]
+
+[ext_resource type="Script" path="res://scripts/AttackDialog.gd" id="1_y66o4"]
+
+[sub_resource type="Theme" id="Theme_utl7n"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_tjyrl"]
+
+[node name="AttackDialog" type="PanelContainer"]
+z_index = 1
+grow_horizontal = 0
+grow_vertical = 0
+scale = Vector2(2, 2)
+script = ExtResource("1_y66o4")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme = SubResource("Theme_utl7n")
+alignment = 1
+
+[node name="HSplitContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="PowerCostLabel" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "2 ⚡	
+"
+
+[node name="VSeparator" type="VSeparator" parent="MarginContainer/VBoxContainer/HSplitContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+theme_override_styles/separator = SubResource("StyleBoxEmpty_tjyrl")
+
+[node name="SuccessChanceLabel" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "100% success chance"
+horizontal_alignment = 2
+
+[node name="OverchargeToggle" type="CheckButton" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "Use all available Power and end your turn to apply extra knockback."
+text = "Overcharge"
+
+[connection signal="toggled" from="MarginContainer/VBoxContainer/OverchargeToggle" to="." method="_on_overcharge_toggle_toggled"]

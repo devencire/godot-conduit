@@ -16,12 +16,12 @@ static func team_name(team: Team) -> String:
 		return 'Red'
 	return 'None'
 
-static func team_color(team: Team) -> String:
+static func team_color(team: Team) -> Color:
 	if team == Constants.Team.ONE:
-		return '#0000ff'
+		return Color(0, 0, 1)
 	elif team == Constants.Team.TWO:
-		return '#ff0000'
-	return '#ff00ff'
+		return Color(1, 0, 0)
+	return Color(1, 0, 1)
 
 static func other_team(team: Team) -> Team:
 	if team == Team.ONE:
@@ -43,3 +43,8 @@ static func adjacent_directions(direction: TileSet.CellNeighbor) -> Array[TileSe
 		TileSet.CELL_NEIGHBOR_TOP_LEFT_SIDE:
 			return [TileSet.CELL_NEIGHBOR_BOTTOM_LEFT_SIDE, TileSet.CELL_NEIGHBOR_TOP_SIDE]
 	return [] # this should never happen
+
+static func success_chance_color(success_chance: float) -> Color:
+	var green := maxf(0, 1 + (success_chance - 0.5) * 2)
+	var red := maxf(0, 1 - (success_chance - 0.5) * 2)
+	return Color(red, green, 0)

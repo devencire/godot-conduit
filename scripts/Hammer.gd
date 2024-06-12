@@ -2,8 +2,13 @@ extends Node
 
 @export var player: Player
 
+const ATTACK_COST := 2
+const OVERCHARGED_EXTRA_TILE_COST := 2
+
 var target_preview_tile_scene := preload("res://scenes/target_preview_tile.tscn")
 var target_preview: Node
+
+var attack_dialog_scene := preload("res://scenes/attack_dialog.tscn")
 
 var selected_target: ValidTarget
 
@@ -53,7 +58,7 @@ func _unhandled_input(event):
 			var valid_push_targets = get_valid_push_targets()
 			for push_target in valid_push_targets:
 				if push_target.cell == clicked_cell:
-					try_push(push_target)
+					try_push(push_target, selected_target.overcharged)
 					get_viewport().set_input_as_handled()
 			
 		
@@ -80,6 +85,8 @@ func _draw_hit_direction_selection_preview():
 	selected_target_tile.team = player.team
 	target_preview.add_child(selected_target_tile)
 	# show push directions
+	var base_attack_cost := ATTACK_COST
+	var base_attack_chance := player.turn_state.chance_that_power_available(base_attack_cost)
 	var valid_targets := get_valid_push_targets()
 	for target in valid_targets:
 		var preview_tile: TargetPreviewTile = target_preview_tile_scene.instantiate()
@@ -87,8 +94,48 @@ func _draw_hit_direction_selection_preview():
 		preview_tile.direction = target.direction
 		preview_tile.team = player.team
 		preview_tile.type = TargetPreviewTile.PreviewTileType.ARROW
+		preview_tile.success_chance = base_attack_chance
 		target_preview.add_child(preview_tile)
+		if selected_target.overcharged:
+			var further_push_cost := base_attack_cost
+			var further_push_chance := base_attack_chance
+			var further_push_cell := target.cell
+			while true:
+				further_push_cost += OVERCHARGED_EXTRA_TILE_COST
+				further_push_chance = player.turn_state.chance_that_power_available(further_push_cost)
+				if further_push_chance == 0:
+					break
+				further_push_cell = player.arena_tilemap.get_neighbor_cell(further_push_cell, target.direction)
+				var cell_pathable := player.arena_tilemap.is_cell_pathable(further_push_cell)
+				var further_push_preview_tile: TargetPreviewTile = target_preview_tile_scene.instantiate()
+				further_push_preview_tile.position = player.arena_tilemap.map_to_local(further_push_cell)
+				further_push_preview_tile.direction = target.direction
+				further_push_preview_tile.team = player.team
+				further_push_preview_tile.type = TargetPreviewTile.PreviewTileType.FADED_ARROW
+				further_push_preview_tile.success_chance = further_push_chance
+				target_preview.add_child(further_push_preview_tile)
+				# if we just previewed knocking the target off the arena, don't show any further-out previews
+				if not cell_pathable:
+					break
+	# show attack dialog
+	var attack_dialog: AttackDialog = attack_dialog_scene.instantiate()
+	# TODO not just use a constant vector, or who am I kidding, all this UI code must be burned later
+	match selected_target.direction:
+		TileSet.CELL_NEIGHBOR_TOP_LEFT_SIDE, TileSet.CELL_NEIGHBOR_TOP_SIDE, TileSet.CELL_NEIGHBOR_TOP_RIGHT_SIDE:
+			attack_dialog.position = player.arena_tilemap.map_to_local(player.tile_position) + Vector2(0, 150)
+		_:
+			attack_dialog.position = player.arena_tilemap.map_to_local(player.tile_position) - Vector2(0, 150)
+	attack_dialog.power_cost = base_attack_cost
+	attack_dialog.success_chance = base_attack_chance
+	attack_dialog.overcharge_activated = selected_target.overcharged
+	attack_dialog.set_overcharge.connect(_set_overcharge)
+	target_preview.add_child(attack_dialog)
 	add_child(target_preview)
+
+func _set_overcharge(toggled_on: bool):
+	if selected_target:
+		selected_target.overcharged = toggled_on
+		_draw_hit_direction_selection_preview()
 
 func _clear_target_preview():
 	if target_preview:
@@ -99,6 +146,7 @@ class ValidTarget:
 	var direction: TileSet.CellNeighbor
 	var cell: Vector2i
 	var player: Player
+	var overcharged: bool
 
 func get_valid_targets() -> Array[ValidTarget]:
 	var valid_targets: Array[ValidTarget] = []
@@ -132,22 +180,34 @@ class PushAction:
 	var direction: TileSet.CellNeighbor
 	var force: int # this is just a number of tiles for now
 
-func try_push(push_target: ValidTarget):
-	if not player.turn_state.try_spend_power(2):
-		player.event_log.log('[b][color=%s]%s[/color] tried to push [color=%s]%s[/color] but ran out of power![/b]' % [Constants.team_color(player.team), player.debug_name, Constants.team_color(push_target.player.team), push_target.player.debug_name])
+func try_push(push_target: ValidTarget, overcharged: bool):
+	var attack_cost := ATTACK_COST
+	if not player.turn_state.try_spend_power(attack_cost):
+		player.event_log.log('[b][color=%s]%s[/color] tried to push [color=%s]%s[/color] but didn\'t have %s⚡![/b]' % [Constants.team_color(player.team).to_html(), player.debug_name, Constants.team_color(push_target.player.team).to_html(), push_target.player.debug_name, attack_cost])
 		player.selected = false
 		return
 	var push_action := PushAction.new()
 	push_action.player = push_target.player
 	push_action.direction = push_target.direction
 	push_action.force = 1
+	if overcharged:
+		while player.turn_state.try_spend_power(OVERCHARGED_EXTRA_TILE_COST):
+			push_action.force += 1
+			attack_cost += OVERCHARGED_EXTRA_TILE_COST
 	var push_outcomes := resolve_push(push_action)
+	if overcharged:
+		player.event_log.log('[b][color=%s]%s[/color] spent %s⚡ on an overcharged push![/b]' % [Constants.team_color(player.team).to_html(), player.debug_name, attack_cost])
+	else:
+		player.event_log.log('[color=%s]%s[/color] spent %s⚡ on a push' % [Constants.team_color(player.team).to_html(), player.debug_name, attack_cost])
 	for outcome in push_outcomes:
 		match outcome.type:
 			PushOutcomeType.MOVED_TO:
-				player.event_log.log('[color=%s]%s[/color] pushed [color=%s]%s[/color] into %s' % [Constants.team_color(player.team), player.debug_name, Constants.team_color(outcome.player.team), outcome.player.debug_name, outcome.player.tile_position])
+				player.event_log.log('[color=%s]%s[/color] pushed [color=%s]%s[/color] into %s' % [Constants.team_color(player.team).to_html(), player.debug_name, Constants.team_color(outcome.player.team).to_html(), outcome.player.debug_name, outcome.player.tile_position])
 			PushOutcomeType.OUT_OF_ARENA:
-				player.event_log.log('[color=%s]%s[/color] pushed [color=%s]%s[/color] off the arena!' % [Constants.team_color(player.team), player.debug_name, Constants.team_color(outcome.player.team), outcome.player.debug_name])
+				player.event_log.log('[color=%s]%s[/color] pushed [color=%s]%s[/color] off the arena!' % [Constants.team_color(player.team).to_html(), player.debug_name, Constants.team_color(outcome.player.team).to_html(), outcome.player.debug_name])
+	if overcharged:
+		player.selected = false
+		return
 	_clear_selected_target()
 
 enum PushOutcomeType { MOVED_TO, OUT_OF_ARENA }
@@ -177,7 +237,8 @@ func resolve_push(push_action: PushAction) -> Array[PushOutcome]:
 			var new_push_action := PushAction.new()
 			new_push_action.player = player_in_next_cell
 			new_push_action.direction = push_action.direction
-			new_push_action.force = push_action.force
+			# use up an extra force (absorbed by the impact?) so that the preview is accurate to the final victim's final location
+			new_push_action.force = push_action.force - 1
 			new_push_results = resolve_push(new_push_action)
 			break
 		# push `push_action.player` one tile

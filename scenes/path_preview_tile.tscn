@@ -19,11 +19,13 @@ font_size = 24
 
 [node name="PathPreviewTile" type="Node2D"]
 script = ExtResource("1_v1bwt")
+power_cost = null
+success_chance = null
 
 [node name="Sprite" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_jitg5")
 
-[node name="EnergyCostLabel" type="Label" parent="."]
+[node name="PowerCostLabel" type="Label" parent="."]
 offset_left = -19.0
 offset_top = -40.0
 offset_right = 21.0

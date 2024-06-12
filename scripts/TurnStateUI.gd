@@ -15,3 +15,6 @@ func _on_turn_state_changed(state: TurnState):
 	$MaximumRemainingPower.text = "Maximum possible remaining power: %s" % (
 		state.copied_excess_power + state.base_turn_power + Constants.MAX_EXCESS_POWER - state.power_used
 	)
+	$ActualRemainingPower.text = "Actual remaining power: %s" % (
+		state.total_available_power - state.power_used
+	)

@@ -119,11 +119,11 @@ func _try_move_selected_player(destination_cell: Vector2i):
 		return # there is no valid path
 	while cell_path.size() > 0:
 		if not turn_state.try_spend_power(1):
-			event_log.log('[b][color=%s]%s[/color] tried to move to %s but ran out of power![/b]' % [Constants.team_color(team), debug_name, cell_path[0]])
+			event_log.log('[b][color=%s]%s[/color] tried to move to %s but ran out of power![/b]' % [Constants.team_color(team).to_html(), debug_name, cell_path[0]])
 			selected = false
 			return # couldn't afford it, turn has ended
 		tile_position = cell_path[0]
-		event_log.log('[color=%s]%s[/color] moved to %s' % [Constants.team_color(team), debug_name, cell_path[0]])
+		event_log.log('[color=%s]%s[/color] moved to %s' % [Constants.team_color(team).to_html(), debug_name, cell_path[0]])
 		cell_path = cell_path.slice(1)
 	_update_selection_tile()
 	_clear_path_preview()
@@ -135,4 +135,9 @@ func _update_selection_tile():
 		selection_tile.position = arena_tilemap.map_to_local(tile_position)
 
 func is_powered_by_team_beacon() -> bool:
-	return is_beacon or arena_tilemap.are_cells_aligned(tile_position, players.beacon_for_team(team).tile_position)
+	if is_beacon:
+		return true
+	var beacon_player := players.beacon_for_team(team)
+	if not beacon_player:
+		return false
+	return arena_tilemap.are_cells_aligned(tile_position, beacon_player.tile_position)

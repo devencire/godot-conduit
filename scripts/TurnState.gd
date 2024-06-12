@@ -51,7 +51,7 @@ func chance_that_power_available(power_cost: int) -> float:
 	var max_remaining_power := known_remaining_power + Constants.MAX_EXCESS_POWER
 	if max_remaining_power < power_cost:
 		return 0.0
-	return 1.0 - (float(power_cost - maxi(0, known_remaining_power)) / mini(Constants.MAX_EXCESS_POWER, max_remaining_power))
+	return 1.0 - (float(power_cost - maxi(0, known_remaining_power)) / (mini(Constants.MAX_EXCESS_POWER, max_remaining_power) + 1))
 
 ## Ends the current turn and starts the opposing team's turn.
 func end_turn() -> void:

@@ -4,7 +4,7 @@ extends Node2D
 
 @onready var sprite: AnimatedSprite2D = $Sprite
 
-enum PreviewTileType { BLANK, ARROW }
+enum PreviewTileType { BLANK, ARROW, FADED_ARROW }
 
 @export var team: Constants.Team:
 	set(new_team):
@@ -17,8 +17,9 @@ enum PreviewTileType { BLANK, ARROW }
 		match new_type:
 			PreviewTileType.BLANK:
 				$Sprite.animation = 'blank'
-			PreviewTileType.ARROW:
+			PreviewTileType.ARROW, PreviewTileType.FADED_ARROW:
 				$Sprite.animation = 'arrow'
+		update_color()
 
 @export var direction: TileSet.CellNeighbor:
 	set(new_direction):
@@ -37,5 +38,15 @@ enum PreviewTileType { BLANK, ARROW }
 			TileSet.CELL_NEIGHBOR_TOP_LEFT_SIDE:
 				$Sprite.rotation_degrees = 300
 
+@export var success_chance: float:
+	set(new_success_chance):
+		success_chance = new_success_chance
+		$SuccessChanceLabel.visible = true
+		$SuccessChanceLabel.text = str(roundi(success_chance * 100)) + '%'
+		$SuccessChanceLabel.modulate = Constants.success_chance_color(success_chance)
+
 func update_color():
-	$Sprite.modulate = Constants.team_color(team)
+	var color := Constants.team_color(team)
+	if type == PreviewTileType.FADED_ARROW:
+		color.a = 0.4
+	$Sprite.modulate = color
