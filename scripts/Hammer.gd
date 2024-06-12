@@ -238,7 +238,7 @@ func resolve_push(push_action: PushAction) -> Array[PushOutcome]:
 			new_push_action.player = player_in_next_cell
 			new_push_action.direction = push_action.direction
 			# use up an extra force (absorbed by the impact?) so that the preview is accurate to the final victim's final location
-			new_push_action.force = push_action.force - 1
+			new_push_action.force = maxi(push_action.force - 1, 1)
 			new_push_results = resolve_push(new_push_action)
 			break
 		# push `push_action.player` one tile
