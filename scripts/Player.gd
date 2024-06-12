@@ -122,13 +122,14 @@ func _try_move_selected_player(destination_cell: Vector2i):
 		if not turn_state.try_spend_power(1):
 			event_log.log('[b][color=%s]%s[/color] tried to move to %s but ran out of power![/b]' % [Constants.team_color(team).to_html(), debug_name, cell_path[0]])
 			selected = false
-			return # couldn't afford it, turn has ended
+			break
 		walked_path.push_back(cell_path[0])
 		event_log.log('[color=%s]%s[/color] moved to %s' % [Constants.team_color(team).to_html(), debug_name, cell_path[0]])
 		cell_path = cell_path.slice(1)
 	walk_path(walked_path)
-	_update_selection_tile()
-	_clear_path_preview()
+	if selected:
+		_update_selection_tile()
+		_clear_path_preview()
 
 func _update_selection_tile():
 	selection_tile.visible = selected
