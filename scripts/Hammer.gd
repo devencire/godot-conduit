@@ -76,6 +76,7 @@ func _draw_target_selection_preview():
 		var preview_tile: TargetPreviewTile = target_preview_tile_scene.instantiate()
 		preview_tile.position = player.arena_tilemap.map_to_local(target.cell)
 		preview_tile.team = player.team
+		preview_tile.type = TargetPreviewTile.PreviewTileType.TEAM_CIRCLE
 		target_preview.add_child(preview_tile)
 	add_child(target_preview)
 
@@ -86,6 +87,7 @@ func _draw_hit_direction_selection_preview():
 	var selected_target_tile: TargetPreviewTile = target_preview_tile_scene.instantiate()
 	selected_target_tile.position = player.arena_tilemap.map_to_local(selected_target.cell)
 	selected_target_tile.team = player.team
+	selected_target_tile.type = TargetPreviewTile.PreviewTileType.SELECTED_CIRCLE
 	target_preview.add_child(selected_target_tile)
 	# show push directions
 	var base_attack_cost := ATTACK_COST

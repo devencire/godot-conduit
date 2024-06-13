@@ -4,7 +4,7 @@ extends Node2D
 
 @onready var sprite: AnimatedSprite2D = $Sprite
 
-enum PreviewTileType { BLANK, ARROW, FADED_ARROW }
+enum PreviewTileType { TEAM_CIRCLE, SELECTED_CIRCLE, ARROW, FADED_ARROW }
 
 @export var team: Constants.Team:
 	set(new_team):
@@ -15,8 +15,8 @@ enum PreviewTileType { BLANK, ARROW, FADED_ARROW }
 	set(new_type):
 		type = new_type
 		match new_type:
-			PreviewTileType.BLANK:
-				$Sprite.animation = 'blank'
+			PreviewTileType.TEAM_CIRCLE, PreviewTileType.SELECTED_CIRCLE:
+				$Sprite.animation = 'circle'
 			PreviewTileType.ARROW, PreviewTileType.FADED_ARROW:
 				$Sprite.animation = 'arrow'
 		update_color()
@@ -45,7 +45,18 @@ enum PreviewTileType { BLANK, ARROW, FADED_ARROW }
 		BB.set_centered_outlined_text($SuccessChanceLabel, '%s%%' % roundi(success_chance * 100), Constants.success_chance_color(success_chance))
 
 func update_color():
+	if type == PreviewTileType.SELECTED_CIRCLE:
+		$Sprite.modulate = Color.WHITE
+		return
 	var color := Constants.team_color(team)
 	if type == PreviewTileType.FADED_ARROW:
 		color.a = 0.4
 	$Sprite.modulate = color
+
+func _on_mouse_entered():
+	if type == PreviewTileType.ARROW or type == PreviewTileType.TEAM_CIRCLE:
+		$Sprite.modulate = Color.WHITE
+
+func _on_mouse_exited():
+	if type == PreviewTileType.ARROW or type == PreviewTileType.TEAM_CIRCLE:
+		$Sprite.modulate = Constants.team_color(team)
