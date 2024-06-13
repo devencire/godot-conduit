@@ -5,6 +5,9 @@ extends Node
 const ATTACK_COST := 2
 const OVERCHARGED_EXTRA_TILE_COST := 2
 
+const BASE_DIRECT_DAMAGE := 1
+const CLASH_DAMAGE := 1
+
 var target_preview_tile_scene := preload("res://scenes/target_preview_tile.tscn")
 var target_preview: Node
 
@@ -182,31 +185,36 @@ func get_valid_push_targets() -> Array[ValidTarget]:
 class PushAction:
 	var player: Player
 	var direction: TileSet.CellNeighbor
+	var direct_damage: int
 	var force: int # this is just a number of tiles for now
 
 func try_push(push_target: ValidTarget, overcharged: bool):
 	var attack_cost := ATTACK_COST
 	if not player.turn_state.try_spend_power(attack_cost):
-		player.event_log.log('[b]%s tried to push %s back but didn\'t have %s⚡![/b]' % [Constants.bbcode_player_name(player), Constants.bbcode_player_name(push_target.player), attack_cost])
+		player.event_log.log('%s tried to push %s back but didn\'t have %s⚡!' % [Constants.bbcode_player_name(player), Constants.bbcode_player_name(push_target.player), attack_cost])
 		player.selected = false
 		return
 	var push_action := PushAction.new()
 	push_action.player = push_target.player
 	push_action.direction = push_target.direction
+	push_action.direct_damage = 1
 	push_action.force = 1
 	if overcharged:
 		while player.turn_state.try_spend_power(OVERCHARGED_EXTRA_TILE_COST):
 			push_action.force += 1
 			attack_cost += OVERCHARGED_EXTRA_TILE_COST
+	
 	var push_outcomes := resolve_push(push_action)
 	if overcharged:
-		player.event_log.log('[b]%s spent %s⚡ on an overcharged push![/b]' % [Constants.bbcode_player_name(player), attack_cost])
+		player.event_log.log('%s spent %s⚡ on an overcharged push!' % [Constants.bbcode_player_name(player), attack_cost])
 	else:
 		player.event_log.log('%s spent %s⚡ on a push' % [Constants.bbcode_player_name(player), attack_cost])
 	for outcome in push_outcomes:
 		match outcome.type:
 			PushOutcomeType.MOVED_TO:
-				player.event_log.log('%s pushed %s back %s spaces' % [Constants.bbcode_player_name(player), Constants.bbcode_player_name(outcome.player), outcome.distance])
+				player.event_log.log('%s pushed %s back %s spaces, dealing %s damage' % [Constants.bbcode_player_name(player), Constants.bbcode_player_name(outcome.player), outcome.distance, outcome.damage])
+			PushOutcomeType.CLASHED_WITH:
+				player.event_log.log('%s pushed %s back %s spaces into %s, dealing %s damage' % [Constants.bbcode_player_name(player), Constants.bbcode_player_name(outcome.player), outcome.distance, Constants.bbcode_player_name(outcome.clashed_with), outcome.damage])
 			PushOutcomeType.OUT_OF_ARENA:
 				player.event_log.log('%s pushed %s back %s spaces, off the arena!' % [Constants.bbcode_player_name(player), Constants.bbcode_player_name(outcome.player), outcome.distance])
 	if overcharged:
@@ -214,18 +222,22 @@ func try_push(push_target: ValidTarget, overcharged: bool):
 		return
 	_clear_selected_target()
 
-enum PushOutcomeType { MOVED_TO, OUT_OF_ARENA }
+enum PushOutcomeType { MOVED_TO, CLASHED_WITH, OUT_OF_ARENA }
 
 class PushOutcome:
 	var player: Player
 	var type: PushOutcomeType
+	var damage: int
 	var distance: int
+	var clashed_with: Player
 
 # TODO move this out of this specific weapon, it's a generic mechanic
 func resolve_push(push_action: PushAction) -> Array[PushOutcome]:
 	var new_push_results: Array[PushOutcome] = []
 	var current_cell := push_action.player.tile_position
 	var distance := 0
+	var total_damage := push_action.direct_damage
+	var clashed_with: Player = null
 	while push_action.force > 0:
 		distance += 1
 		current_cell = player.arena_tilemap.get_neighbor_cell(current_cell, push_action.direction)
@@ -241,10 +253,14 @@ func resolve_push(push_action: PushAction) -> Array[PushOutcome]:
 			return [push_outcome]
 		var player_in_next_cell := player.players.player_in_cell(current_cell)
 		if player_in_next_cell:
+			clashed_with = player_in_next_cell
+			# damage the original player now, the victim in its own push
+			total_damage += CLASH_DAMAGE
 			# now also push the player already in that cell, transferring all remaining force to them
 			var new_push_action := PushAction.new()
 			new_push_action.player = player_in_next_cell
 			new_push_action.direction = push_action.direction
+			new_push_action.direct_damage = CLASH_DAMAGE
 			# use up an extra force (absorbed by the impact?) so that the preview is accurate to the final victim's final location
 			new_push_action.force = maxi(push_action.force - 1, 1)
 			new_push_results = resolve_push(new_push_action)
@@ -253,11 +269,17 @@ func resolve_push(push_action: PushAction) -> Array[PushOutcome]:
 		push_action.force -= 1
 	
 	push_action.player.push_to(current_cell)
+	push_action.player.take_damage(total_damage)
 	
 	var push_outcome := PushOutcome.new()
 	push_outcome.player = push_action.player
-	push_outcome.type = PushOutcomeType.MOVED_TO
+	if clashed_with:
+		push_outcome.type = PushOutcomeType.CLASHED_WITH
+		push_outcome.clashed_with = clashed_with
+	else:
+		push_outcome.type = PushOutcomeType.MOVED_TO
 	push_outcome.distance = distance
+	push_outcome.damage = total_damage
 	# if this player was pushed into another player,
 	# prepend this result so it gets listed first
 	new_push_results.push_front(push_outcome)

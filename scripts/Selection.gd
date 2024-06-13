@@ -14,7 +14,7 @@ func _unhandled_input(event):
 			return
 		var clicked_cell := arena_tilemap.get_hovered_cell(event)
 		var player := players.player_in_cell(clicked_cell, turn_state.active_team)
-		if player:
+		if player and player.can_act:
 			_select_player(player)
 
 func _select_player(player: Player):
@@ -29,3 +29,7 @@ func _deselect_player():
 		return
 	selected_player.selected = false
 	selected_player = null
+
+
+func _on_turn_state_new_turn_started(state):
+	_deselect_player.call_deferred()

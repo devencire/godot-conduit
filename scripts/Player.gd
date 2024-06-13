@@ -6,12 +6,16 @@ signal was_moved(player: Player)
 signal was_selected(player: Player)
 signal was_deselected(player: Player)
 
+signal initialized(player: Player)
+signal taken_damage(player: Player, damage: int)
+
 var arena_tilemap: ArenaTileMap
 var players: Players
 var turn_state: TurnState
 var event_log: EventLog
 
-@onready var sprite: AnimatedSprite2D = $Sprite
+@onready var graphic: Node2D = $Graphic
+@onready var sprite: AnimatedSprite2D = $Graphic/Sprite
 @onready var selection_tile: SelectionTile = $SelectionTile
 
 var hovered_cell: Vector2i
@@ -25,7 +29,6 @@ var path_preview: Node
 @export var tile_position: Vector2i:
 	set(new_tile_position):
 		tile_position = new_tile_position
-		#_move_sprite_to_tile_position()
 		was_moved.emit(self)
 
 # Whether the Player is the Beacon, powering all aligned tiles.
@@ -48,6 +51,13 @@ static var next_id := 1
 
 @export var moving: bool
 
+@export var max_health: int = 4
+@export var health: int
+@export var can_act: bool:
+	get:
+		return health > 0
+
+
 func _ready():
 	# TODO there's got to be a better way of sharing these?
 	# at least we only use `match_root` directly in `_ready`
@@ -61,7 +71,10 @@ func _ready():
 	debug_name = 'Player %s' % next_id
 	next_id += 1
 	sprite.self_modulate = Constants.team_color(team)
-	_move_sprite_to_tile_position()
+	_move_graphic_to_tile_position()
+	
+	health = max_health
+	initialized.emit(self)
 
 func _unhandled_input(event):
 	if not selected or not moving:
@@ -106,9 +119,9 @@ func _clear_path_preview():
 		path_preview.queue_free()
 	path_preview = null
 
-func _move_sprite_to_tile_position():
-	if arena_tilemap and sprite:
-		sprite.position = arena_tilemap.map_to_local(tile_position)
+func _move_graphic_to_tile_position():
+	if arena_tilemap and graphic:
+		graphic.position = arena_tilemap.map_to_local(tile_position)
 
 const BASE_MOVE_COST := 1
 
@@ -124,9 +137,9 @@ func _try_move_selected_player(destination_cell: Vector2i):
 	while cell_path.size() > 0:
 		if not turn_state.try_spend_power(BASE_MOVE_COST):
 			if walked_path.size() == 0:
-				event_log.log('[b]%s tried to move but ran out of power![/b]' % Constants.bbcode_player_name(self))
+				event_log.log('%s tried to move but ran out of power!' % Constants.bbcode_player_name(self))
 			else:
-				event_log.log('[b]%s ran out of power after spending %s⚡ to move %s spaces![/b]' % [Constants.bbcode_player_name(self), power_spent, walked_path.size()])
+				event_log.log('%s ran out of power after spending %s⚡ to move %s spaces!' % [Constants.bbcode_player_name(self), power_spent, walked_path.size()])
 			selected = false
 			break
 		power_spent += BASE_MOVE_COST
@@ -159,28 +172,33 @@ const WALK_DURATION_PER_TILE := 0.2
 
 func walk_path(cell_path: Array[Vector2i]) -> void:
 	# TEMP: reset the position so we're always animating from the last true location
-	_move_sprite_to_tile_position()
+	_move_graphic_to_tile_position()
 	if tween:
 		tween.kill()
 	tween = create_tween()
 	for cell in cell_path:
 		var position := arena_tilemap.map_to_local(cell)
-		tween.tween_property(sprite, 'position', position, WALK_DURATION_PER_TILE).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+		tween.tween_property(graphic, 'position', position, WALK_DURATION_PER_TILE).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	tile_position = cell_path.back()
 
 const PUSH_DURATION := 0.2
 
 func push_to(cell: Vector2i) -> void:
 	# TEMP: reset the position so we're always animating from the last true location
-	_move_sprite_to_tile_position()
+	_move_graphic_to_tile_position()
 	if tween:
 		tween.kill()
 	tween = create_tween()
 	var position := arena_tilemap.map_to_local(cell)
-	tween.tween_property(sprite, 'position', position, PUSH_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	tween.tween_property(graphic, 'position', position, PUSH_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	if arena_tilemap.is_cell_pathable(cell):
 		tile_position = cell
 	else:
 		tile_position = Constants.OFF_ARENA
-		# TODO not just eradicate the player probably
-		tween.tween_callback(queue_free)
+		take_damage(health)
+
+func take_damage(damage: int) -> void:
+	health = maxi(0, health - damage)
+	taken_damage.emit(self, damage)
+	if health == 0:
+		event_log.log.call_deferred('%s was knocked unconscious!' % [Constants.bbcode_player_name(self)])

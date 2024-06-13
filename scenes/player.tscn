@@ -1,9 +1,10 @@
-[gd_scene load_steps=6 format=3 uid="uid://d1g51gpcf38kc"]
+[gd_scene load_steps=7 format=3 uid="uid://d1g51gpcf38kc"]
 
 [ext_resource type="Script" path="res://scripts/Player.gd" id="1_4vrrm"]
 [ext_resource type="Texture2D" uid="uid://rcrm0go6mclm" path="res://assets/player.png" id="2_bdnyk"]
 [ext_resource type="PackedScene" uid="uid://8r38rbtaivjs" path="res://scenes/selection_tile.tscn" id="3_77lfk"]
 [ext_resource type="Script" path="res://scripts/Hammer.gd" id="4_ek61n"]
+[ext_resource type="Script" path="res://scripts/HealthBar.gd" id="5_byicf"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_8dflb"]
 animations = [{
@@ -19,13 +20,41 @@ animations = [{
 [node name="Player" type="Node" groups=["players"]]
 script = ExtResource("1_4vrrm")
 
-[node name="Sprite" type="AnimatedSprite2D" parent="."]
-position = Vector2(2.08165e-12, 2.08165e-12)
-sprite_frames = SubResource("SpriteFrames_8dflb")
-
 [node name="SelectionTile" parent="." instance=ExtResource("3_77lfk")]
 visible = false
 
 [node name="Hammer" type="Node" parent="." node_paths=PackedStringArray("player")]
 script = ExtResource("4_ek61n")
 player = NodePath("..")
+
+[node name="Graphic" type="Node2D" parent="."]
+
+[node name="Sprite" type="AnimatedSprite2D" parent="Graphic"]
+position = Vector2(2.08165e-12, 2.08165e-12)
+sprite_frames = SubResource("SpriteFrames_8dflb")
+
+[node name="HealthBar" type="Node2D" parent="Graphic"]
+z_index = 2
+position = Vector2(0, -42)
+script = ExtResource("5_byicf")
+
+[node name="HealthBackRect" type="ColorRect" parent="Graphic/HealthBar"]
+z_index = -1
+offset_left = -32.0
+offset_top = -8.0
+offset_right = 32.0
+offset_bottom = 8.0
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+
+[node name="HealthRemainingRect" type="ColorRect" parent="Graphic/HealthBar"]
+z_index = -1
+offset_left = -30.0
+offset_top = -6.0
+offset_right = 30.0
+offset_bottom = 6.0
+mouse_filter = 2
+color = Color(0, 1, 0, 1)
+
+[connection signal="initialized" from="." to="Graphic/HealthBar" method="_on_player_initialized"]
+[connection signal="taken_damage" from="." to="Graphic/HealthBar" method="_on_player_taken_damage"]
