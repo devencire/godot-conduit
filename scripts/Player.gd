@@ -60,7 +60,7 @@ func _ready():
 
 	debug_name = 'Player %s' % next_id
 	next_id += 1
-	sprite.modulate = Constants.team_color(team)
+	sprite.self_modulate = Constants.team_color(team)
 	_move_sprite_to_tile_position()
 
 func _unhandled_input(event):

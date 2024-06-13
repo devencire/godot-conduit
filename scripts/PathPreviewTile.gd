@@ -6,6 +6,5 @@ extends Node2D
 @export var success_chance: float = 1.0 # between 0 and 1
 
 func _ready():
-	$PowerCostLabel.text = str(power_cost) + '⚡'
-	$SuccessChanceLabel.text = str(roundi(success_chance * 100)) + '%'
-	$SuccessChanceLabel.modulate = Constants.success_chance_color(success_chance)
+	BB.set_centered_outlined_text($PowerCostLabel, '%s⚡' % power_cost)
+	BB.set_centered_outlined_text($SuccessChanceLabel, '%s%%' % roundi(success_chance * 100), Constants.success_chance_color(success_chance))

@@ -42,8 +42,7 @@ enum PreviewTileType { BLANK, ARROW, FADED_ARROW }
 	set(new_success_chance):
 		success_chance = new_success_chance
 		$SuccessChanceLabel.visible = true
-		$SuccessChanceLabel.text = str(roundi(success_chance * 100)) + '%'
-		$SuccessChanceLabel.modulate = Constants.success_chance_color(success_chance)
+		BB.set_centered_outlined_text($SuccessChanceLabel, '%s%%' % roundi(success_chance * 100), Constants.success_chance_color(success_chance))
 
 func update_color():
 	var color := Constants.team_color(team)
