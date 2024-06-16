@@ -3,18 +3,7 @@ extends Node2D
 @onready var health_remaining_rect: ColorRect = $HealthRemainingRect
 var player: Player
 
-# Called when the node enters the scene tree for the first time.
-func _ready():
-	pass # Replace with function body.
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
-	pass
-
-
 func _draw():
-	print('draw ', player)
 	if not player:
 		return
 	for notch in range(1, player.max_health):
@@ -29,10 +18,6 @@ func _on_player_initialized(new_player: Player):
 	queue_redraw()
 
 
-func _on_player_taken_damage(player: Player, damage: int):
-	print('taken damage ', player, damage)
-	health_remaining_rect.size.x = 60 * player.health / player.max_health
+func _on_player_taken_damage(_player: Player, _damage: int):
+	health_remaining_rect.size.x = 60 * float(player.health) / player.max_health
 	health_remaining_rect.color = Constants.success_chance_color(float(player.health) / player.max_health)
-	
-
-

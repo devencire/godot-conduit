@@ -18,7 +18,7 @@ var all_players: Array[Player]:
 func _on_child_order_changed():
 	changed.emit(all_players)
 
-func _player_was_moved(player: Player):
+func _player_was_moved(_player: Player):
 	changed.emit(all_players)
 
 func add_player(team: Constants.Team, tile_position: Vector2i, is_beacon: bool = false):

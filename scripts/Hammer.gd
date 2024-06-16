@@ -248,11 +248,11 @@ func resolve_push(push_action: PushAction) -> Array[PushOutcome]:
 			#push_action.player.tile_position = Constants.OFF_ARENA
 			#push_action.player.queue_free()
 			push_action.player.push_to(current_cell)
-			var push_outcome := PushOutcome.new()
-			push_outcome.player = push_action.player
-			push_outcome.type = PushOutcomeType.OUT_OF_ARENA
-			push_outcome.distance = distance
-			return [push_outcome]
+			var ooa_push_outcome := PushOutcome.new()
+			ooa_push_outcome.player = push_action.player
+			ooa_push_outcome.type = PushOutcomeType.OUT_OF_ARENA
+			ooa_push_outcome.distance = distance
+			return [ooa_push_outcome]
 		var player_in_next_cell := player.players.player_in_cell(current_cell)
 		if player_in_next_cell:
 			clashed_with = player_in_next_cell

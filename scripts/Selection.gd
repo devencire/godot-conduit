@@ -31,5 +31,5 @@ func _deselect_player():
 	selected_player = null
 
 
-func _on_turn_state_new_turn_started(state):
+func _on_turn_state_new_turn_started(_state):
 	_deselect_player.call_deferred()

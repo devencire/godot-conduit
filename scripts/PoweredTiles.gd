@@ -21,9 +21,8 @@ func _on_turn_state_new_turn_started(_state):
 	draw_powered_tiles() # bleh probably shouldn't use % for this
 
 func draw_powered_tiles():
-	var players := players.all_players
 	var powered_cell_teams := {}  # Dictionary[Vector2i, Constants.Team]
-	for player in players:
+	for player in players.all_players:
 		if player.is_beacon:
 			var aligned_cells := arena_tilemap.get_aligned_cells(player.tile_position)
 			for cell in aligned_cells:

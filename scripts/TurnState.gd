@@ -18,7 +18,7 @@ signal new_turn_started(state: TurnState)
 
 @export var max_remaining_power: int:
 	get:
-		return copied_excess_power + base_turn_power + Constants.MAX_EXCESS_POWER - power_used
+		return known_remaining_power + Constants.MAX_EXCESS_POWER
 
 ## Starts a new turn for the given `team`.
 func start_turn(team: Constants.Team) -> void:
@@ -54,11 +54,9 @@ func try_spend_power(amount: int) -> bool:
 
 # Returns the probability of the turn containing enough power for an action costing `power_cost`, between 0 and 1.
 func chance_that_power_available(power_cost: int) -> float:
-	var known_remaining_power := base_turn_power + copied_excess_power - power_used # will be negative if some unknown power has been used
 	var unknown_power_use := power_cost - known_remaining_power
 	if unknown_power_use <= 0:
 		return 1.0
-	var max_remaining_power := known_remaining_power + Constants.MAX_EXCESS_POWER
 	if max_remaining_power < power_cost:
 		return 0.0
 	return 1.0 - (float(power_cost - maxi(0, known_remaining_power)) / (mini(Constants.MAX_EXCESS_POWER, max_remaining_power) + 1))
