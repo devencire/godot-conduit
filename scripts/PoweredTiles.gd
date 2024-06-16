@@ -11,10 +11,10 @@ var powered_tile_container: Node2D
 
 var pulse_tween: Tween
 
-func _on_players_changed(_players):
+func _on_players_changed(_players: Players):
 	draw_powered_tiles()
 
-func _on_turn_state_new_turn_started(_state):
+func _on_turn_state_new_turn_started(_state: TurnState):
 	draw_powered_tiles() # bleh probably shouldn't use % for this
 
 func draw_powered_tiles():

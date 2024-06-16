@@ -36,7 +36,7 @@ func start_turn(team: Constants.Team) -> void:
 	total_available_power = copied_excess_power + base_turn_power + secret_available_excess_power
 	power_used = 0
 	
-	%EventLog.log.call_deferred('[b]%s starts their turn with %s-%s⚡ available[/b]' % [Constants.bbcode_team_name(team), known_remaining_power, max_remaining_power])
+	%EventLog.log.call_deferred('[b]%s starts their turn with %s-%s⚡ available[/b]' % [BB.team_name(team), known_remaining_power, max_remaining_power])
 	
 	changed.emit(self)
 	new_turn_started.emit(self)

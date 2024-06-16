@@ -4,4 +4,5 @@ extends Label
 
 func _unhandled_input(event):
 	if event is InputEventMouseMotion:
-		text = 'Hovered tile: %s' % arena_tilemap.get_hovered_cell(event)
+		var cell := arena_tilemap.get_hovered_cell(event)
+		text = 'Hovered tile: %s (%s)' % [cell, arena_tilemap.distance_from_halfway_line(cell)]

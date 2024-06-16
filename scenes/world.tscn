@@ -1,16 +1,18 @@
-[gd_scene load_steps=16 format=3 uid="uid://d1t087k7mdxvb"]
+[gd_scene load_steps=17 format=3 uid="uid://d1t087k7mdxvb"]
 
 [ext_resource type="Script" path="res://world.gd" id="1_4avd2"]
 [ext_resource type="Texture2D" uid="uid://bu0j2ljbdu4jy" path="res://assets/hexes_2px_outline.png" id="1_7kdkn"]
 [ext_resource type="Script" path="res://scripts/TurnState.gd" id="2_7l4uc"]
 [ext_resource type="Script" path="res://scripts/RoundRoot.gd" id="2_r7p20"]
 [ext_resource type="Script" path="res://scripts/ArenaTileMap.gd" id="3_rf75t"]
+[ext_resource type="Script" path="res://scripts/ScoreState.gd" id="4_kseo3"]
 [ext_resource type="PackedScene" uid="uid://dvuatsyki3ehj" path="res://scenes/selection.tscn" id="5_0ab0n"]
 [ext_resource type="Script" path="res://scripts/Players.gd" id="6_4jl0i"]
 [ext_resource type="Script" path="res://scripts/DebugShowTileLabel.gd" id="7_23lak"]
 [ext_resource type="PackedScene" uid="uid://c04vm1q3ssoxd" path="res://scenes/round_ui.tscn" id="7_p4op4"]
 [ext_resource type="PackedScene" uid="uid://dxxmf1dm70jy3" path="res://scenes/powered_tiles.tscn" id="8_h1dur"]
 [ext_resource type="Script" path="res://scripts/EventLog.gd" id="10_7koks"]
+[ext_resource type="Script" path="res://scripts/MatchUI.gd" id="12_1lrdw"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_s34qc"]
 texture = ExtResource("1_7kdkn")
@@ -36,10 +38,6 @@ sources/0 = SubResource("TileSetAtlasSource_s34qc")
 [sub_resource type="LabelSettings" id="LabelSettings_8os5q"]
 font_size = 24
 
-[sub_resource type="Theme" id="Theme_f63g6"]
-default_font_size = 24
-RichTextLabel/fonts/normal_font = null
-
 [node name="MatchRoot" type="Node"]
 script = ExtResource("1_4avd2")
 
@@ -50,7 +48,14 @@ script = ExtResource("2_r7p20")
 unique_name_in_owner = true
 script = ExtResource("2_7l4uc")
 
+[node name="ScoreState" type="Node" parent="RoundRoot" node_paths=PackedStringArray("match_root", "event_log")]
+unique_name_in_owner = true
+script = ExtResource("4_kseo3")
+match_root = NodePath("../..")
+event_log = NodePath("../CanvasLayer/EventLog")
+
 [node name="Arena" type="Node2D" parent="RoundRoot"]
+position = Vector2(-48, 32)
 scale = Vector2(0.75, 0.75)
 
 [node name="ArenaTileMap" type="TileMap" parent="RoundRoot/Arena"]
@@ -84,6 +89,8 @@ arena_tilemap = NodePath("../ArenaTileMap")
 [node name="PoweredTiles" parent="RoundRoot/Arena" instance=ExtResource("8_h1dur")]
 
 [node name="CanvasLayer" type="CanvasLayer" parent="RoundRoot"]
+offset = Vector2(2.08165e-12, 2.08165e-12)
+transform = Transform2D(1, 0, 0, 1, 2.08165e-12, 2.08165e-12)
 
 [node name="EventLog" type="RichTextLabel" parent="RoundRoot/CanvasLayer"]
 unique_name_in_owner = true
@@ -95,21 +102,42 @@ offset_top = -240.0
 offset_right = 500.0
 grow_vertical = 0
 focus_mode = 2
-theme = SubResource("Theme_f63g6")
 bbcode_enabled = true
 text = "[b]The game begins![/b]"
 scroll_following = true
 selection_enabled = true
 script = ExtResource("10_7koks")
 
+[node name="RoundUI" parent="RoundRoot" instance=ExtResource("7_p4op4")]
+
 [node name="Camera" type="Camera2D" parent="."]
 unique_name_in_owner = true
 
-[node name="RoundUI" parent="." instance=ExtResource("7_p4op4")]
+[node name="MatchUI" type="CanvasLayer" parent="."]
+script = ExtResource("12_1lrdw")
 
-[connection signal="changed" from="RoundRoot/TurnState" to="RoundUI" method="_on_turn_state_changed"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MatchUI"]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -200.0
+offset_right = 200.0
+offset_bottom = 70.0
+grow_horizontal = 2
+
+[node name="Score" type="RichTextLabel" parent="MatchUI/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 48
+bbcode_enabled = true
+text = "[center][outline_size=8][outline_color=black]0 - 0"
+fit_content = true
+scroll_active = false
+
+[connection signal="changed" from="." to="MatchUI" method="_on_match_root_changed"]
+[connection signal="changed" from="RoundRoot/TurnState" to="RoundRoot/RoundUI" method="_on_turn_state_changed"]
 [connection signal="new_turn_started" from="RoundRoot/TurnState" to="RoundRoot/Arena/Selection" method="_on_turn_state_new_turn_started"]
 [connection signal="new_turn_started" from="RoundRoot/TurnState" to="RoundRoot/Arena/PoweredTiles" method="_on_turn_state_new_turn_started"]
+[connection signal="changed" from="RoundRoot/Arena/Players" to="RoundRoot/ScoreState" method="_on_players_changed"]
 [connection signal="changed" from="RoundRoot/Arena/Players" to="RoundRoot/Arena/ArenaTileMap" method="_on_players_changed"]
 [connection signal="changed" from="RoundRoot/Arena/Players" to="RoundRoot/Arena/PoweredTiles" method="_on_players_changed"]
 [connection signal="child_order_changed" from="RoundRoot/Arena/Players" to="RoundRoot/Arena/Players" method="_on_child_order_changed"]

@@ -100,6 +100,12 @@ func get_aligned_cells_at_range(center_cell: Vector2i, distance: int) -> Diction
 func are_cells_aligned(first: Vector2i, second: Vector2i) -> bool:
 	return first.x == second.x or first.y == second.y or first.x - first.y == second.x - second.y
 
+## Returns the distance in tiles to travel from the halfway line to `cell`.
+## Negative distances are towards team one's starting positions.
+## Positive distances are towards team two's starting positions.
+func distance_from_halfway_line(cell: Vector2i) -> int:
+	return cell.x - cell.y
+
 ## Remove all existing pathfinding obstacles and create up-to-date ones.
 ## TODO do this incrementally instead?
 func update_obstacles(players: Array[Player]):
@@ -116,6 +122,6 @@ func update_obstacles(players: Array[Player]):
 		disabled_point_ids.append(astar_id)
 
 
-func _on_players_changed(players: Array[Player]):
-	update_obstacles(players)
+func _on_players_changed(players: Players):
+	update_obstacles(players.all_players)
 

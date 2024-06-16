@@ -6,7 +6,7 @@ extends Node
 
 const player_scene := preload("res://scenes/player.tscn")
 
-signal changed(players: Array[Player])
+signal changed(players: Players)
 
 var all_players: Array[Player]:
 	get:
@@ -16,10 +16,10 @@ var all_players: Array[Player]:
 		return players
 
 func _on_child_order_changed():
-	changed.emit(all_players)
+	changed.emit(self)
 
 func _player_was_moved(_player: Player):
-	changed.emit(all_players)
+	changed.emit(self)
 
 func add_player(team: Constants.Team, tile_position: Vector2i, is_beacon: bool = false):
 	var player: Player = player_scene.instantiate()

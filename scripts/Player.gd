@@ -15,6 +15,7 @@ var players: Players
 var arena_tilemap: ArenaTileMap
 var turn_state: TurnState
 var event_log: EventLog
+var score_state: ScoreState
 
 @onready var graphic: Node2D = $Graphic
 @onready var sprite: AnimatedSprite2D = $Graphic/Sprite
@@ -64,6 +65,7 @@ func _ready():
 	arena_tilemap = round_root.arena_tilemap
 	turn_state = round_root.turn_state
 	event_log = round_root.event_log
+	score_state = round_root.score_state
 	
 	players = get_parent()
 
@@ -136,9 +138,9 @@ func _try_move_selected_player(destination_cell: Vector2i):
 	while cell_path.size() > 0:
 		if not turn_state.try_spend_power(BASE_MOVE_COST):
 			if walked_path.size() == 0:
-				event_log.log('%s tried to move but ran out of power!' % Constants.bbcode_player_name(self))
+				event_log.log('%s tried to move but ran out of power!' % BB.player_name(self))
 			else:
-				event_log.log('%s ran out of power after spending %s⚡ to move %s spaces!' % [Constants.bbcode_player_name(self), power_spent, walked_path.size()])
+				event_log.log('%s ran out of power after spending %s⚡ to move %s spaces!' % [BB.player_name(self), power_spent, walked_path.size()])
 			selected = false
 			break
 		power_spent += BASE_MOVE_COST
@@ -147,7 +149,7 @@ func _try_move_selected_player(destination_cell: Vector2i):
 	if walked_path.size() > 0:
 		walk_path(walked_path)
 	if selected:
-		event_log.log('%s spent %s⚡ to move %s spaces' % [Constants.bbcode_player_name(self), power_spent, walked_path.size()])
+		event_log.log('%s spent %s⚡ to move %s spaces' % [BB.player_name(self), power_spent, walked_path.size()])
 		_update_selection_tile()
 		_clear_path_preview()
 
@@ -200,4 +202,6 @@ func take_damage(damage: int) -> void:
 	health = maxi(0, health - damage)
 	taken_damage.emit(self, damage)
 	if health == 0:
-		event_log.log.call_deferred('%s was knocked unconscious!' % [Constants.bbcode_player_name(self)])
+		event_log.log.call_deferred('%s was knocked unconscious!' % [BB.player_name(self)])
+		if is_beacon:
+			score_state.score_points(Constants.other_team(team), Constants.POINTS_FOR_SACKING_BEACON)

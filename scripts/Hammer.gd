@@ -195,7 +195,7 @@ class PushAction:
 func try_push(push_target: ValidTarget, overcharged: bool):
 	var attack_cost := ATTACK_COST
 	if not player.turn_state.try_spend_power(attack_cost):
-		player.event_log.log('%s tried to push %s back but didn\'t have %s⚡!' % [Constants.bbcode_player_name(player), Constants.bbcode_player_name(push_target.player), attack_cost])
+		player.event_log.log('%s tried to push %s back but didn\'t have %s⚡!' % [BB.player_name(player), BB.player_name(push_target.player), attack_cost])
 		player.selected = false
 		return
 	var push_action := PushAction.new()
@@ -210,17 +210,17 @@ func try_push(push_target: ValidTarget, overcharged: bool):
 	
 	var push_outcomes := resolve_push(push_action)
 	if overcharged:
-		player.event_log.log('%s spent %s⚡ on an overcharged push!' % [Constants.bbcode_player_name(player), attack_cost])
+		player.event_log.log('%s spent %s⚡ on an overcharged push!' % [BB.player_name(player), attack_cost])
 	else:
-		player.event_log.log('%s spent %s⚡ on a push' % [Constants.bbcode_player_name(player), attack_cost])
+		player.event_log.log('%s spent %s⚡ on a push' % [BB.player_name(player), attack_cost])
 	for outcome in push_outcomes:
 		match outcome.type:
 			PushOutcomeType.MOVED_TO:
-				player.event_log.log('%s pushed %s back %s spaces, dealing %s damage' % [Constants.bbcode_player_name(player), Constants.bbcode_player_name(outcome.player), outcome.distance, outcome.damage])
+				player.event_log.log('%s pushed %s back %s spaces, dealing %s damage' % [BB.player_name(player), BB.player_name(outcome.player), outcome.distance, outcome.damage])
 			PushOutcomeType.CLASHED_WITH:
-				player.event_log.log('%s pushed %s back %s spaces into %s, dealing %s damage' % [Constants.bbcode_player_name(player), Constants.bbcode_player_name(outcome.player), outcome.distance, Constants.bbcode_player_name(outcome.clashed_with), outcome.damage])
+				player.event_log.log('%s pushed %s back %s spaces into %s, dealing %s damage' % [BB.player_name(player), BB.player_name(outcome.player), outcome.distance, BB.player_name(outcome.clashed_with), outcome.damage])
 			PushOutcomeType.OUT_OF_ARENA:
-				player.event_log.log('%s pushed %s back %s spaces, off the arena!' % [Constants.bbcode_player_name(player), Constants.bbcode_player_name(outcome.player), outcome.distance])
+				player.event_log.log('%s pushed %s back %s spaces, off the arena!' % [BB.player_name(player), BB.player_name(outcome.player), outcome.distance])
 	if overcharged:
 		player.selected = false
 		return

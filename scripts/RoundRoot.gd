@@ -6,6 +6,7 @@ extends Node
 @onready var arena_tilemap: ArenaTileMap = %ArenaTileMap
 @onready var event_log: EventLog = %EventLog
 @onready var players: Players = %Players
+@onready var score_state: ScoreState = %ScoreState
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
