@@ -26,3 +26,4 @@ func check_for_travel_scoring(team: Constants.Team, beacon_player: Player):
 func score_points(team: Constants.Team, points: int):
 	match_root.score_points(team, points)
 	event_log.log.call_deferred('[b]%s scored %s points![/b]' % [BB.team_name(team), points])
+	changed.emit(self)

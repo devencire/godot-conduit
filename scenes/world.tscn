@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://d1t087k7mdxvb"]
+[gd_scene load_steps=18 format=3 uid="uid://d1t087k7mdxvb"]
 
 [ext_resource type="Script" path="res://world.gd" id="1_4avd2"]
 [ext_resource type="Texture2D" uid="uid://bu0j2ljbdu4jy" path="res://assets/hexes_2px_outline.png" id="1_7kdkn"]
@@ -12,6 +12,7 @@
 [ext_resource type="PackedScene" uid="uid://c04vm1q3ssoxd" path="res://scenes/round_ui.tscn" id="7_p4op4"]
 [ext_resource type="PackedScene" uid="uid://dxxmf1dm70jy3" path="res://scenes/powered_tiles.tscn" id="8_h1dur"]
 [ext_resource type="Script" path="res://scripts/EventLog.gd" id="10_7koks"]
+[ext_resource type="Script" path="res://scripts/TravelBoundaries.gd" id="11_q0q07"]
 [ext_resource type="Script" path="res://scripts/MatchUI.gd" id="12_1lrdw"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_s34qc"]
@@ -63,10 +64,10 @@ unique_name_in_owner = true
 tile_set = SubResource("TileSet_ce3eq")
 format = 2
 layer_0/name = "ground"
-layer_0/tile_data = PackedInt32Array(65537, 0, 0, 0, 0, 0, -1, 0, 0, -65538, 0, 0, 65538, 0, 0, 1, 0, 0, -65536, 0, 0, -65537, 0, 0, -131074, 0, 0, -196610, 0, 0, -131073, 0, 0, -131072, 0, 0, -65535, 0, 0, -65534, 0, 0, 2, 0, 0, 3, 0, 0, 65539, 0, 0, -131071, 0, 0, -196607, 0, 0, -196608, 0, 0, -262144, 0, 0, -196609, 0, 0, -262146, 0, 0, -327682, 0, 0, -262145, 0, 0, -196606, 0, 0, -131070, 0, 0, -131069, 0, 0, -65533, 0, 0, 4, 0, 0, 65540, 0, 0, 65541, 0, 0, 5, 0, 0, -65531, 0, 0, -65532, 0, 0, -131068, 0, 0, -196605, 0, 0, -262142, 0, 0, -262143, 0, 0, -327680, 0, 0, -327681, 0, 0, -393216, 0, 0, -327679, 0, 0, -262147, 0, 0, -196611, 0, 0, -131075, 0, 0, -65539, 0, 0, 131076, 0, 0, 131075, 0, 0, 131074, 0, 0, 131073, 0, 0, 65536, 0, 0, 65535, 0, 0, -2, 0, 0, 196611, 0, 0, 196610, 0, 0, 262146, 0, 0, 262145, 0, 0, 327681, 0, 0, 327680, 0, 0, 393215, 0, 0, 262141, 0, 0, 196604, 0, 0, 131067, 0, 0, 65530, 0, 0, -6, 0, 0, -65542, 0, 0, -5, 0, 0, 65532, 0, 0, 131068, 0, 0, 196605, 0, 0, 327678, 0, 0, 327679, 0, 0, 262142, 0, 0, 131069, 0, 0, 65531, 0, 0, -65541, 0, 0, -65540, 0, 0, -131077, 0, 0, -131076, 0, 0, -196612, 0, 0, -4, 0, 0, -3, 0, 0, 65533, 0, 0, 65534, 0, 0, 131071, 0, 0, 196607, 0, 0, 196606, 0, 0, 131070, 0, 0, 262143, 0, 0, 196608, 0, 0, 262144, 0, 0, 131072, 0, 0, 196609, 0, 0)
+layer_0/tile_data = PackedInt32Array(65537, 0, 0, 0, 0, 0, -1, 0, 0, -65538, 0, 0, -196610, 0, 0, -131073, 0, 0, -131072, 0, 0, -65535, 0, 0, -65534, 0, 0, 2, 0, 0, 3, 0, 0, 65539, 0, 0, -131071, 0, 0, -196607, 0, 0, -196608, 0, 0, -262144, 0, 0, -196609, 0, 0, -262146, 0, 0, -327682, 0, 0, -262145, 0, 0, -196606, 0, 0, -131070, 0, 0, -131069, 0, 0, -65533, 0, 0, 4, 0, 0, 65540, 0, 0, 65541, 0, 0, 5, 0, 0, -65531, 0, 0, -65532, 0, 0, -131068, 0, 0, -196605, 0, 0, -262142, 0, 0, -262143, 0, 0, -327680, 0, 0, -327681, 0, 0, -393216, 0, 0, -327679, 0, 0, -262147, 0, 0, -131075, 0, 0, -65539, 0, 0, 131076, 0, 0, 131074, 0, 0, 131073, 0, 0, 65536, 0, 0, 65535, 0, 0, -2, 0, 0, 196611, 0, 0, 196610, 0, 0, 262146, 0, 0, 262145, 0, 0, 327681, 0, 0, 327680, 0, 0, 393215, 0, 0, 262141, 0, 0, 196604, 0, 0, 131067, 0, 0, 65530, 0, 0, -6, 0, 0, -65542, 0, 0, -5, 0, 0, 65532, 0, 0, 131068, 0, 0, 196605, 0, 0, 327678, 0, 0, 327679, 0, 0, 262142, 0, 0, 131069, 0, 0, 65531, 0, 0, -65541, 0, 0, -65540, 0, 0, -131077, 0, 0, -131076, 0, 0, -196612, 0, 0, -4, 0, 0, -3, 0, 0, 65533, 0, 0, 65534, 0, 0, 131071, 0, 0, 196607, 0, 0, 196606, 0, 0, 131070, 0, 0, 262143, 0, 0, 196608, 0, 0, 262144, 0, 0, 131072, 0, 0, 196609, 0, 0, 131075, 0, 0, 65538, 0, 0, 1, 0, 0, -65536, 0, 0, -65537, 0, 0, -131074, 0, 0, -196611, 0, 0)
 layer_1/name = "walls"
 layer_1/navigation_enabled = false
-layer_1/tile_data = PackedInt32Array(393218, 65536, 1, 327682, 65536, 1, 327683, 65536, 1, 262147, 65536, 1, 262148, 65536, 1, 196612, 65536, 1, 196613, 65536, 1, 131077, 65536, 1, 131078, 65536, 1, 65542, 65536, 1, 6, 65536, 1, -65530, 65536, 1, -458752, 65536, 1, -393217, 65536, 1, -393218, 65536, 1, -393219, 65536, 1, -327683, 65536, 1, -327684, 65536, 1, -262148, 65536, 1, -262149, 65536, 1, -196613, 65536, 1, -196614, 65536, 1, -131078, 65536, 1, -131079, 65536, 1, -65543, 65536, 1, -7, 65536, 1, 65529, 65536, 1, 393217, 65536, 1, 393216, 65536, 1, 458751, 65536, 1, 393214, 65536, 1, 327677, 65536, 1, 262140, 65536, 1, 196603, 65536, 1, 131066, 65536, 1, -131067, 65536, 1, -196604, 65536, 1, -262141, 65536, 1, -327678, 65536, 1, -393215, 65536, 1)
+layer_1/tile_data = PackedInt32Array(327682, 65536, 0, 327683, 65536, 0, 262148, 65536, 0, 196612, 65536, 0, 196613, 65536, 0, 131077, 65536, 0, 131078, 65536, 0, 65542, 65536, 0, 6, 65536, 0, -65530, 65536, 0, -131067, 65536, 0, -196604, 65536, 0, -262141, 65536, 0, -327678, 65536, 0, -393215, 65536, 0, -458752, 65536, 0, -393217, 65536, 0, -393218, 65536, 0, -393219, 65536, 0, -327683, 65536, 0, -327684, 65536, 0, -262148, 65536, 0, -262149, 65536, 0, -196613, 65536, 0, -196614, 65536, 0, -131078, 65536, 0, -131079, 65536, 0, -65543, 65536, 0, -7, 65536, 0, 65529, 65536, 0, 131066, 65536, 0, 196603, 65536, 0, 262140, 65536, 0, 327677, 65536, 0, 393214, 65536, 0, 458751, 65536, 0, 393216, 65536, 0, 393217, 65536, 0, 393218, 65536, 0, 262147, 65536, 0)
 script = ExtResource("3_rf75t")
 
 [node name="Selection" parent="RoundRoot/Arena" instance=ExtResource("5_0ab0n")]
@@ -87,6 +88,21 @@ script = ExtResource("7_23lak")
 arena_tilemap = NodePath("../ArenaTileMap")
 
 [node name="PoweredTiles" parent="RoundRoot/Arena" instance=ExtResource("8_h1dur")]
+
+[node name="TravelBoundaries" type="Node2D" parent="RoundRoot/Arena" node_paths=PackedStringArray("score_state", "arena_tilemap")]
+script = ExtResource("11_q0q07")
+score_state = NodePath("../../ScoreState")
+arena_tilemap = NodePath("../ArenaTileMap")
+
+[node name="TeamOneBoundary" type="TileMap" parent="RoundRoot/Arena/TravelBoundaries"]
+modulate = Color(0, 0, 1, 1)
+tile_set = SubResource("TileSet_ce3eq")
+format = 2
+
+[node name="TeamTwoBoundary" type="TileMap" parent="RoundRoot/Arena/TravelBoundaries"]
+modulate = Color(1, 0, 0, 1)
+tile_set = SubResource("TileSet_ce3eq")
+format = 2
 
 [node name="CanvasLayer" type="CanvasLayer" parent="RoundRoot"]
 offset = Vector2(2.08165e-12, 2.08165e-12)
@@ -137,6 +153,7 @@ scroll_active = false
 [connection signal="changed" from="RoundRoot/TurnState" to="RoundRoot/RoundUI" method="_on_turn_state_changed"]
 [connection signal="new_turn_started" from="RoundRoot/TurnState" to="RoundRoot/Arena/Selection" method="_on_turn_state_new_turn_started"]
 [connection signal="new_turn_started" from="RoundRoot/TurnState" to="RoundRoot/Arena/PoweredTiles" method="_on_turn_state_new_turn_started"]
+[connection signal="changed" from="RoundRoot/ScoreState" to="RoundRoot/Arena/TravelBoundaries" method="_on_score_state_changed"]
 [connection signal="changed" from="RoundRoot/Arena/Players" to="RoundRoot/ScoreState" method="_on_players_changed"]
 [connection signal="changed" from="RoundRoot/Arena/Players" to="RoundRoot/Arena/ArenaTileMap" method="_on_players_changed"]
 [connection signal="changed" from="RoundRoot/Arena/Players" to="RoundRoot/Arena/PoweredTiles" method="_on_players_changed"]
