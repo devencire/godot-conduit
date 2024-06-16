@@ -50,7 +50,10 @@ script = ExtResource("2_r7p20")
 unique_name_in_owner = true
 script = ExtResource("2_7l4uc")
 
-[node name="ArenaTileMap" type="TileMap" parent="RoundRoot"]
+[node name="Arena" type="Node2D" parent="RoundRoot"]
+scale = Vector2(0.75, 0.75)
+
+[node name="ArenaTileMap" type="TileMap" parent="RoundRoot/Arena"]
 unique_name_in_owner = true
 tile_set = SubResource("TileSet_ce3eq")
 format = 2
@@ -61,14 +64,14 @@ layer_1/navigation_enabled = false
 layer_1/tile_data = PackedInt32Array(393218, 65536, 1, 327682, 65536, 1, 327683, 65536, 1, 262147, 65536, 1, 262148, 65536, 1, 196612, 65536, 1, 196613, 65536, 1, 131077, 65536, 1, 131078, 65536, 1, 65542, 65536, 1, 6, 65536, 1, -65530, 65536, 1, -458752, 65536, 1, -393217, 65536, 1, -393218, 65536, 1, -393219, 65536, 1, -327683, 65536, 1, -327684, 65536, 1, -262148, 65536, 1, -262149, 65536, 1, -196613, 65536, 1, -196614, 65536, 1, -131078, 65536, 1, -131079, 65536, 1, -65543, 65536, 1, -7, 65536, 1, 65529, 65536, 1, 393217, 65536, 1, 393216, 65536, 1, 458751, 65536, 1, 393214, 65536, 1, 327677, 65536, 1, 262140, 65536, 1, 196603, 65536, 1, 131066, 65536, 1, -131067, 65536, 1, -196604, 65536, 1, -262141, 65536, 1, -327678, 65536, 1, -393215, 65536, 1)
 script = ExtResource("3_rf75t")
 
-[node name="Selection" parent="RoundRoot/ArenaTileMap" instance=ExtResource("5_0ab0n")]
+[node name="Selection" parent="RoundRoot/Arena" instance=ExtResource("5_0ab0n")]
 
-[node name="Players" type="Node" parent="RoundRoot/ArenaTileMap" node_paths=PackedStringArray("round_root")]
+[node name="Players" type="Node2D" parent="RoundRoot/Arena" node_paths=PackedStringArray("round_root")]
 unique_name_in_owner = true
 script = ExtResource("6_4jl0i")
 round_root = NodePath("../..")
 
-[node name="DebugShowTileLabel" type="Label" parent="RoundRoot/ArenaTileMap"]
+[node name="DebugShowTileLabel" type="Label" parent="RoundRoot/Arena" node_paths=PackedStringArray("arena_tilemap")]
 offset_left = 722.0
 offset_top = 486.0
 offset_right = 895.0
@@ -76,16 +79,21 @@ offset_bottom = 520.0
 text = "Hovered tile: {}"
 label_settings = SubResource("LabelSettings_8os5q")
 script = ExtResource("7_23lak")
+arena_tilemap = NodePath("../ArenaTileMap")
 
-[node name="PoweredTiles" parent="RoundRoot/ArenaTileMap" instance=ExtResource("8_h1dur")]
+[node name="PoweredTiles" parent="RoundRoot/Arena" instance=ExtResource("8_h1dur")]
 
-[node name="EventLog" type="RichTextLabel" parent="RoundRoot"]
+[node name="CanvasLayer" type="CanvasLayer" parent="RoundRoot"]
+
+[node name="EventLog" type="RichTextLabel" parent="RoundRoot/CanvasLayer"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(750, 240)
-offset_left = 218.0
-offset_top = -906.0
-offset_right = 968.0
-offset_bottom = -666.0
+custom_minimum_size = Vector2(500, 240)
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -240.0
+offset_right = 500.0
+grow_vertical = 0
 focus_mode = 2
 theme = SubResource("Theme_f63g6")
 bbcode_enabled = true
@@ -96,13 +104,12 @@ script = ExtResource("10_7koks")
 
 [node name="Camera" type="Camera2D" parent="."]
 unique_name_in_owner = true
-position = Vector2(64, -128)
 
 [node name="RoundUI" parent="." instance=ExtResource("7_p4op4")]
 
 [connection signal="changed" from="RoundRoot/TurnState" to="RoundUI" method="_on_turn_state_changed"]
-[connection signal="new_turn_started" from="RoundRoot/TurnState" to="RoundRoot/ArenaTileMap/Selection" method="_on_turn_state_new_turn_started"]
-[connection signal="new_turn_started" from="RoundRoot/TurnState" to="RoundRoot/ArenaTileMap/PoweredTiles" method="_on_turn_state_new_turn_started"]
-[connection signal="changed" from="RoundRoot/ArenaTileMap/Players" to="RoundRoot/ArenaTileMap" method="_on_players_changed"]
-[connection signal="changed" from="RoundRoot/ArenaTileMap/Players" to="RoundRoot/ArenaTileMap/PoweredTiles" method="_on_players_changed"]
-[connection signal="child_order_changed" from="RoundRoot/ArenaTileMap/Players" to="RoundRoot/ArenaTileMap/Players" method="_on_child_order_changed"]
+[connection signal="new_turn_started" from="RoundRoot/TurnState" to="RoundRoot/Arena/Selection" method="_on_turn_state_new_turn_started"]
+[connection signal="new_turn_started" from="RoundRoot/TurnState" to="RoundRoot/Arena/PoweredTiles" method="_on_turn_state_new_turn_started"]
+[connection signal="changed" from="RoundRoot/Arena/Players" to="RoundRoot/Arena/ArenaTileMap" method="_on_players_changed"]
+[connection signal="changed" from="RoundRoot/Arena/Players" to="RoundRoot/Arena/PoweredTiles" method="_on_players_changed"]
+[connection signal="child_order_changed" from="RoundRoot/Arena/Players" to="RoundRoot/Arena/Players" method="_on_child_order_changed"]

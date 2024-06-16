@@ -4,6 +4,8 @@
 
 [sub_resource type="LabelSettings" id="LabelSettings_76cn4"]
 font_size = 32
+outline_size = 8
+outline_color = Color(0, 0, 0, 1)
 
 [sub_resource type="LabelSettings" id="LabelSettings_17700"]
 font_size = 32
@@ -22,6 +24,7 @@ offset_left = 16.0
 offset_top = 16.0
 offset_right = 1904.0
 offset_bottom = 1584.0
+mouse_filter = 2
 
 [node name="TeamIndicator" type="Label" parent="VBoxContainer"]
 layout_mode = 2
@@ -73,5 +76,5 @@ size_flags_horizontal = 0
 theme_override_font_sizes/font_size = 32
 text = "End turn"
 
-[connection signal="pressed" from="VBoxContainer/EndTurnButton" to="VBoxContainer/EndTurnButton" method="_on_pressed"]
 [connection signal="pressed" from="VBoxContainer/EndTurnButton" to="." method="_on_end_turn_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/EndTurnButton" to="VBoxContainer/EndTurnButton" method="_on_pressed"]

@@ -2,17 +2,14 @@ class_name PoweredTiles
 
 extends Node
 
-var arena_tilemap: ArenaTileMap
+@onready var arena_tilemap: ArenaTileMap = %ArenaTileMap
 @onready var players: Players = %Players
 @onready var turn_state: TurnState = %TurnState
 
 var powered_tile_scene := preload("res://scenes/powered_tile.tscn")
-var powered_tile_container: Node
+var powered_tile_container: Node2D
 
 var pulse_tween: Tween
-
-func _ready():
-	arena_tilemap = find_parent('ArenaTileMap') as ArenaTileMap
 
 func _on_players_changed(_players):
 	draw_powered_tiles()
@@ -35,7 +32,7 @@ func draw_powered_tiles():
 	if powered_tile_container:
 		powered_tile_container.queue_free()
 		
-	powered_tile_container = Node.new()
+	powered_tile_container = Node2D.new()
 	var active_team_container := Node2D.new()
 	var other_team_container := Node2D.new()
 	for cell in powered_cell_teams:

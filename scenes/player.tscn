@@ -17,13 +17,13 @@ animations = [{
 "speed": 5.0
 }]
 
-[node name="Player" type="Node" groups=["players"]]
+[node name="Player" type="Node2D" groups=["players"]]
 script = ExtResource("1_4vrrm")
 
 [node name="SelectionTile" parent="." instance=ExtResource("3_77lfk")]
 visible = false
 
-[node name="Hammer" type="Node" parent="." node_paths=PackedStringArray("player")]
+[node name="Hammer" type="Node2D" parent="." node_paths=PackedStringArray("player")]
 script = ExtResource("4_ek61n")
 player = NodePath("..")
 

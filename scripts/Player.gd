@@ -22,7 +22,7 @@ var event_log: EventLog
 
 var hovered_cell: Vector2i
 var path_preview_tile_scene := preload("res://scenes/path_preview_tile.tscn")
-var path_preview: Node
+var path_preview: Node2D
 
 # Which team the player is a member of.
 @export var team: Constants.Team
@@ -102,7 +102,7 @@ const MOVE_COST := 1
 func _update_path_preview(cell_path: Array[Vector2i]):
 	# TODO retain and re-use the preview tiles for performance?
 	_clear_path_preview()
-	path_preview = Node.new()
+	path_preview = Node2D.new()
 	var total_power_cost := 0
 	for cell in cell_path:
 		total_power_cost += MOVE_COST

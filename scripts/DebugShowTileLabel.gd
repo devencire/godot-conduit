@@ -1,9 +1,6 @@
 extends Label
 
-var arena_tilemap: ArenaTileMap
-
-func _ready():
-	arena_tilemap = get_parent()
+@export var arena_tilemap: ArenaTileMap
 
 func _unhandled_input(event):
 	if event is InputEventMouseMotion:

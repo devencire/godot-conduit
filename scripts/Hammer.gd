@@ -9,7 +9,7 @@ const BASE_DIRECT_DAMAGE := 1
 const CLASH_DAMAGE := 1
 
 var target_preview_tile_scene := preload("res://scenes/target_preview_tile.tscn")
-var target_preview: Node
+var target_preview: Node2D
 
 var attack_dialog_scene := preload("res://scenes/attack_dialog.tscn")
 
@@ -70,7 +70,7 @@ func _draw_target_selection_preview():
 	_clear_target_preview()
 	if not player.is_powered_by_team_beacon():
 		return
-	target_preview = Node.new()
+	target_preview = Node2D.new()
 	var valid_targets := get_valid_targets()
 	for target in valid_targets:
 		var preview_tile: TargetPreviewTile = target_preview_tile_scene.instantiate()
@@ -83,7 +83,7 @@ func _draw_target_selection_preview():
 func _draw_hit_direction_selection_preview():
 	_clear_target_preview()
 	# show the opponent player as targeted
-	target_preview = Node.new()
+	target_preview = Node2D.new()
 	var selected_target_tile: TargetPreviewTile = target_preview_tile_scene.instantiate()
 	selected_target_tile.position = player.arena_tilemap.map_to_local(selected_target.cell)
 	selected_target_tile.team = player.team
@@ -139,7 +139,9 @@ func _draw_hit_direction_selection_preview():
 			attack_dialog.max_power_cost += OVERCHARGED_EXTRA_TILE_COST
 	attack_dialog.set_overcharge.connect(_set_overcharge)
 	target_preview.add_child(attack_dialog)
+	attack_dialog.owner = target_preview
 	add_child(target_preview)
+	target_preview.owner = self
 
 func _set_overcharge(toggled_on: bool):
 	if selected_target:
