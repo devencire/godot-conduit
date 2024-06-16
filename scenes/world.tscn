@@ -98,10 +98,9 @@ script = ExtResource("10_7koks")
 unique_name_in_owner = true
 position = Vector2(64, -128)
 
-[node name="RoundUI" parent="Camera" instance=ExtResource("7_p4op4")]
-position = Vector2(-961, -800)
+[node name="RoundUI" parent="." instance=ExtResource("7_p4op4")]
 
-[connection signal="changed" from="RoundRoot/TurnState" to="Camera/RoundUI" method="_on_turn_state_changed"]
+[connection signal="changed" from="RoundRoot/TurnState" to="RoundUI" method="_on_turn_state_changed"]
 [connection signal="new_turn_started" from="RoundRoot/TurnState" to="RoundRoot/ArenaTileMap/Selection" method="_on_turn_state_new_turn_started"]
 [connection signal="new_turn_started" from="RoundRoot/TurnState" to="RoundRoot/ArenaTileMap/PoweredTiles" method="_on_turn_state_new_turn_started"]
 [connection signal="changed" from="RoundRoot/ArenaTileMap/Players" to="RoundRoot/ArenaTileMap" method="_on_players_changed"]
