@@ -9,8 +9,10 @@ signal was_deselected(player: Player)
 signal initialized(player: Player)
 signal taken_damage(player: Player, damage: int)
 
-var arena_tilemap: ArenaTileMap
 var players: Players
+
+@export var round_root: RoundRoot
+var arena_tilemap: ArenaTileMap
 var turn_state: TurnState
 var event_log: EventLog
 
@@ -59,12 +61,9 @@ static var next_id := 1
 
 
 func _ready():
-	# TODO there's got to be a better way of sharing these?
-	# at least we only use `match_root` directly in `_ready`
-	var match_root: MatchRoot = find_parent('MatchRoot')
-	arena_tilemap = match_root.arena_tilemap
-	turn_state = match_root.turn_state
-	event_log = match_root.event_log
+	arena_tilemap = round_root.arena_tilemap
+	turn_state = round_root.turn_state
+	event_log = round_root.event_log
 	
 	players = get_parent()
 

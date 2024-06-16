@@ -2,6 +2,8 @@ class_name Players
 
 extends Node
 
+@export var round_root: RoundRoot
+
 const player_scene := preload("res://scenes/player.tscn")
 
 signal changed(players: Array[Player])
@@ -21,6 +23,7 @@ func _player_was_moved(player: Player):
 
 func add_player(team: Constants.Team, tile_position: Vector2i, is_beacon: bool = false):
 	var player: Player = player_scene.instantiate()
+	player.round_root = round_root
 	player.team = team
 	player.tile_position = tile_position
 	player.is_beacon = is_beacon

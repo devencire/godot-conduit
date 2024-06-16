@@ -1,0 +1,78 @@
+[gd_scene load_steps=6 format=3 uid="uid://c04vm1q3ssoxd"]
+
+[ext_resource type="Script" path="res://scripts/RoundUI.gd" id="1_7pbux"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_76cn4"]
+font_size = 32
+
+[sub_resource type="LabelSettings" id="LabelSettings_17700"]
+font_size = 32
+
+[sub_resource type="LabelSettings" id="LabelSettings_rs8d1"]
+font_size = 24
+
+[sub_resource type="LabelSettings" id="LabelSettings_ajpyq"]
+font_size = 24
+
+[node name="TurnStateUI" type="Node2D"]
+position = Vector2(-1, 0)
+script = ExtResource("1_7pbux")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 659.0
+offset_bottom = 273.0
+
+[node name="TeamIndicator" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "It is Team {}'s turn"
+label_settings = SubResource("LabelSettings_76cn4")
+metadata/_edit_use_anchors_ = true
+
+[node name="KnownRemainingPower" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Known remaining power: {}⚡"
+label_settings = SubResource("LabelSettings_17700")
+metadata/_edit_use_anchors_ = true
+
+[node name="MaximumRemainingPower" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Maximum possible remaining power: {}⚡"
+label_settings = SubResource("LabelSettings_17700")
+metadata/_edit_use_anchors_ = true
+
+[node name="CopiedExcessPower" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Copied excess power: {}⚡"
+label_settings = SubResource("LabelSettings_rs8d1")
+metadata/_edit_use_anchors_ = true
+
+[node name="BaseTurnPower" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Base turn power: {}⚡"
+label_settings = SubResource("LabelSettings_ajpyq")
+metadata/_edit_use_anchors_ = true
+
+[node name="MaximumRandomPower" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Maximum random power: {}⚡"
+label_settings = SubResource("LabelSettings_ajpyq")
+metadata/_edit_use_anchors_ = true
+
+[node name="ActualRemainingPower" type="Label" parent="VBoxContainer"]
+visible = false
+modulate = Color(0.498039, 0.501961, 0.498039, 1)
+layout_mode = 2
+text = "Actual random power: {}"
+label_settings = SubResource("LabelSettings_ajpyq")
+metadata/_edit_use_anchors_ = true
+
+[node name="EndTurnButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 32
+text = "End turn"
+
+[connection signal="pressed" from="VBoxContainer/EndTurnButton" to="." method="_on_end_turn_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/EndTurnButton" to="VBoxContainer/EndTurnButton" method="_on_pressed"]
