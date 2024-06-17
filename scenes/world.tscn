@@ -75,21 +75,6 @@ script = ExtResource("3_rf75t")
 
 [node name="Selection" parent="RoundRoot/Arena" instance=ExtResource("5_0ab0n")]
 
-[node name="Players" type="Node2D" parent="RoundRoot/Arena" node_paths=PackedStringArray("round_root")]
-unique_name_in_owner = true
-script = ExtResource("6_4jl0i")
-round_root = NodePath("../..")
-
-[node name="DebugShowTileLabel" type="Label" parent="RoundRoot/Arena" node_paths=PackedStringArray("arena_tilemap")]
-offset_left = 722.0
-offset_top = 486.0
-offset_right = 895.0
-offset_bottom = 520.0
-text = "Hovered tile: {}"
-label_settings = SubResource("LabelSettings_8os5q")
-script = ExtResource("7_23lak")
-arena_tilemap = NodePath("../ArenaTileMap")
-
 [node name="PoweredTiles" parent="RoundRoot/Arena" instance=ExtResource("8_h1dur")]
 
 [node name="TravelBoundaries" type="Node2D" parent="RoundRoot/Arena" node_paths=PackedStringArray("score_state", "arena_tilemap")]
@@ -106,6 +91,21 @@ format = 2
 modulate = Color(1, 0, 0, 1)
 tile_set = SubResource("TileSet_ce3eq")
 format = 2
+
+[node name="Players" type="Node2D" parent="RoundRoot/Arena" node_paths=PackedStringArray("round_root")]
+unique_name_in_owner = true
+script = ExtResource("6_4jl0i")
+round_root = NodePath("../..")
+
+[node name="DebugShowTileLabel" type="Label" parent="RoundRoot/Arena" node_paths=PackedStringArray("arena_tilemap")]
+offset_left = 722.0
+offset_top = 486.0
+offset_right = 895.0
+offset_bottom = 520.0
+text = "Hovered tile: {}"
+label_settings = SubResource("LabelSettings_8os5q")
+script = ExtResource("7_23lak")
+arena_tilemap = NodePath("../ArenaTileMap")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="RoundRoot"]
 offset = Vector2(2.08165e-12, 2.08165e-12)
