@@ -39,5 +39,5 @@ func _draw_travel_boundary(team: Constants.Team, current_travel_score: int) -> v
 		next_cell = Vector2i(next_cell.x + 1, next_cell.y + 1)
 
 
-func _on_score_state_changed(score_state):
+func _on_score_state_changed(_score_state):
 	queue_redraw()

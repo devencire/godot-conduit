@@ -118,7 +118,8 @@ func update_obstacles(players: Array[Player]):
 
 	for player in players:
 		var astar_id := _cell_to_astar_id(player.tile_position)
-		astar.set_point_disabled(astar_id, true)
+		if astar.has_point(astar_id): # not true for out-of-arena players
+			astar.set_point_disabled(astar_id, true)
 		disabled_point_ids.append(astar_id)
 
 
