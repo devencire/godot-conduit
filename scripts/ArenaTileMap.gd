@@ -3,6 +3,7 @@ class_name ArenaTileMap
 extends TileMap
 
 const GROUND_LAYER := 0
+const WALL_LAYER := 1
 
 var astar: AStar2D
 var disabled_point_ids: Array[int] = []
@@ -53,6 +54,10 @@ func get_cell_path(start: Vector2i, end: Vector2i) -> Array[Vector2i]:
 func is_cell_pathable(cell: Vector2i) -> bool:
 	var id := _cell_to_astar_id(cell)
 	return astar.has_point(id)
+
+## Returns true if the cell contains a wall (that players hit rather than fall into)
+func is_cell_wall(cell: Vector2i) -> bool:
+	return get_cell_source_id(WALL_LAYER, cell) != -1
 
 ## Get the cell for the mouse position of an InputEventMouse.
 func get_hovered_cell(event: InputEventMouse) -> Vector2i:

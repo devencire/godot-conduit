@@ -217,6 +217,8 @@ func try_push(push_target: ValidTarget, overcharged: bool):
 		match outcome.type:
 			PushOutcomeType.MOVED_TO:
 				player.event_log.log('%s pushed %s back %s spaces, dealing %s damage' % [BB.player_name(player), BB.player_name(outcome.player), outcome.distance, outcome.damage])
+			PushOutcomeType.INTO_WALL:
+				player.event_log.log('%s pushed %s back %s spaces into a wall, dealing %s damage' % [BB.player_name(player), BB.player_name(outcome.player), outcome.distance, outcome.damage])
 			PushOutcomeType.CLASHED_WITH:
 				player.event_log.log('%s pushed %s back %s spaces into %s, dealing %s damage' % [BB.player_name(player), BB.player_name(outcome.player), outcome.distance, BB.player_name(outcome.clashed_with), outcome.damage])
 			PushOutcomeType.OUT_OF_ARENA:
@@ -226,7 +228,7 @@ func try_push(push_target: ValidTarget, overcharged: bool):
 		return
 	_clear_selected_target()
 
-enum PushOutcomeType { MOVED_TO, CLASHED_WITH, OUT_OF_ARENA }
+enum PushOutcomeType { MOVED_TO, INTO_WALL, CLASHED_WITH, OUT_OF_ARENA }
 
 class PushOutcome:
 	var player: Player
@@ -244,17 +246,26 @@ func resolve_push(push_action: PushAction) -> Array[PushOutcome]:
 	var clashed_with: Player = null
 	while push_action.force > 0:
 		distance += 1
+		var previous_cell := current_cell
 		current_cell = player.arena_tilemap.get_neighbor_cell(current_cell, push_action.direction)
 		if not player.arena_tilemap.is_cell_pathable(current_cell):
-			# obviously this will want to be something else eventually
-			#push_action.player.tile_position = Constants.OFF_ARENA
-			#push_action.player.queue_free()
-			push_action.player.push_to(current_cell)
-			var ooa_push_outcome := PushOutcome.new()
-			ooa_push_outcome.player = push_action.player
-			ooa_push_outcome.type = PushOutcomeType.OUT_OF_ARENA
-			ooa_push_outcome.distance = distance
-			return [ooa_push_outcome]
+			if player.arena_tilemap.is_cell_wall(current_cell):
+				total_damage += push_action.force
+				push_action.player.push_to(previous_cell)
+				push_action.player.take_damage(total_damage)
+				var wall_push_outcome := PushOutcome.new()
+				wall_push_outcome.player = push_action.player
+				wall_push_outcome.type = PushOutcomeType.INTO_WALL
+				wall_push_outcome.distance = distance - 1
+				wall_push_outcome.damage = total_damage
+				return [wall_push_outcome]
+			else:
+				push_action.player.push_to(current_cell)
+				var ooa_push_outcome := PushOutcome.new()
+				ooa_push_outcome.player = push_action.player
+				ooa_push_outcome.type = PushOutcomeType.OUT_OF_ARENA
+				ooa_push_outcome.distance = distance
+				return [ooa_push_outcome]
 		var player_in_next_cell := player.players.player_in_cell(current_cell)
 		if player_in_next_cell:
 			clashed_with = player_in_next_cell
