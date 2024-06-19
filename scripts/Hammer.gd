@@ -2,10 +2,12 @@ extends Node
 
 @export var player: Player
 
-const ATTACK_COST := 2
-const OVERCHARGED_EXTRA_TILE_COST := 2
+const ATTACK_COST := 1
 
-const BASE_DIRECT_DAMAGE := 1
+const OVERCHARGED_ATTACK_BASE_COST := 2
+const OVERCHARGED_EXTRA_TILE_COST := 2
+const OVERCHARGED_DIRECT_DAMAGE := 1
+
 const CLASH_DAMAGE := 1
 
 var target_preview_tile_scene := preload("res://scenes/target_preview_tile.tscn")
@@ -90,7 +92,7 @@ func _draw_hit_direction_selection_preview():
 	selected_target_tile.type = TargetPreviewTile.PreviewTileType.SELECTED_CIRCLE
 	target_preview.add_child(selected_target_tile)
 	# show push directions
-	var base_attack_cost := ATTACK_COST
+	var base_attack_cost := ATTACK_COST if not selected_target.overcharged else OVERCHARGED_ATTACK_BASE_COST
 	var base_attack_chance := player.turn_state.chance_that_power_available(base_attack_cost)
 	var valid_targets := get_valid_push_targets()
 	for target in valid_targets:
@@ -135,6 +137,7 @@ func _draw_hit_direction_selection_preview():
 	attack_dialog.overcharge_activated = selected_target.overcharged
 	if selected_target.overcharged:
 		attack_dialog.max_power_cost = attack_dialog.power_cost
+		attack_dialog.direct_damage = OVERCHARGED_DIRECT_DAMAGE
 		while attack_dialog.max_power_cost + OVERCHARGED_EXTRA_TILE_COST <= player.turn_state.max_remaining_power:
 			attack_dialog.max_power_cost += OVERCHARGED_EXTRA_TILE_COST
 	attack_dialog.set_overcharge.connect(_set_overcharge)
@@ -201,9 +204,9 @@ func try_push(push_target: ValidTarget, overcharged: bool):
 	var push_action := PushAction.new()
 	push_action.player = push_target.player
 	push_action.direction = push_target.direction
-	push_action.direct_damage = 1
 	push_action.force = 1
 	if overcharged:
+		push_action.direct_damage = OVERCHARGED_DIRECT_DAMAGE
 		while player.turn_state.try_spend_power(OVERCHARGED_EXTRA_TILE_COST):
 			push_action.force += 1
 			attack_cost += OVERCHARGED_EXTRA_TILE_COST

@@ -42,13 +42,18 @@ theme_override_styles/separator = SubResource("StyleBoxEmpty_tjyrl")
 [node name="SuccessChanceLabel" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "100% success chance"
+text = "100% chance"
 horizontal_alignment = 2
+
+[node name="DirectDamageLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "1 damage"
 
 [node name="OverchargeToggle" type="CheckButton" parent="MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-tooltip_text = "Use all available Power and end your turn to apply extra knockback."
+tooltip_text = "Use all available Power and end your turn to apply extra knockback and damage."
 text = "Overcharge"
 
 [connection signal="toggled" from="MarginContainer/VBoxContainer/OverchargeToggle" to="." method="_on_overcharge_toggle_toggled"]
