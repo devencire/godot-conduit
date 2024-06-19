@@ -15,15 +15,15 @@ static func team_name(team: Team) -> String:
 	if team == Constants.Team.ONE:
 		return 'Blue'
 	elif team == Constants.Team.TWO:
-		return 'Red'
+		return 'Orange'
 	return 'None'
 
 static func team_color(team: Team) -> Color:
 	if team == Constants.Team.ONE:
 		return Color(0, 0, 1)
 	elif team == Constants.Team.TWO:
-		return Color(1, 0, 0)
-	return Color(1, 0, 1)
+		return Color(1, 0.55, 0)
+	return Color(1, 0.55, 1)
 
 static func other_team(team: Team) -> Team:
 	if team == Team.ONE:

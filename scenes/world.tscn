@@ -88,7 +88,7 @@ tile_set = SubResource("TileSet_ce3eq")
 format = 2
 
 [node name="TeamTwoBoundary" type="TileMap" parent="RoundRoot/Arena/TravelBoundaries"]
-modulate = Color(1, 0, 0, 1)
+modulate = Color(1, 0.54902, 0, 1)
 tile_set = SubResource("TileSet_ce3eq")
 format = 2
 

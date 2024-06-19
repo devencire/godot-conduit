@@ -29,10 +29,10 @@ func _draw_travel_boundary(team: Constants.Team, current_travel_score: int) -> v
 		tile_atlas_coords = TEAM_TWO_BOUNDARY_TILE
 	
 	boundary_tilemap.clear()
+	boundary_tilemap.modulate = Constants.team_color(team)
 	
 	while arena_tilemap.is_cell_pathable(Vector2i(next_cell.x - 1, next_cell.y - 1)):
 		next_cell = Vector2i(next_cell.x - 1, next_cell.y - 1)
-	print('team ', team, ' start_cell ', next_cell)
 	
 	while arena_tilemap.is_cell_pathable(next_cell):
 		boundary_tilemap.set_cell(0, next_cell, 0, tile_atlas_coords)
