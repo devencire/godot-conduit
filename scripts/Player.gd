@@ -54,11 +54,19 @@ static var next_id := 1
 
 @export var moving: bool
 
-@export var max_health: int = 4
-@export var health: int
+var stats := PlayerStats.new()
+
+@export var resolve: int
 @export var can_act: bool:
 	get:
-		return health > 0
+		return resolve > 0
+
+signal free_moves_remaining_changed(new_remaining: int)
+
+@export var free_moves_remaining := 0:
+	set(new_remaining):
+		free_moves_remaining = new_remaining
+		free_moves_remaining_changed.emit(new_remaining)
 
 
 func _ready():
@@ -74,8 +82,19 @@ func _ready():
 	sprite.self_modulate = Constants.team_color(team)
 	_move_graphic_to_tile_position()
 	
-	health = max_health
+	resolve = stats.starting_resolve
+	
+	turn_state.new_turn_started.connect(_turn_state_new_turn_started)
+	
 	initialized.emit(self)
+
+func _turn_state_new_turn_started(_turn_state: TurnState) -> void:
+	if turn_state.active_team != team:
+		free_moves_remaining = 0
+		return
+	if can_act:
+		if not is_beacon:
+			free_moves_remaining = stats.free_moves_per_turn
 
 func _unhandled_input(event):
 	if not selected or not moving:
@@ -105,9 +124,13 @@ func _update_path_preview(cell_path: Array[Vector2i]):
 	# TODO retain and re-use the preview tiles for performance?
 	_clear_path_preview()
 	path_preview = Node2D.new()
+	var free_moves_used := 0
 	var total_power_cost := 0
 	for cell in cell_path:
-		total_power_cost += MOVE_COST
+		if free_moves_used < free_moves_remaining:
+			free_moves_used += 1
+		else:
+			total_power_cost += MOVE_COST
 		var preview_tile: PathPreviewTile = path_preview_tile_scene.instantiate()
 		preview_tile.position = arena_tilemap.map_to_local(cell)
 		preview_tile.power_cost = total_power_cost
@@ -136,7 +159,9 @@ func _try_move_selected_player(destination_cell: Vector2i):
 	var walked_path: Array[Vector2i] = []
 	var power_spent := 0
 	while cell_path.size() > 0:
-		if not turn_state.try_spend_power(BASE_MOVE_COST):
+		if free_moves_remaining > 0:
+			free_moves_remaining -= 1
+		elif not turn_state.try_spend_power(BASE_MOVE_COST):
 			if walked_path.size() == 0:
 				event_log.log('%s tried to move but ran out of power!' % BB.player_name(self))
 			else:
@@ -196,12 +221,12 @@ func push_to(cell: Vector2i) -> void:
 		tile_position = cell
 	else:
 		tile_position = Constants.OFF_ARENA
-		take_damage(health)
+		take_damage(resolve)
 
 func take_damage(damage: int) -> void:
-	health = maxi(0, health - damage)
+	resolve = maxi(0, resolve - damage)
 	taken_damage.emit(self, damage)
-	if health == 0:
+	if resolve == 0:
 		event_log.log.call_deferred('%s was knocked unconscious!' % [BB.player_name(self)])
 		if is_beacon:
 			score_state.score_points(Constants.other_team(team), Constants.POINTS_FOR_SACKING_BEACON)

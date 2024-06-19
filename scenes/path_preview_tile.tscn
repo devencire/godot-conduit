@@ -23,7 +23,7 @@ sprite_frames = SubResource("SpriteFrames_jitg5")
 [node name="PowerCostLabel" type="RichTextLabel" parent="."]
 offset_left = -40.0
 offset_top = -40.0
-offset_right = 41.0
+offset_right = 40.0
 offset_bottom = -6.0
 mouse_filter = 2
 theme_override_font_sizes/normal_font_size = 24
@@ -44,3 +44,13 @@ scroll_active = false
 shortcut_keys_enabled = false
 deselect_on_focus_loss_enabled = false
 drag_and_drop_selection_enabled = false
+
+[node name="FreeMoveDisplay" type="RichTextLabel" parent="."]
+offset_left = -37.0
+offset_top = -40.0
+offset_right = 37.0
+offset_bottom = -6.0
+theme_override_font_sizes/bold_font_size = 24
+bbcode_enabled = true
+text = "[center][b][outline_size=8][outline_color=black]>"
+scroll_active = false

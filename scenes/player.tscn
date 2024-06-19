@@ -1,10 +1,11 @@
-[gd_scene load_steps=7 format=3 uid="uid://d1g51gpcf38kc"]
+[gd_scene load_steps=8 format=3 uid="uid://d1g51gpcf38kc"]
 
 [ext_resource type="Script" path="res://scripts/Player.gd" id="1_4vrrm"]
 [ext_resource type="Texture2D" uid="uid://rcrm0go6mclm" path="res://assets/player.png" id="2_bdnyk"]
 [ext_resource type="PackedScene" uid="uid://8r38rbtaivjs" path="res://scenes/selection_tile.tscn" id="3_77lfk"]
 [ext_resource type="Script" path="res://scripts/Hammer.gd" id="4_ek61n"]
 [ext_resource type="Script" path="res://scripts/HealthBar.gd" id="5_byicf"]
+[ext_resource type="Script" path="res://scripts/FreeMoveDisplay.gd" id="6_fma3s"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_8dflb"]
 animations = [{
@@ -56,5 +57,18 @@ offset_bottom = 6.0
 mouse_filter = 2
 color = Color(0, 1, 0, 1)
 
+[node name="FreeMoveDisplay" type="RichTextLabel" parent="Graphic"]
+offset_left = -21.0
+offset_top = 28.0
+offset_right = 21.0
+offset_bottom = 59.0
+theme_override_font_sizes/bold_font_size = 24
+bbcode_enabled = true
+text = "[center][b][outline_size=8][outline_color=black]>[color=#ffffff30]>"
+scroll_active = false
+script = ExtResource("6_fma3s")
+
+[connection signal="free_moves_remaining_changed" from="." to="Graphic/FreeMoveDisplay" method="_on_player_free_moves_remaining_changed"]
 [connection signal="initialized" from="." to="Graphic/HealthBar" method="_on_player_initialized"]
+[connection signal="initialized" from="." to="Graphic/FreeMoveDisplay" method="_on_player_initialized"]
 [connection signal="taken_damage" from="." to="Graphic/HealthBar" method="_on_player_taken_damage"]

@@ -4,7 +4,7 @@ enum Team {NONE, ONE, TWO}
 
 const CONTROLLED_TEAM := Team.ONE
 
-const BASE_TURN_POWER := 5
+const BASE_TURN_POWER := 3
 const MAX_EXCESS_POWER := 6
 
 const POINTS_FOR_SACKING_BEACON := 3
