@@ -19,7 +19,7 @@ var score_state: ScoreState
 
 @onready var graphic: Node2D = $Graphic
 @onready var sprite: AnimatedSprite2D = $Graphic/Sprite
-@onready var selection_tile: SelectionTile = $SelectionTile
+@onready var selection_tile: SelectionTile = $Graphic/SelectionTile
 
 var hovered_cell: Vector2i
 var path_preview_tile_scene := preload("res://scenes/path_preview_tile.tscn")
@@ -94,6 +94,7 @@ func _ready():
 	initialized.emit(self)
 
 func _turn_state_new_turn_started(_turn_state: TurnState) -> void:
+	_update_selection_tile()
 	if turn_state.active_team != team:
 		free_moves_remaining = 0
 		return
@@ -184,10 +185,14 @@ func _try_move_selected_player(destination_cell: Vector2i):
 		_clear_path_preview()
 
 func _update_selection_tile():
-	selection_tile.visible = selected
-	selection_tile.team = turn_state.active_team
+	if turn_state.active_team != team:
+		selection_tile.visible = false
+		return
+	selection_tile.visible = true
 	if selected:
-		selection_tile.position = arena_tilemap.map_to_local(tile_position)
+		selection_tile.mode = SelectionTile.Mode.THICK
+	else:
+		selection_tile.mode = SelectionTile.Mode.DEFAULT
 
 func is_powered_by_team_beacon() -> bool:
 	if is_beacon:

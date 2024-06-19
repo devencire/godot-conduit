@@ -2,6 +2,13 @@ class_name SelectionTile
 
 extends Node2D
 
-@export var team: Constants.Team:
-	set(new_team):
-		team = new_team
+enum Mode { DEFAULT, THICK }
+
+@export var mode: Mode:
+	set(new_mode):
+		mode = new_mode
+		match mode:
+			Mode.DEFAULT:
+				$Sprite.animation = 'default'
+			Mode.THICK:
+				$Sprite.animation = 'thick'

@@ -22,9 +22,6 @@ animations = [{
 [node name="Player" type="Node2D" groups=["players"]]
 script = ExtResource("1_4vrrm")
 
-[node name="SelectionTile" parent="." instance=ExtResource("3_77lfk")]
-visible = false
-
 [node name="Hammer" type="Node2D" parent="." node_paths=PackedStringArray("player")]
 script = ExtResource("4_ek61n")
 player = NodePath("..")
@@ -79,6 +76,8 @@ bbcode_enabled = true
 text = "[center]💡"
 scroll_active = false
 script = ExtResource("7_0054y")
+
+[node name="SelectionTile" parent="Graphic" instance=ExtResource("3_77lfk")]
 
 [connection signal="free_moves_remaining_changed" from="." to="Graphic/FreeMoveDisplay" method="_on_player_free_moves_remaining_changed"]
 [connection signal="initialized" from="." to="Graphic/HealthBar" method="_on_player_initialized"]
