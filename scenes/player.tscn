@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://d1g51gpcf38kc"]
+[gd_scene load_steps=9 format=3 uid="uid://d1g51gpcf38kc"]
 
 [ext_resource type="Script" path="res://scripts/Player.gd" id="1_4vrrm"]
 [ext_resource type="Texture2D" uid="uid://rcrm0go6mclm" path="res://assets/player.png" id="2_bdnyk"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" path="res://scripts/Hammer.gd" id="4_ek61n"]
 [ext_resource type="Script" path="res://scripts/HealthBar.gd" id="5_byicf"]
 [ext_resource type="Script" path="res://scripts/FreeMoveDisplay.gd" id="6_fma3s"]
+[ext_resource type="Script" path="res://scripts/BeaconIndicator.gd" id="7_0054y"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_8dflb"]
 animations = [{
@@ -68,7 +69,20 @@ text = "[center][b][outline_size=8][outline_color=black]>[color=#ffffff30]>"
 scroll_active = false
 script = ExtResource("6_fma3s")
 
+[node name="BeaconIndicator" type="RichTextLabel" parent="Graphic"]
+offset_left = -20.0
+offset_top = 29.0
+offset_right = 20.0
+offset_bottom = 60.0
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
+text = "[center]💡"
+scroll_active = false
+script = ExtResource("7_0054y")
+
 [connection signal="free_moves_remaining_changed" from="." to="Graphic/FreeMoveDisplay" method="_on_player_free_moves_remaining_changed"]
 [connection signal="initialized" from="." to="Graphic/HealthBar" method="_on_player_initialized"]
 [connection signal="initialized" from="." to="Graphic/FreeMoveDisplay" method="_on_player_initialized"]
+[connection signal="is_beacon_changed" from="." to="Graphic/FreeMoveDisplay" method="_on_player_is_beacon_changed"]
+[connection signal="is_beacon_changed" from="." to="Graphic/BeaconIndicator" method="_on_player_is_beacon_changed"]
 [connection signal="taken_damage" from="." to="Graphic/HealthBar" method="_on_player_taken_damage"]

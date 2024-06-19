@@ -34,8 +34,13 @@ var path_preview: Node2D
 		tile_position = new_tile_position
 		was_moved.emit(self)
 
+signal is_beacon_changed(new_is_beacon: bool)
+
 # Whether the Player is the Beacon, powering all aligned tiles.
-@export var is_beacon: bool
+@export var is_beacon: bool:
+	set(new_is_beacon):
+		is_beacon = new_is_beacon
+		is_beacon_changed.emit(is_beacon)
 
 # A name, just used for debugging for now
 @export var debug_name: String

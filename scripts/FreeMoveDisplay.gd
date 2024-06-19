@@ -23,3 +23,7 @@ func _update_visual(free_moves_remaining: int):
 
 func _on_player_free_moves_remaining_changed(new_remaining):
 	_update_visual(new_remaining)
+
+
+func _on_player_is_beacon_changed(new_is_beacon: bool):
+	visible = not new_is_beacon
