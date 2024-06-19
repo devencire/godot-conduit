@@ -36,7 +36,7 @@ func start_turn(team: Constants.Team) -> void:
 	total_available_power = copied_excess_power + base_turn_power + secret_available_excess_power
 	power_used = 0
 	
-	%EventLog.log.call_deferred('[b]%s starts their turn with %s-%s⚡ available[/b]' % [BB.team_name(team), known_remaining_power, max_remaining_power])
+	%EventLog.log('[b]%s starts their turn with %s-%s⚡ available[/b]' % [BB.team_name(team), known_remaining_power, max_remaining_power])
 	
 	changed.emit(self)
 	new_turn_started.emit(self)
@@ -45,7 +45,8 @@ func start_turn(team: Constants.Team) -> void:
 ## or if there's not enough power, starts the opposing team's turn and returns `false`.
 func try_spend_power(amount: int) -> bool:
 	if power_used + amount > total_available_power:
-		start_turn(Constants.other_team(active_team))
+		# TODO: using call_deferred to time this is very very dodgy, do something better
+		start_turn.call_deferred(Constants.other_team(active_team))
 		return false
 	else:
 		power_used += amount

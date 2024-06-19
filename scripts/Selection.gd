@@ -10,8 +10,9 @@ var selected_player: Player
 
 func _unhandled_input(event):
 	if event is InputEventMouseButton:
-		if not event.pressed:
+		if not event.pressed or event.button_index != MOUSE_BUTTON_LEFT:
 			return
+		print('processed by Selection')
 		var clicked_cell := arena_tilemap.get_hovered_cell(event)
 		var player := players.player_in_cell(clicked_cell, turn_state.active_team)
 		if player and player.can_act:

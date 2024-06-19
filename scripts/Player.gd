@@ -20,6 +20,8 @@ var score_state: ScoreState
 @onready var graphic: Node2D = $Graphic
 @onready var sprite: AnimatedSprite2D = $Graphic/Sprite
 @onready var selection_tile: SelectionTile = $Graphic/SelectionTile
+@onready var dazed_indicator: CanvasItem = $Graphic/DazedIndicator
+@onready var knocked_out_indicator: CanvasItem = $Graphic/KnockedOutIndicator
 
 var hovered_cell: Vector2i
 var path_preview_tile_scene := preload("res://scenes/path_preview_tile.tscn")
@@ -64,7 +66,7 @@ var stats := PlayerStats.new()
 @export var resolve: int
 @export var can_act: bool:
 	get:
-		return resolve > 0
+		return status == Status.OK
 
 signal free_moves_remaining_changed(new_remaining: int)
 
@@ -72,6 +74,15 @@ signal free_moves_remaining_changed(new_remaining: int)
 	set(new_remaining):
 		free_moves_remaining = new_remaining
 		free_moves_remaining_changed.emit(new_remaining)
+
+enum Status { OK, DAZED, KNOCKED_OUT }
+
+@export var status := Status.OK:
+	set(new_status):
+		status = new_status
+		dazed_indicator.visible = new_status == Status.DAZED
+		knocked_out_indicator.visible = new_status == Status.KNOCKED_OUT
+		_update_selection_tile()
 
 
 func _ready():
@@ -97,6 +108,9 @@ func _turn_state_new_turn_started(_turn_state: TurnState) -> void:
 	_update_selection_tile()
 	if turn_state.active_team != team:
 		free_moves_remaining = 0
+		if status == Status.DAZED:
+			status = Status.OK
+			event_log.log('%s recovered from being dazed' % BB.player_name(self))
 		return
 	if can_act:
 		if not is_beacon:
@@ -112,6 +126,12 @@ func _unhandled_input(event):
 			return
 		hovered_cell = new_hovered_cell
 		
+		if is_beacon:
+			var hovered_player := players.player_in_cell(hovered_cell)
+			if hovered_player and hovered_player.team == team and hovered_player.status == Status.DAZED:
+				_update_revive_preview(hovered_player)
+				return
+		
 		var cell_path := arena_tilemap.get_cell_path(tile_position, hovered_cell)
 		if cell_path.size() > 0:
 			_update_path_preview(cell_path)
@@ -120,7 +140,14 @@ func _unhandled_input(event):
 	
 	if event is InputEventMouseButton:
 		if event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+			print('processed by player ', self)
 			var clicked_cell := arena_tilemap.get_hovered_cell(event)
+			if is_beacon:
+				var hovered_player := players.player_in_cell(hovered_cell)
+				if hovered_player and hovered_player.team == team and hovered_player.status == Status.DAZED:
+					_try_revive_player(hovered_player)
+					get_viewport().set_input_as_handled()
+					return
 			_try_move_selected_player(clicked_cell)
 
 # TODO replace this once move costs are worked out
@@ -142,6 +169,15 @@ func _update_path_preview(cell_path: Array[Vector2i]):
 		preview_tile.power_cost = total_power_cost
 		preview_tile.success_chance = turn_state.chance_that_power_available(total_power_cost)
 		path_preview.add_child(preview_tile)
+	add_child(path_preview)
+
+func _update_revive_preview(revivable_player: Player) -> void:
+	_clear_path_preview()
+	path_preview = Node2D.new()
+	var preview_tile: PathPreviewTile = path_preview_tile_scene.instantiate()
+	preview_tile.position = arena_tilemap.map_to_local(revivable_player.tile_position)
+	preview_tile.power_cost = revivable_player.stats.dazed_revive_cost
+	path_preview.add_child(preview_tile)
 	add_child(path_preview)
 
 func _clear_path_preview():
@@ -185,7 +221,7 @@ func _try_move_selected_player(destination_cell: Vector2i):
 		_clear_path_preview()
 
 func _update_selection_tile():
-	if turn_state.active_team != team:
+	if turn_state.active_team != team or not can_act:
 		selection_tile.visible = false
 		return
 	selection_tile.visible = true
@@ -217,6 +253,15 @@ func walk_path(cell_path: Array[Vector2i]) -> void:
 		tween.tween_property(graphic, 'position', position, WALK_DURATION_PER_TILE).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	tile_position = cell_path.back()
 
+func _try_revive_player(revivable_player: Player) -> void:
+	var power_cost := revivable_player.stats.dazed_revive_cost
+	if not turn_state.try_spend_power(power_cost):
+		event_log.log('%s tried to revive %s but ran out of power!' % [BB.player_name(self), BB.player_name(revivable_player)])
+		return
+	revivable_player.revive()
+	event_log.log('%s spent %s⚡ to revive %s' % [BB.player_name(self), power_cost, BB.player_name(revivable_player)])
+	_clear_path_preview()
+
 const PUSH_DURATION := 0.2
 
 func push_to(cell: Vector2i) -> void:
@@ -234,9 +279,32 @@ func push_to(cell: Vector2i) -> void:
 		take_damage(resolve)
 
 func take_damage(damage: int) -> void:
-	resolve = maxi(0, resolve - damage)
+	var damage_absorbed_by_resolve := mini(resolve, damage)
+	resolve -= damage_absorbed_by_resolve
+	
 	taken_damage.emit(self, damage)
-	if resolve == 0:
+	
+	var remaining_damage := damage - damage_absorbed_by_resolve
+	var status_changed := false
+	if remaining_damage > 0 and status == Status.OK:
+		remaining_damage -= 1
+		status = Status.DAZED
+		status_changed = true
+	if remaining_damage > 0 and status == Status.DAZED:
+		remaining_damage -= 1
+		status = Status.KNOCKED_OUT
+		status_changed = true
+	if remaining_damage > 0:
+		# longer-term wounds
+		pass
+	
+	if status_changed and status == Status.DAZED:
+		event_log.log.call_deferred('%s is dazed!' % [BB.player_name(self)])
+	elif status_changed and status == Status.KNOCKED_OUT:
 		event_log.log.call_deferred('%s was knocked unconscious!' % [BB.player_name(self)])
 		if is_beacon:
 			score_state.score_points(Constants.other_team(team), Constants.POINTS_FOR_SACKING_BEACON)
+
+func revive() -> void:
+	status = Status.OK
+	free_moves_remaining = stats.free_moves_per_turn

@@ -53,7 +53,7 @@ offset_top = -6.0
 offset_right = 30.0
 offset_bottom = 6.0
 mouse_filter = 2
-color = Color(0, 1, 0, 1)
+color = Color(0, 1, 1, 1)
 
 [node name="FreeMoveDisplay" type="RichTextLabel" parent="Graphic"]
 offset_left = -21.0
@@ -78,6 +78,32 @@ scroll_active = false
 script = ExtResource("7_0054y")
 
 [node name="SelectionTile" parent="Graphic" instance=ExtResource("3_77lfk")]
+
+[node name="DazedIndicator" type="RichTextLabel" parent="Graphic"]
+visible = false
+offset_left = -20.0
+offset_top = -19.0
+offset_right = 20.0
+offset_bottom = 21.0
+mouse_filter = 2
+theme_override_font_sizes/normal_font_size = 32
+bbcode_enabled = true
+text = "[center]💫"
+scroll_active = false
+script = ExtResource("7_0054y")
+
+[node name="KnockedOutIndicator" type="RichTextLabel" parent="Graphic"]
+visible = false
+offset_left = -20.0
+offset_top = -18.0
+offset_right = 20.0
+offset_bottom = 23.0
+mouse_filter = 2
+theme_override_font_sizes/normal_font_size = 32
+bbcode_enabled = true
+text = "[center]😵‍"
+scroll_active = false
+script = ExtResource("7_0054y")
 
 [connection signal="free_moves_remaining_changed" from="." to="Graphic/FreeMoveDisplay" method="_on_player_free_moves_remaining_changed"]
 [connection signal="initialized" from="." to="Graphic/HealthBar" method="_on_player_initialized"]

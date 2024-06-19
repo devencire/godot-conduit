@@ -43,3 +43,6 @@ func beacon_for_team(team: Constants.Team) -> Player:
 		if player.team == team and player.is_beacon:
 			return player
 	return null # this shouldn't happen
+
+func players_on_team(team: Constants.Team) -> Array[Player]:
+	return all_players.filter(func(player: Player): return player.team == team)

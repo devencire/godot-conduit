@@ -24,4 +24,3 @@ func _on_player_taken_damage(_player: Player, _damage: int):
 
 func _update_health_remaining():
 	health_remaining_rect.size.x = 60 * float(player.resolve) / player.stats.max_resolve
-	health_remaining_rect.color = Constants.success_chance_color(float(player.resolve) / player.stats.max_resolve)
