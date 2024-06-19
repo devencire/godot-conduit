@@ -8,6 +8,7 @@ const BASE_TURN_POWER := 3
 const MAX_EXCESS_POWER := 6
 
 const POINTS_FOR_SACKING_BEACON := 3
+const MAX_TRAVEL_POINTS := 6
 
 const OFF_ARENA := Vector2i(-40, -40)
 

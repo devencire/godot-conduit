@@ -1,133 +1,10 @@
-[gd_scene load_steps=18 format=3 uid="uid://d1t087k7mdxvb"]
+[gd_scene load_steps=3 format=3 uid="uid://d1t087k7mdxvb"]
 
 [ext_resource type="Script" path="res://world.gd" id="1_4avd2"]
-[ext_resource type="Texture2D" uid="uid://bu0j2ljbdu4jy" path="res://assets/hexes_2px_outline.png" id="1_7kdkn"]
-[ext_resource type="Script" path="res://scripts/TurnState.gd" id="2_7l4uc"]
-[ext_resource type="Script" path="res://scripts/RoundRoot.gd" id="2_r7p20"]
-[ext_resource type="Script" path="res://scripts/ArenaTileMap.gd" id="3_rf75t"]
-[ext_resource type="Script" path="res://scripts/ScoreState.gd" id="4_kseo3"]
-[ext_resource type="PackedScene" uid="uid://dvuatsyki3ehj" path="res://scenes/selection.tscn" id="5_0ab0n"]
-[ext_resource type="Script" path="res://scripts/Players.gd" id="6_4jl0i"]
-[ext_resource type="Script" path="res://scripts/DebugShowTileLabel.gd" id="7_23lak"]
-[ext_resource type="PackedScene" uid="uid://c04vm1q3ssoxd" path="res://scenes/round_ui.tscn" id="7_p4op4"]
-[ext_resource type="PackedScene" uid="uid://dxxmf1dm70jy3" path="res://scenes/powered_tiles.tscn" id="8_h1dur"]
-[ext_resource type="Script" path="res://scripts/EventLog.gd" id="10_7koks"]
-[ext_resource type="Script" path="res://scripts/TravelBoundaries.gd" id="11_q0q07"]
 [ext_resource type="Script" path="res://scripts/MatchUI.gd" id="12_1lrdw"]
-
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_s34qc"]
-texture = ExtResource("1_7kdkn")
-texture_region_size = Vector2i(128, 128)
-use_texture_padding = false
-0:0/next_alternative_id = 4
-0:0/0 = 0
-1:0/0 = 0
-2:0/0 = 0
-3:0/0 = 0
-0:1/0 = 0
-1:1/0 = 0
-2:1/0 = 0
-3:1/0 = 0
-
-[sub_resource type="TileSet" id="TileSet_ce3eq"]
-tile_shape = 3
-tile_layout = 5
-tile_offset_axis = 1
-tile_size = Vector2i(128, 128)
-sources/0 = SubResource("TileSetAtlasSource_s34qc")
-
-[sub_resource type="LabelSettings" id="LabelSettings_8os5q"]
-font_size = 24
 
 [node name="MatchRoot" type="Node"]
 script = ExtResource("1_4avd2")
-
-[node name="RoundRoot" type="Node" parent="."]
-script = ExtResource("2_r7p20")
-
-[node name="TurnState" type="Node" parent="RoundRoot"]
-unique_name_in_owner = true
-script = ExtResource("2_7l4uc")
-
-[node name="ScoreState" type="Node" parent="RoundRoot" node_paths=PackedStringArray("match_root", "event_log")]
-unique_name_in_owner = true
-script = ExtResource("4_kseo3")
-match_root = NodePath("../..")
-event_log = NodePath("../CanvasLayer/EventLog")
-
-[node name="Arena" type="Node2D" parent="RoundRoot"]
-position = Vector2(-48, 32)
-scale = Vector2(0.75, 0.75)
-
-[node name="ArenaTileMap" type="TileMap" parent="RoundRoot/Arena"]
-unique_name_in_owner = true
-tile_set = SubResource("TileSet_ce3eq")
-format = 2
-layer_0/name = "ground"
-layer_0/tile_data = PackedInt32Array(65537, 0, 0, 0, 0, 0, -1, 0, 0, -65538, 0, 0, -196610, 0, 0, -131073, 0, 0, -131072, 0, 0, -65535, 0, 0, -65534, 0, 0, 2, 0, 0, 3, 0, 0, 65539, 0, 0, -131071, 0, 0, -196607, 0, 0, -196608, 0, 0, -262144, 0, 0, -196609, 0, 0, -262146, 0, 0, -327682, 0, 0, -262145, 0, 0, -196606, 0, 0, -131070, 0, 0, -131069, 0, 0, -65533, 0, 0, 4, 0, 0, 65540, 0, 0, 65541, 0, 0, 5, 0, 0, -65531, 0, 0, -65532, 0, 0, -131068, 0, 0, -196605, 0, 0, -262142, 0, 0, -262143, 0, 0, -327680, 0, 0, -327681, 0, 0, -393216, 0, 0, -327679, 0, 0, -262147, 0, 0, -131075, 0, 0, -65539, 0, 0, 131076, 0, 0, 131074, 0, 0, 131073, 0, 0, 65536, 0, 0, 65535, 0, 0, -2, 0, 0, 196611, 0, 0, 196610, 0, 0, 262146, 0, 0, 262145, 0, 0, 327681, 0, 0, 327680, 0, 0, 393215, 0, 0, 262141, 0, 0, 196604, 0, 0, 131067, 0, 0, 65530, 0, 0, -6, 0, 0, -65542, 0, 0, -5, 0, 0, 65532, 0, 0, 131068, 0, 0, 196605, 0, 0, 327678, 0, 0, 327679, 0, 0, 262142, 0, 0, 131069, 0, 0, 65531, 0, 0, -65541, 0, 0, -65540, 0, 0, -131077, 0, 0, -131076, 0, 0, -196612, 0, 0, -4, 0, 0, -3, 0, 0, 65533, 0, 0, 65534, 0, 0, 131071, 0, 0, 196607, 0, 0, 196606, 0, 0, 131070, 0, 0, 262143, 0, 0, 196608, 0, 0, 262144, 0, 0, 131072, 0, 0, 196609, 0, 0, 131075, 0, 0, 65538, 0, 0, 1, 0, 0, -65536, 0, 0, -65537, 0, 0, -131074, 0, 0, -196611, 0, 0)
-layer_1/name = "walls"
-layer_1/navigation_enabled = false
-layer_1/tile_data = PackedInt32Array(327682, 65536, 0, 327683, 65536, 0, 196612, 65536, 0, 196613, 65536, 0, 131077, 65536, 0, 65542, 65536, 0, 6, 65536, 0, -65530, 65536, 0, -458752, 65536, 0, -393217, 65536, 0, -393218, 65536, 0, -327683, 65536, 0, -327684, 65536, 0, -196613, 65536, 0, -196614, 65536, 0, -131078, 65536, 0, -65543, 65536, 0, -7, 65536, 0, 458751, 65536, 0, 393216, 65536, 0, 393217, 65536, 0, 262147, 65536, 0, -262148, 65536, 0, 65529, 65536, 0)
-layer_2/name = "art"
-layer_2/navigation_enabled = false
-layer_2/tile_data = PackedInt32Array(-393219, 0, 1, -262149, 0, 1, -131079, 0, 1, 131066, 0, 1, 196603, 0, 1, 262140, 0, 1, 327677, 0, 1, 393214, 0, 1, 393218, 0, 1, 262148, 0, 1, 131078, 0, 1, -131067, 0, 1, -393215, 0, 1, -196604, 0, 1, -262141, 0, 1, -327678, 0, 1)
-script = ExtResource("3_rf75t")
-
-[node name="Selection" parent="RoundRoot/Arena" instance=ExtResource("5_0ab0n")]
-
-[node name="PoweredTiles" parent="RoundRoot/Arena" instance=ExtResource("8_h1dur")]
-
-[node name="TravelBoundaries" type="Node2D" parent="RoundRoot/Arena" node_paths=PackedStringArray("score_state", "arena_tilemap")]
-script = ExtResource("11_q0q07")
-score_state = NodePath("../../ScoreState")
-arena_tilemap = NodePath("../ArenaTileMap")
-
-[node name="TeamOneBoundary" type="TileMap" parent="RoundRoot/Arena/TravelBoundaries"]
-modulate = Color(0, 0, 1, 1)
-tile_set = SubResource("TileSet_ce3eq")
-format = 2
-
-[node name="TeamTwoBoundary" type="TileMap" parent="RoundRoot/Arena/TravelBoundaries"]
-modulate = Color(1, 0.54902, 0, 1)
-tile_set = SubResource("TileSet_ce3eq")
-format = 2
-
-[node name="Players" type="Node2D" parent="RoundRoot/Arena" node_paths=PackedStringArray("round_root")]
-unique_name_in_owner = true
-script = ExtResource("6_4jl0i")
-round_root = NodePath("../..")
-
-[node name="DebugShowTileLabel" type="Label" parent="RoundRoot/Arena" node_paths=PackedStringArray("arena_tilemap")]
-offset_left = 722.0
-offset_top = 486.0
-offset_right = 895.0
-offset_bottom = 520.0
-text = "Hovered tile: {}"
-label_settings = SubResource("LabelSettings_8os5q")
-script = ExtResource("7_23lak")
-arena_tilemap = NodePath("../ArenaTileMap")
-
-[node name="CanvasLayer" type="CanvasLayer" parent="RoundRoot"]
-offset = Vector2(2.08165e-12, 2.08165e-12)
-transform = Transform2D(1, 0, 0, 1, 2.08165e-12, 2.08165e-12)
-
-[node name="EventLog" type="RichTextLabel" parent="RoundRoot/CanvasLayer"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(500, 240)
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
-offset_top = -240.0
-offset_right = 500.0
-grow_vertical = 0
-focus_mode = 2
-bbcode_enabled = true
-text = "[b]The game begins![/b]"
-scroll_following = true
-selection_enabled = true
-script = ExtResource("10_7koks")
-
-[node name="RoundUI" parent="RoundRoot" instance=ExtResource("7_p4op4")]
 
 [node name="Camera" type="Camera2D" parent="."]
 unique_name_in_owner = true
@@ -153,11 +30,3 @@ fit_content = true
 scroll_active = false
 
 [connection signal="changed" from="." to="MatchUI" method="_on_match_root_changed"]
-[connection signal="changed" from="RoundRoot/TurnState" to="RoundRoot/RoundUI" method="_on_turn_state_changed"]
-[connection signal="new_turn_started" from="RoundRoot/TurnState" to="RoundRoot/Arena/Selection" method="_on_turn_state_new_turn_started"]
-[connection signal="new_turn_started" from="RoundRoot/TurnState" to="RoundRoot/Arena/PoweredTiles" method="_on_turn_state_new_turn_started"]
-[connection signal="changed" from="RoundRoot/ScoreState" to="RoundRoot/Arena/TravelBoundaries" method="_on_score_state_changed"]
-[connection signal="changed" from="RoundRoot/Arena/Players" to="RoundRoot/ScoreState" method="_on_players_changed"]
-[connection signal="changed" from="RoundRoot/Arena/Players" to="RoundRoot/Arena/ArenaTileMap" method="_on_players_changed"]
-[connection signal="changed" from="RoundRoot/Arena/Players" to="RoundRoot/Arena/PoweredTiles" method="_on_players_changed"]
-[connection signal="child_order_changed" from="RoundRoot/Arena/Players" to="RoundRoot/Arena/Players" method="_on_child_order_changed"]

@@ -304,6 +304,7 @@ func take_damage(damage: int) -> void:
 		event_log.log.call_deferred('%s was knocked unconscious!' % [BB.player_name(self)])
 		if is_beacon:
 			score_state.score_points(Constants.other_team(team), Constants.POINTS_FOR_SACKING_BEACON)
+			round_root.end_round()
 
 func revive() -> void:
 	status = Status.OK
