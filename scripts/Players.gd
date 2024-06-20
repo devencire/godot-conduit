@@ -20,6 +20,11 @@ func _on_child_order_changed():
 
 func _player_was_moved(_player: Player):
 	changed.emit(self)
+	
+func _player_is_beacon_changed(_player: Player, is_beacon: bool):
+	if is_beacon: # only emit once, for the receiver of the throw
+		print('emitting changed after the throw')
+		changed.emit(self)
 
 func add_player(team: Constants.Team, tile_position: Vector2i, is_beacon: bool = false):
 	var player: Player = player_scene.instantiate()
@@ -28,6 +33,7 @@ func add_player(team: Constants.Team, tile_position: Vector2i, is_beacon: bool =
 	player.tile_position = tile_position
 	player.is_beacon = is_beacon
 	player.was_moved.connect(_player_was_moved)
+	player.is_beacon_changed.connect(_player_is_beacon_changed)
 	add_child(player)
 
 func player_in_cell(cell: Vector2i, team: Constants.Team = Constants.Team.NONE) -> Player:

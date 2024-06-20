@@ -9,7 +9,6 @@ func _on_player_initialized(player: Player):
 	_update_visual()
 
 func _update_visual():
-	print(free_moves_remaining, ' ', dashes_used)
 	clear()
 	push_paragraph(HORIZONTAL_ALIGNMENT_CENTER)
 	push_bold()
@@ -38,5 +37,5 @@ func _on_player_dashes_used_changed(new_dashes_used: int):
 	_update_visual()
 
 
-func _on_player_is_beacon_changed(new_is_beacon: bool):
+func _on_player_is_beacon_changed(_player: Player, new_is_beacon: bool):
 	visible = not new_is_beacon

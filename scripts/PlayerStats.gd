@@ -6,3 +6,4 @@ class_name PlayerStats
 @export var starting_resolve: int = 2
 @export var max_resolve: int = 3
 @export var dazed_revive_cost: int = 1
+@export var pass_cost: int = 3

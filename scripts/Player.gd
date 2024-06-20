@@ -37,13 +37,13 @@ var path_preview: Node2D
 		tile_position = new_tile_position
 		was_moved.emit(self)
 
-signal is_beacon_changed(new_is_beacon: bool)
+signal is_beacon_changed(player: Player, new_is_beacon: bool)
 
 # Whether the Player is the Beacon, powering all aligned tiles.
 @export var is_beacon: bool:
 	set(new_is_beacon):
 		is_beacon = new_is_beacon
-		is_beacon_changed.emit(is_beacon)
+		is_beacon_changed.emit(self, is_beacon)
 
 @export var is_powered: bool:
 	get:
@@ -61,7 +61,7 @@ static var next_id := 1
 @export var selected: bool:
 	set(new_selected):
 		selected = new_selected
-		moving = true
+		moving = new_selected
 		_update_selection_tile()
 		if selected:
 			was_selected.emit(self)
@@ -88,7 +88,6 @@ signal dashes_used_changed(new_dashes_used: int)
 @export var dashes_used := 0:
 	set(new_dashes_used):
 		dashes_used = new_dashes_used
-		print('emitting ', new_dashes_used)
 		dashes_used_changed.emit(new_dashes_used)
 		
 
@@ -145,10 +144,13 @@ func _unhandled_input(event):
 			return
 		hovered_cell = new_hovered_cell
 		
-		if is_beacon:
+		if is_beacon and tile_position != hovered_cell and arena_tilemap.are_cells_aligned(tile_position, hovered_cell):
 			var hovered_player := players.player_in_cell(hovered_cell)
-			if hovered_player and hovered_player.team == team and hovered_player.status == Status.DAZED:
-				_update_revive_preview(hovered_player)
+			if hovered_player and hovered_player.team == team:
+				if hovered_player.status == Status.DAZED:
+					_update_revive_preview(hovered_player)
+				elif hovered_player.status == Status.OK:
+					_update_pass_preview(hovered_player)
 				return
 		
 		var cell_path := arena_tilemap.get_cell_path(tile_position, hovered_cell)
@@ -160,12 +162,21 @@ func _unhandled_input(event):
 	if event is InputEventMouseButton:
 		if event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 			var clicked_cell := arena_tilemap.get_hovered_cell(event)
-			if is_beacon:
-				var hovered_player := players.player_in_cell(hovered_cell)
-				if hovered_player and hovered_player.team == team and hovered_player.status == Status.DAZED:
-					_try_revive_player(hovered_player)
-					get_viewport().set_input_as_handled()
-					return
+			if tile_position == clicked_cell:
+				selected = false
+				get_viewport().set_input_as_handled()
+				return
+			if is_beacon and arena_tilemap.are_cells_aligned(tile_position, clicked_cell):
+				var clicked_player := players.player_in_cell(clicked_cell)
+				if clicked_player and clicked_player.team == team:
+					if clicked_player.status == Status.DAZED:
+						_try_revive_player(clicked_player)
+						get_viewport().set_input_as_handled()
+						return
+					elif clicked_player.status == Status.OK:
+						_try_pass_to_player(clicked_player)
+						get_viewport().set_input_as_handled()
+						return
 			_try_move_selected_player(clicked_cell)
 
 # TODO replace this once move costs are worked out
@@ -200,6 +211,17 @@ func _update_revive_preview(revivable_player: Player) -> void:
 	var preview_tile: PathPreviewTile = path_preview_tile_scene.instantiate()
 	preview_tile.position = arena_tilemap.map_to_local(revivable_player.tile_position)
 	preview_tile.power_cost = revivable_player.stats.dazed_revive_cost
+	preview_tile.success_chance = turn_state.chance_that_power_available(preview_tile.power_cost)
+	path_preview.add_child(preview_tile)
+	add_child(path_preview)
+
+func _update_pass_preview(receiving_player: Player) -> void:
+	_clear_path_preview()
+	path_preview = Node2D.new()
+	var preview_tile: PathPreviewTile = path_preview_tile_scene.instantiate()
+	preview_tile.position = arena_tilemap.map_to_local(receiving_player.tile_position)
+	preview_tile.power_cost = stats.pass_cost
+	preview_tile.success_chance = turn_state.chance_that_power_available(preview_tile.power_cost)
 	path_preview.add_child(preview_tile)
 	add_child(path_preview)
 
@@ -277,6 +299,17 @@ func _try_revive_player(revivable_player: Player) -> void:
 	revivable_player.revive()
 	event_log.log('%s spent %s⚡ to revive %s' % [BB.player_name(self), power_cost, BB.player_name(revivable_player)])
 	_clear_path_preview()
+
+func _try_pass_to_player(receiving_player: Player) -> void:
+	var power_cost := stats.pass_cost
+	if not turn_state.try_spend_power(power_cost):
+		event_log.log('%s tried to pass the beacon to %s but ran out of power!' % [BB.player_name(self), BB.player_name(receiving_player)])
+		return
+	is_beacon = false
+	receiving_player.is_beacon = true
+	event_log.log('%s spent %s⚡ to pass the beacon to %s' % [BB.player_name(self), power_cost, BB.player_name(receiving_player)])
+	# they probably don't want the old ball carrier still selected
+	selected = false
 
 const PUSH_DURATION := 0.2
 

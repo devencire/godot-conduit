@@ -16,6 +16,7 @@ func _unhandled_input(event):
 		var player := players.player_in_cell(clicked_cell, turn_state.active_team)
 		if player and player.can_act:
 			_select_player(player)
+			player.was_deselected.connect(_player_was_deselected)
 
 func _select_player(player: Player):
 	if player == selected_player:
@@ -27,9 +28,13 @@ func _select_player(player: Player):
 func _deselect_player():
 	if not selected_player:
 		return
+	selected_player.was_deselected.disconnect(_player_was_deselected)
 	selected_player.selected = false
 	selected_player = null
 
+func _player_was_deselected(player: Player):
+	if player == selected_player:
+		_deselect_player()
 
 func _on_turn_state_new_turn_started(_state):
 	_deselect_player.call_deferred()
