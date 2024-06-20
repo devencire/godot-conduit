@@ -72,6 +72,19 @@ const hex_cell_neighbors: Array[TileSet.CellNeighbor] = [
 	TileSet.CELL_NEIGHBOR_TOP_LEFT_SIDE
 ]
 
+func get_aligned_cells_by_direction(center_cell: Vector2i) -> Dictionary: # Dictionary[TileSet.CellNeighbor, Array[Vector2i]]
+	var aligned_cells_by_direction := {}
+	for hex_cell_neighbor in hex_cell_neighbors:
+		var aligned_cells: Array[Vector2i] = []
+		var current_cell := center_cell
+		while true:
+			current_cell = get_neighbor_cell(current_cell, hex_cell_neighbor)
+			if get_cell_source_id(GROUND_LAYER, current_cell) == -1:
+				break
+			aligned_cells.append(current_cell)
+		aligned_cells_by_direction[hex_cell_neighbor] = aligned_cells
+	return aligned_cells_by_direction
+
 ## Returns the cells in the lines in the six directions from `center_cell`.
 ## Lines are blocked only by non-pathable tiles (i.e. walls but not players).
 func get_aligned_cells(center_cell: Vector2i) -> Array[Vector2i]:

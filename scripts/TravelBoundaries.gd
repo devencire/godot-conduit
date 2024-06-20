@@ -9,11 +9,7 @@ extends Node2D
 const TEAM_ONE_BOUNDARY_TILE := Vector2i(2, 0)
 const TEAM_TWO_BOUNDARY_TILE := Vector2i(3, 0)
 
-func _draw() -> void:
-	for team in [Constants.Team.ONE, Constants.Team.TWO]:
-		_draw_travel_boundary(team, score_state.travel_scores[team])
-
-func _draw_travel_boundary(team: Constants.Team, current_travel_score: int) -> void:	
+func _set_travel_boundary(team: Constants.Team, current_travel_score: int) -> void:	
 	# find the topmost tile
 	var next_cell: Vector2i
 	var boundary_tilemap: TileMap
@@ -40,4 +36,5 @@ func _draw_travel_boundary(team: Constants.Team, current_travel_score: int) -> v
 
 
 func _on_score_state_changed(_score_state):
-	queue_redraw()
+	for team in [Constants.Team.ONE, Constants.Team.TWO]:
+		_set_travel_boundary(team, score_state.travel_scores[team])

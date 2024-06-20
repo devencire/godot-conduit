@@ -20,8 +20,8 @@ func check_for_travel_scoring(team: Constants.Team, beacon_player: Player):
 	var progress := beacon_player.arena_tilemap.distance_from_halfway_line(beacon_player.tile_position) * scoring_direction
 	var new_progress: int = progress - travel_scores[team]
 	if new_progress > 0:
-		score_points(team, new_progress)
 		travel_scores[team] += new_progress
+		score_points(team, new_progress)
 		if travel_scores[team] == Constants.MAX_TRAVEL_POINTS:
 			round_root.end_round()
 
