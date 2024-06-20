@@ -79,11 +79,18 @@ var stats := PlayerStats.new()
 		return status == Status.OK
 
 signal free_moves_remaining_changed(new_remaining: int)
-
 @export var free_moves_remaining := 0:
 	set(new_remaining):
 		free_moves_remaining = new_remaining
 		free_moves_remaining_changed.emit(new_remaining)
+
+signal dashes_used_changed(new_dashes_used: int)
+@export var dashes_used := 0:
+	set(new_dashes_used):
+		dashes_used = new_dashes_used
+		print('emitting ', new_dashes_used)
+		dashes_used_changed.emit(new_dashes_used)
+		
 
 enum Status { OK, DAZED, KNOCKED_OUT }
 
@@ -126,6 +133,7 @@ func _turn_state_new_turn_started(_turn_state: TurnState) -> void:
 	if can_act:
 		if not is_beacon:
 			free_moves_remaining = stats.free_moves_per_turn
+	dashes_used = 0
 
 func _unhandled_input(event):
 	if not selected or not moving:
@@ -151,7 +159,6 @@ func _unhandled_input(event):
 	
 	if event is InputEventMouseButton:
 		if event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-			print('processed by player ', self)
 			var clicked_cell := arena_tilemap.get_hovered_cell(event)
 			if is_beacon:
 				var hovered_player := players.player_in_cell(hovered_cell)
@@ -162,22 +169,27 @@ func _unhandled_input(event):
 			_try_move_selected_player(clicked_cell)
 
 # TODO replace this once move costs are worked out
-const MOVE_COST := 1
+const DASH_COST := 1
+const INCREASED_DASH_COST := 2
 
 func _update_path_preview(cell_path: Array[Vector2i]):
 	# TODO retain and re-use the preview tiles for performance?
 	_clear_path_preview()
 	path_preview = Node2D.new()
 	var free_moves_used := 0
+	var new_dashes_used := 0
 	var total_power_cost := 0
 	for cell in cell_path:
+		var increased_cost := dashes_used + new_dashes_used >= stats.dashes_before_cost_increase
 		if free_moves_used < free_moves_remaining:
 			free_moves_used += 1
 		else:
-			total_power_cost += MOVE_COST
+			total_power_cost += INCREASED_DASH_COST if increased_cost else DASH_COST
+			new_dashes_used += 1
 		var preview_tile: PathPreviewTile = path_preview_tile_scene.instantiate()
 		preview_tile.position = arena_tilemap.map_to_local(cell)
 		preview_tile.power_cost = total_power_cost
+		preview_tile.increased_cost = increased_cost
 		preview_tile.success_chance = turn_state.chance_that_power_available(total_power_cost)
 		path_preview.add_child(preview_tile)
 	add_child(path_preview)
@@ -200,8 +212,6 @@ func _move_graphic_to_tile_position():
 	if arena_tilemap and graphic:
 		graphic.position = arena_tilemap.map_to_local(tile_position)
 
-const BASE_MOVE_COST := 1
-
 ## Try to move the selected player to `destination_cell`.
 ## May move the player less tiles, or zero tiles, if power runs out during the move.
 ## Ends the turn if power runs out.
@@ -214,14 +224,17 @@ func _try_move_selected_player(destination_cell: Vector2i):
 	while cell_path.size() > 0:
 		if free_moves_remaining > 0:
 			free_moves_remaining -= 1
-		elif not turn_state.try_spend_power(BASE_MOVE_COST):
-			if walked_path.size() == 0:
-				event_log.log('%s tried to move but ran out of power!' % BB.player_name(self))
-			else:
-				event_log.log('%s ran out of power after spending %s⚡ to move %s spaces!' % [BB.player_name(self), power_spent, walked_path.size()])
-			selected = false
-			break
-		power_spent += BASE_MOVE_COST
+		else:
+			var dash_cost := DASH_COST if dashes_used < stats.dashes_before_cost_increase else INCREASED_DASH_COST
+			if not turn_state.try_spend_power(dash_cost):
+				if walked_path.size() == 0:
+					event_log.log('%s tried to move but ran out of power!' % BB.player_name(self))
+				else:
+					event_log.log('%s ran out of power after spending %s⚡ to move %s spaces!' % [BB.player_name(self), power_spent, walked_path.size()])
+				selected = false
+				break
+			power_spent += dash_cost
+			dashes_used += 1
 		walked_path.push_back(cell_path[0])
 		cell_path = cell_path.slice(1)
 	if walked_path.size() > 0:

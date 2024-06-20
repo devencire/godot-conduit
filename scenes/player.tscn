@@ -21,6 +21,18 @@ animations = [{
 
 [node name="Player" type="Node2D" groups=["players"]]
 script = ExtResource("1_4vrrm")
+team = null
+tile_position = null
+is_beacon = null
+is_powered = null
+debug_name = null
+selected = null
+moving = null
+resolve = null
+can_act = null
+free_moves_remaining = null
+dashes_used = null
+status = null
 
 [node name="Hammer" type="Node2D" parent="." node_paths=PackedStringArray("player")]
 script = ExtResource("4_ek61n")
@@ -106,6 +118,7 @@ text = "[center]😵‍"
 scroll_active = false
 script = ExtResource("7_0054y")
 
+[connection signal="dashes_used_changed" from="." to="Graphic/FreeMoveDisplay" method="_on_player_dashes_used_changed"]
 [connection signal="free_moves_remaining_changed" from="." to="Graphic/FreeMoveDisplay" method="_on_player_free_moves_remaining_changed"]
 [connection signal="initialized" from="." to="Graphic/HealthBar" method="_on_player_initialized"]
 [connection signal="initialized" from="." to="Graphic/FreeMoveDisplay" method="_on_player_initialized"]

@@ -74,6 +74,9 @@ func get_cell_path(start: Vector2i, end: Vector2i) -> Array[Vector2i]:
 	var id_path := Array(astar.get_id_path(start_id, end_id))
 	for id in id_path:
 		var cell := _astar_id_to_cell(id)
+		# if the cell isn't the final cell and the opposing team controls it,
+		# there is no valid path (ZoneRespectingAStar2D will only path through
+		# such a cell if there is no other option)
 		if id != id_path[-1] and control_zones.cell_controlled_by_team(cell, Constants.other_team(astar.moving_team)):
 			cells = []
 			return cells
