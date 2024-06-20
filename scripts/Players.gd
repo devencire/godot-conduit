@@ -46,3 +46,6 @@ func beacon_for_team(team: Constants.Team) -> Player:
 
 func players_on_team(team: Constants.Team) -> Array[Player]:
 	return all_players.filter(func(player: Player): return player.team == team)
+
+func powered_players_on_team(team: Constants.Team) -> Array[Player]:
+	return players_on_team(team).filter(func(player: Player): return player.is_powered)

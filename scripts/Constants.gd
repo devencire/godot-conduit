@@ -26,6 +26,13 @@ static func team_color(team: Team) -> Color:
 		return Color(1, 0.55, 0)
 	return Color(1, 0.55, 1)
 
+static func team_zone_color(team: Team) -> Color:
+	if team == Constants.Team.ONE:
+		return Color(0, 0, 1, 0.2)
+	elif team == Constants.Team.TWO:
+		return Color(0.6, 0.3, 0, 0.3)
+	return Color(1, 0.55, 1, 0.2)
+
 static func other_team(team: Team) -> Team:
 	if team == Team.ONE:
 		return Team.TWO

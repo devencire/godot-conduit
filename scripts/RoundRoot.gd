@@ -8,6 +8,7 @@ signal round_ended(round_root: RoundRoot)
 @onready var turn_state: TurnState = %TurnState
 @onready var arena_tilemap: ArenaTileMap = %ArenaTileMap
 @onready var event_log: EventLog = %EventLog
+@onready var control_zones: ControlZones = %ControlZones
 @onready var players: Players = %Players
 @onready var score_state: ScoreState = %ScoreState
 @onready var round_over_ui: CanvasLayer = %RoundOverUI

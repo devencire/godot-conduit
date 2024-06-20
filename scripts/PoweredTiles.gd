@@ -9,9 +9,6 @@ extends Node
 @onready var team_one_power_lines: TileMap = $TeamOnePowerLines
 @onready var team_two_power_lines: TileMap = $TeamTwoPowerLines
 
-var powered_tile_scene := preload("res://scenes/powered_tile.tscn")
-var powered_tile_container: Node2D
-
 var pulse_tween: Tween
 
 func _on_players_changed(_players: Players):

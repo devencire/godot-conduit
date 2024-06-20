@@ -39,7 +39,7 @@ func _clear_selected_target() -> void:
 	_draw_target_selection_preview()
 
 func _unhandled_input(event):
-	if not player.selected or not player.is_powered_by_team_beacon():
+	if not player.selected or not player.is_powered:
 		return
 	
 	if event is InputEventMouseButton:
@@ -70,7 +70,7 @@ func _unhandled_input(event):
 func _draw_target_selection_preview():
 	# TODO retain and re-use the preview tiles for performance?
 	_clear_target_preview()
-	if not player.is_powered_by_team_beacon():
+	if not player.is_powered:
 		return
 	target_preview = Node2D.new()
 	var valid_targets := get_valid_targets()

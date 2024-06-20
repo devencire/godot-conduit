@@ -5,18 +5,44 @@ extends TileMap
 const GROUND_LAYER := 0
 const WALL_LAYER := 1
 
-var astar: AStar2D
+var astar: ZoneRespectingAStar2D
 var disabled_point_ids: Array[int] = []
+
+@export var control_zones: ControlZones
 
 func _ready():
 	_build_astar()
 
+## A specialised AStar2D that knows the `moving_team` and heavily penalises moves
+## that leave a tile controlled by the opposing team (since players cannot normally
+## make such moves).
+class ZoneRespectingAStar2D:
+	extends AStar2D
+	
+	var control_zones: ControlZones
+	var moving_team: Constants.Team
+	
+	func _init(new_control_zones: ControlZones):
+		control_zones = new_control_zones
+	
+	func _compute_cost(from_id: int, to_id: int):
+		# heavily penalise moving out of opponent's controlled zones (since players cannot normally do this)
+		var from_cell := ArenaTileMap._astar_id_to_cell(from_id)
+		if control_zones.cell_controlled_by_team(from_cell, Constants.other_team(moving_team)):
+			return 100000
+		# otherwise just use the distance between the tiles
+		var from_vec := get_point_position(from_id)
+		var to_vec := get_point_position(to_id)
+		return from_vec.distance_to(to_vec)
+
 func _build_astar() -> void:
 	var cells := get_used_cells(GROUND_LAYER)
-	astar = AStar2D.new()
+	astar = ZoneRespectingAStar2D.new(control_zones)
 	astar.reserve_space(cells.size())
+	var tile_scale := Vector2(tile_set.tile_size.x, tile_set.tile_size.y)
 	for cell in cells:
-		astar.add_point(_cell_to_astar_id(cell), map_to_local(cell))
+		astar.add_point(_cell_to_astar_id(cell), map_to_local(cell) / tile_scale)
+		print(_cell_to_astar_id(cell), ' ', map_to_local(cell) / tile_scale)
 	for cell in cells:
 		var cell_id := _cell_to_astar_id(cell)
 		var surrounding_cells := get_surrounding_cells(cell)
@@ -27,13 +53,13 @@ func _build_astar() -> void:
 
 ## Converts a Vector2i into a single int (mirroring `_astar_id_to_cell`).
 ## Depends on the grid not exceeding 50x50.
-func _cell_to_astar_id(cell: Vector2i) -> int:
+static func _cell_to_astar_id(cell: Vector2i) -> int:
 	# Need to add 10000 to ensure the id is not negative
 	# (AStar2D rejects negative ids)
 	return 10000 + cell.x + cell.y * 100
 
 ## Converts a single int into a Vector2i (mirroring `_cell_to_astar_id`).
-func _astar_id_to_cell(id: int) -> Vector2i:
+static func _astar_id_to_cell(id: int) -> Vector2i:
 	var without_const := id - 10000
 	var y = roundi(without_const / 100.0)
 	return Vector2i(without_const - y * 100, y)
@@ -47,6 +73,10 @@ func get_cell_path(start: Vector2i, end: Vector2i) -> Array[Vector2i]:
 		return cells
 	var id_path := Array(astar.get_id_path(start_id, end_id))
 	for id in id_path:
+		var cell := _astar_id_to_cell(id)
+		if id != id_path[-1] and control_zones.cell_controlled_by_team(cell, Constants.other_team(astar.moving_team)):
+			cells = []
+			return cells
 		cells.append(_astar_id_to_cell(id))
 	return cells.slice(1)
 
@@ -144,3 +174,5 @@ func update_obstacles(players: Array[Player]):
 func _on_players_changed(players: Players):
 	update_obstacles(players.all_players)
 
+func _on_turn_state_new_turn_started(state: TurnState):
+	astar.moving_team = state.active_team

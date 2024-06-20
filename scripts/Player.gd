@@ -16,6 +16,7 @@ var arena_tilemap: ArenaTileMap
 var turn_state: TurnState
 var event_log: EventLog
 var score_state: ScoreState
+var control_zones: ControlZones
 
 @onready var graphic: Node2D = $Graphic
 @onready var sprite: AnimatedSprite2D = $Graphic/Sprite
@@ -43,6 +44,15 @@ signal is_beacon_changed(new_is_beacon: bool)
 	set(new_is_beacon):
 		is_beacon = new_is_beacon
 		is_beacon_changed.emit(is_beacon)
+
+@export var is_powered: bool:
+	get:
+		if is_beacon:
+			return true
+		var beacon_player := players.beacon_for_team(team)
+		if not beacon_player:
+			return false
+		return arena_tilemap.are_cells_aligned(tile_position, beacon_player.tile_position)
 
 # A name, just used for debugging for now
 @export var debug_name: String
@@ -90,6 +100,7 @@ func _ready():
 	turn_state = round_root.turn_state
 	event_log = round_root.event_log
 	score_state = round_root.score_state
+	control_zones = round_root.control_zones
 	
 	players = get_parent()
 
@@ -229,14 +240,6 @@ func _update_selection_tile():
 		selection_tile.mode = SelectionTile.Mode.THICK
 	else:
 		selection_tile.mode = SelectionTile.Mode.DEFAULT
-
-func is_powered_by_team_beacon() -> bool:
-	if is_beacon:
-		return true
-	var beacon_player := players.beacon_for_team(team)
-	if not beacon_player:
-		return false
-	return arena_tilemap.are_cells_aligned(tile_position, beacon_player.tile_position)
 
 var tween: Tween
 

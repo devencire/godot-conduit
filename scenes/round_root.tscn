@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://c3nygxpkibi84"]
+[gd_scene load_steps=19 format=3 uid="uid://c3nygxpkibi84"]
 
 [ext_resource type="Script" path="res://scripts/RoundRoot.gd" id="1_01v7h"]
 [ext_resource type="Script" path="res://scripts/TurnState.gd" id="2_rsc10"]
@@ -12,6 +12,7 @@
 [ext_resource type="Script" path="res://scripts/Players.gd" id="9_08gjo"]
 [ext_resource type="Script" path="res://scripts/DebugShowTileLabel.gd" id="10_gxg42"]
 [ext_resource type="Script" path="res://scripts/EventLog.gd" id="11_on58r"]
+[ext_resource type="Script" path="res://scripts/ControlZones.gd" id="12_8vi0e"]
 [ext_resource type="PackedScene" uid="uid://c04vm1q3ssoxd" path="res://scenes/round_ui.tscn" id="12_v5fyg"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_s34qc"]
@@ -35,6 +36,7 @@ texture_region_size = Vector2i(128, 128)
 1:0/0 = 0
 2:0/0 = 0
 3:0/0 = 0
+0:1/0 = 0
 
 [sub_resource type="TileSet" id="TileSet_ce3eq"]
 tile_shape = 3
@@ -64,7 +66,7 @@ event_log = NodePath("../CanvasLayer/EventLog")
 position = Vector2(-48, 32)
 scale = Vector2(0.75, 0.75)
 
-[node name="ArenaTileMap" type="TileMap" parent="Arena"]
+[node name="ArenaTileMap" type="TileMap" parent="Arena" node_paths=PackedStringArray("control_zones")]
 unique_name_in_owner = true
 tile_set = SubResource("TileSet_ce3eq")
 format = 2
@@ -77,6 +79,7 @@ layer_2/name = "art"
 layer_2/navigation_enabled = false
 layer_2/tile_data = PackedInt32Array(-393219, 0, 1, -262149, 0, 1, -131079, 0, 1, 131066, 0, 1, 196603, 0, 1, 262140, 0, 1, 327677, 0, 1, 393214, 0, 1, 393218, 0, 1, 262148, 0, 1, 131078, 0, 1, -131067, 0, 1, -393215, 0, 1, -196604, 0, 1, -262141, 0, 1, -327678, 0, 1)
 script = ExtResource("5_ivx7d")
+control_zones = NodePath("../ControlZones")
 
 [node name="Selection" parent="Arena" instance=ExtResource("6_pdv55")]
 
@@ -103,6 +106,20 @@ tile_set = SubResource("TileSet_ce3eq")
 format = 2
 
 [node name="TeamTwoBoundary" type="TileMap" parent="Arena/TravelBoundaries"]
+modulate = Color(1, 0.54902, 0, 1)
+tile_set = SubResource("TileSet_ce3eq")
+format = 2
+
+[node name="ControlZones" parent="Arena" instance=ExtResource("7_56j7m")]
+unique_name_in_owner = true
+script = ExtResource("12_8vi0e")
+
+[node name="TeamOneZones" type="TileMap" parent="Arena/ControlZones"]
+modulate = Color(0, 0, 1, 1)
+tile_set = SubResource("TileSet_ce3eq")
+format = 2
+
+[node name="TeamTwoZones" type="TileMap" parent="Arena/ControlZones"]
 modulate = Color(1, 0.54902, 0, 1)
 tile_set = SubResource("TileSet_ce3eq")
 format = 2
@@ -185,11 +202,14 @@ theme_override_font_sizes/font_size = 24
 text = "Next round"
 
 [connection signal="changed" from="TurnState" to="RoundUI" method="_on_turn_state_changed"]
+[connection signal="new_turn_started" from="TurnState" to="Arena/ArenaTileMap" method="_on_turn_state_new_turn_started"]
 [connection signal="new_turn_started" from="TurnState" to="Arena/Selection" method="_on_turn_state_new_turn_started"]
 [connection signal="new_turn_started" from="TurnState" to="Arena/PoweredTiles" method="_on_turn_state_new_turn_started"]
+[connection signal="new_turn_started" from="TurnState" to="Arena/ControlZones" method="_on_turn_state_new_turn_started"]
 [connection signal="changed" from="ScoreState" to="Arena/TravelBoundaries" method="_on_score_state_changed"]
 [connection signal="changed" from="Arena/Players" to="ScoreState" method="_on_players_changed"]
 [connection signal="changed" from="Arena/Players" to="Arena/ArenaTileMap" method="_on_players_changed"]
 [connection signal="changed" from="Arena/Players" to="Arena/PoweredTiles" method="_on_players_changed"]
+[connection signal="changed" from="Arena/Players" to="Arena/ControlZones" method="_on_players_changed"]
 [connection signal="child_order_changed" from="Arena/Players" to="Arena/Players" method="_on_child_order_changed"]
 [connection signal="pressed" from="RoundOverUI/VBoxContainer/NextRoundButton" to="." method="_on_next_round_button_pressed"]
