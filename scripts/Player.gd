@@ -128,18 +128,18 @@ func _ready():
 	initialized.emit(self)
 
 func _turn_state_new_turn_started(_turn_state: TurnState) -> void:
-	_update_selection_tile()
 	if turn_state.active_team != team:
 		free_moves_remaining = 0
 		if status == Status.DAZED:
 			status = Status.OK
 			event_log.log('%s recovered from being dazed' % BB.player_name(self))
 		return
+	acted_this_turn = false
 	if can_act:
 		if not is_beacon:
 			free_moves_remaining = stats.free_moves_per_turn
 	dashes_used = 0
-	acted_this_turn = false
+	_update_selection_tile()
 
 func _unhandled_input(event):
 	if not selected or not moving:
