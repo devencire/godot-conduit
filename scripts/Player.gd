@@ -167,7 +167,7 @@ func _unhandled_input(event):
 			_clear_path_preview()
 	
 	if event is InputEventMouseButton:
-		if event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		if event.pressed and event.button_index == MOUSE_BUTTON_RIGHT:
 			var clicked_cell := arena_tilemap.get_hovered_cell(event)
 			if tile_position == clicked_cell:
 				selected = false

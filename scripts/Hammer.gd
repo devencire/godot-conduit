@@ -43,7 +43,7 @@ func _unhandled_input(event):
 		return
 	
 	if event is InputEventMouseButton:
-		if not event.pressed or not event.button_index == MOUSE_BUTTON_LEFT:
+		if not event.pressed or not event.button_index == MOUSE_BUTTON_RIGHT:
 			return
 		var clicked_cell := player.arena_tilemap.get_hovered_cell(event)
 		if not selected_target:
