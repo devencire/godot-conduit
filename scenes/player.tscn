@@ -21,18 +21,6 @@ animations = [{
 
 [node name="Player" type="Node2D" groups=["players"]]
 script = ExtResource("1_4vrrm")
-team = null
-tile_position = null
-is_beacon = null
-is_powered = null
-debug_name = null
-selected = null
-moving = null
-resolve = null
-can_act = null
-free_moves_remaining = null
-dashes_used = null
-status = null
 
 [node name="Hammer" type="Node2D" parent="." node_paths=PackedStringArray("player")]
 script = ExtResource("4_ek61n")

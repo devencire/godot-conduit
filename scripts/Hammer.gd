@@ -226,10 +226,9 @@ func try_push(push_target: ValidTarget, overcharged: bool):
 				player.event_log.log('%s pushed %s back %s spaces into %s, dealing %s damage' % [BB.player_name(player), BB.player_name(outcome.player), outcome.distance, BB.player_name(outcome.clashed_with), outcome.damage])
 			PushOutcomeType.OUT_OF_ARENA:
 				player.event_log.log('%s pushed %s back %s spaces, off the arena!' % [BB.player_name(player), BB.player_name(outcome.player), outcome.distance])
+	player.acted_this_turn = true
 	if overcharged:
 		player.selected = false
-		return
-	_clear_selected_target()
 
 enum PushOutcomeType { MOVED_TO, INTO_WALL, CLASHED_WITH, OUT_OF_ARENA }
 

@@ -76,7 +76,13 @@ var stats := PlayerStats.new()
 @export var resolve: int
 @export var can_act: bool:
 	get:
-		return status == Status.OK
+		return status == Status.OK and not acted_this_turn
+
+@export var acted_this_turn: bool:
+	set(new_acted_this_turn):
+		acted_this_turn = new_acted_this_turn
+		if acted_this_turn:
+			selected = false
 
 signal free_moves_remaining_changed(new_remaining: int)
 @export var free_moves_remaining := 0:
@@ -133,6 +139,7 @@ func _turn_state_new_turn_started(_turn_state: TurnState) -> void:
 		if not is_beacon:
 			free_moves_remaining = stats.free_moves_per_turn
 	dashes_used = 0
+	acted_this_turn = false
 
 func _unhandled_input(event):
 	if not selected or not moving:
@@ -267,11 +274,13 @@ func _try_move_selected_player(destination_cell: Vector2i):
 		_clear_path_preview()
 
 func _update_selection_tile():
-	if turn_state.active_team != team or not can_act:
+	if turn_state.active_team != team:
 		selection_tile.visible = false
 		return
 	selection_tile.visible = true
-	if selected:
+	if not can_act:
+		selection_tile.mode = SelectionTile.Mode.CANNOT_ACT
+	elif selected:
 		selection_tile.mode = SelectionTile.Mode.THICK
 	else:
 		selection_tile.mode = SelectionTile.Mode.DEFAULT
@@ -309,7 +318,7 @@ func _try_pass_to_player(receiving_player: Player) -> void:
 	receiving_player.is_beacon = true
 	event_log.log('%s spent %s⚡ to pass the beacon to %s' % [BB.player_name(self), power_cost, BB.player_name(receiving_player)])
 	# they probably don't want the old ball carrier still selected
-	selected = false
+	acted_this_turn = true
 
 const PUSH_DURATION := 0.2
 
