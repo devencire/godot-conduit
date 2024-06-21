@@ -41,13 +41,13 @@ func _build_astar() -> void:
 	astar.reserve_space(cells.size())
 	var tile_scale := Vector2(tile_set.tile_size.x, tile_set.tile_size.y)
 	for cell in cells:
-		astar.add_point(_cell_to_astar_id(cell), map_to_local(cell) / tile_scale)
-		print(_cell_to_astar_id(cell), ' ', map_to_local(cell) / tile_scale)
+		astar.add_point(ArenaTileMap._cell_to_astar_id(cell), map_to_local(cell) / tile_scale)
+		print(ArenaTileMap._cell_to_astar_id(cell), ' ', map_to_local(cell) / tile_scale)
 	for cell in cells:
-		var cell_id := _cell_to_astar_id(cell)
+		var cell_id := ArenaTileMap._cell_to_astar_id(cell)
 		var surrounding_cells := get_surrounding_cells(cell)
 		for surrounding_cell in surrounding_cells:
-			var surrounding_cell_id := _cell_to_astar_id(surrounding_cell)
+			var surrounding_cell_id := ArenaTileMap._cell_to_astar_id(surrounding_cell)
 			if astar.has_point(surrounding_cell_id):
 				astar.connect_points(cell_id, surrounding_cell_id)
 
@@ -67,25 +67,25 @@ static func _astar_id_to_cell(id: int) -> Vector2i:
 ## Gets the shortest path of cells from start to end, or an empty array if there is no such path.
 func get_cell_path(start: Vector2i, end: Vector2i) -> Array[Vector2i]:
 	var cells: Array[Vector2i] = []
-	var start_id := _cell_to_astar_id(start)
-	var end_id := _cell_to_astar_id(end)
+	var start_id := ArenaTileMap._cell_to_astar_id(start)
+	var end_id := ArenaTileMap._cell_to_astar_id(end)
 	if not astar.has_point(start_id) or not astar.has_point(end_id):
 		return cells
 	var id_path := Array(astar.get_id_path(start_id, end_id))
 	for id in id_path:
-		var cell := _astar_id_to_cell(id)
+		var cell := ArenaTileMap._astar_id_to_cell(id)
 		# if the cell isn't the final cell and the opposing team controls it,
 		# there is no valid path (ZoneRespectingAStar2D will only path through
 		# such a cell if there is no other option)
 		if id != id_path[-1] and control_zones.cell_controlled_by_team(cell, Constants.other_team(astar.moving_team)):
 			cells = []
 			return cells
-		cells.append(_astar_id_to_cell(id))
+		cells.append(ArenaTileMap._astar_id_to_cell(id))
 	return cells.slice(1)
 
 ## Returns true if the cell contains ground (even if there's an obstacle).
 func is_cell_pathable(cell: Vector2i) -> bool:
-	var id := _cell_to_astar_id(cell)
+	var id := ArenaTileMap._cell_to_astar_id(cell)
 	return astar.has_point(id)
 
 ## Returns true if the cell contains a wall (that players hit rather than fall into)
@@ -168,7 +168,7 @@ func update_obstacles(players: Array[Player]):
 	disabled_point_ids = []
 
 	for player in players:
-		var astar_id := _cell_to_astar_id(player.tile_position)
+		var astar_id := ArenaTileMap._cell_to_astar_id(player.tile_position)
 		if astar.has_point(astar_id): # not true for out-of-arena players
 			astar.set_point_disabled(astar_id, true)
 		disabled_point_ids.append(astar_id)
