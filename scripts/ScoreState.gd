@@ -26,6 +26,6 @@ func check_for_travel_scoring(team: Constants.Team, beacon_player: Player):
 			round_root.end_round()
 
 func score_points(team: Constants.Team, points: int):
-	round_root.points_scored.emit(team, points)
+	round_root.score_points(team, points)
 	event_log.log.call_deferred('[b]%s scored %s points![/b]' % [BB.team_name(team), points])
 	changed.emit(self)

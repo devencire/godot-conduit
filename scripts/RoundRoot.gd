@@ -30,6 +30,9 @@ func _ready():
 
 	turn_state.start_turn(Constants.Team.ONE)
 
+func score_points(team: Constants.Team, points: int) -> void:
+	points_scored.emit(team, points)
+
 func end_round():
 	round_over_ui.visible = true
 	round_ended.emit(self)

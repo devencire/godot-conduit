@@ -71,5 +71,5 @@ func chance_that_power_available(power_cost: int) -> float:
 func end_turn() -> void:
 	start_turn(Constants.other_team(active_team))
 
-func _on_round_root_round_ended(round_root: RoundRoot):
+func _on_round_root_round_ended(_round_root: RoundRoot):
 	round_is_over = true

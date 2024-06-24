@@ -342,22 +342,22 @@ func take_damage(damage: int, pierces_resolve: bool = false) -> void:
 	
 	taken_damage.emit(self, damage)
 	
-	var status_changed := false
+	var status_altered := false
 	if remaining_damage > 0 and status == Status.OK:
 		remaining_damage -= 1
 		status = Status.DAZED
-		status_changed = true
+		status_altered = true
 	if remaining_damage > 0 and status == Status.DAZED:
 		remaining_damage -= 1
 		status = Status.KNOCKED_OUT
-		status_changed = true
+		status_altered = true
 	if remaining_damage > 0:
 		# longer-term wounds
 		pass
 	
-	if status_changed and status == Status.DAZED:
+	if status_altered and status == Status.DAZED:
 		event_log.log.call_deferred('%s is dazed!' % [BB.player_name(self)])
-	elif status_changed and status == Status.KNOCKED_OUT:
+	elif status_altered and status == Status.KNOCKED_OUT:
 		event_log.log.call_deferred('%s was knocked unconscious!' % [BB.player_name(self)])
 		if is_beacon:
 			round_root.end_round()
