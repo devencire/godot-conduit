@@ -43,6 +43,8 @@ signal is_beacon_changed(player: Player, new_is_beacon: bool)
 @export var is_beacon: bool:
 	set(new_is_beacon):
 		is_beacon = new_is_beacon
+		if is_beacon:
+			free_moves_remaining = 0
 		is_beacon_changed.emit(self, is_beacon)
 
 @export var is_powered: bool:
