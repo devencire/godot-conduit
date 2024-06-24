@@ -334,14 +334,14 @@ func push_to(cell: Vector2i) -> void:
 		take_damage(Constants.OFF_ARENA_DAMAGE, true)
 
 func take_damage(damage: int, pierces_resolve: bool = false) -> void:
-	taken_damage.emit(self, damage)
-	
 	var remaining_damage := damage
 	if not pierces_resolve:
 		var damage_absorbed_by_resolve := mini(resolve, damage)
 		resolve -= damage_absorbed_by_resolve
 		remaining_damage -= damage_absorbed_by_resolve
-
+	
+	taken_damage.emit(self, damage)
+	
 	var status_changed := false
 	if remaining_damage > 0 and status == Status.OK:
 		remaining_damage -= 1
