@@ -4,6 +4,7 @@ extends Node
 
 signal points_scored(team: Constants.Team, points: int)
 signal round_ended(round_root: RoundRoot)
+signal next_round_requested(round_root: RoundRoot)
 
 @onready var turn_state: TurnState = %TurnState
 @onready var arena_tilemap: ArenaTileMap = %ArenaTileMap
@@ -12,6 +13,8 @@ signal round_ended(round_root: RoundRoot)
 @onready var players: Players = %Players
 @onready var score_state: ScoreState = %ScoreState
 @onready var round_over_ui: CanvasLayer = %RoundOverUI
+
+@export var round_complete: bool
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -29,6 +32,7 @@ func _ready():
 
 func end_round():
 	round_over_ui.visible = true
+	round_ended.emit(self)
 
 func _on_next_round_button_pressed():
-	round_ended.emit(self)
+	next_round_requested.emit(self)

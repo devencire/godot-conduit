@@ -20,8 +20,13 @@ signal new_turn_started(state: TurnState)
 	get:
 		return known_remaining_power + Constants.MAX_EXCESS_POWER
 
+var round_is_over: bool
+
 ## Starts a new turn for the given `team`.
 func start_turn(team: Constants.Team) -> void:
+	if round_is_over:
+		return
+	
 	active_team = team
 	
 	# A team's available power for a turn is
@@ -65,3 +70,6 @@ func chance_that_power_available(power_cost: int) -> float:
 ## Ends the current turn and starts the opposing team's turn.
 func end_turn() -> void:
 	start_turn(Constants.other_team(active_team))
+
+func _on_round_root_round_ended(round_root: RoundRoot):
+	round_is_over = true

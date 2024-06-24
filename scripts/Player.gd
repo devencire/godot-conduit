@@ -305,7 +305,9 @@ func _try_revive_player(revivable_player: Player) -> void:
 func _try_pass_to_player(receiving_player: Player) -> void:
 	var power_cost := stats.pass_cost
 	if not turn_state.try_spend_power(power_cost):
-		event_log.log('%s tried to pass the beacon to %s but ran out of power!' % [BB.player_name(self), BB.player_name(receiving_player)])
+		event_log.log('%s tried to pass the beacon to %s but ran out of power and dropped it!' % [BB.player_name(self), BB.player_name(receiving_player)])
+		round_root.end_round()
+		score_state.score_points(Constants.other_team(team), Constants.POINTS_FOR_SACKING_BEACON)
 		return
 	is_beacon = false
 	receiving_player.is_beacon = true
@@ -327,15 +329,17 @@ func push_to(cell: Vector2i) -> void:
 		tile_position = cell
 	else:
 		tile_position = Constants.OFF_ARENA
-		take_damage(resolve)
+		take_damage(Constants.OFF_ARENA_DAMAGE, true)
 
-func take_damage(damage: int) -> void:
-	var damage_absorbed_by_resolve := mini(resolve, damage)
-	resolve -= damage_absorbed_by_resolve
-	
+func take_damage(damage: int, pierces_resolve: bool = false) -> void:
 	taken_damage.emit(self, damage)
 	
-	var remaining_damage := damage - damage_absorbed_by_resolve
+	var remaining_damage := damage
+	if not pierces_resolve:
+		var damage_absorbed_by_resolve := mini(resolve, damage)
+		resolve -= damage_absorbed_by_resolve
+		remaining_damage -= damage_absorbed_by_resolve
+
 	var status_changed := false
 	if remaining_damage > 0 and status == Status.OK:
 		remaining_damage -= 1
@@ -354,8 +358,8 @@ func take_damage(damage: int) -> void:
 	elif status_changed and status == Status.KNOCKED_OUT:
 		event_log.log.call_deferred('%s was knocked unconscious!' % [BB.player_name(self)])
 		if is_beacon:
-			score_state.score_points(Constants.other_team(team), Constants.POINTS_FOR_SACKING_BEACON)
 			round_root.end_round()
+			score_state.score_points(Constants.other_team(team), Constants.POINTS_FOR_SACKING_BEACON)
 
 func revive() -> void:
 	status = Status.OK

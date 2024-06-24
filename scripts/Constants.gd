@@ -11,6 +11,7 @@ const POINTS_FOR_SACKING_BEACON := 3
 const MAX_TRAVEL_POINTS := 6
 
 const OFF_ARENA := Vector2i(-40, -40)
+const OFF_ARENA_DAMAGE := 2
 
 static func team_name(team: Team) -> String:
 	if team == Constants.Team.ONE:

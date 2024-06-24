@@ -201,6 +201,7 @@ size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 24
 text = "Next round"
 
+[connection signal="round_ended" from="." to="TurnState" method="_on_round_root_round_ended"]
 [connection signal="changed" from="TurnState" to="RoundUI" method="_on_turn_state_changed"]
 [connection signal="new_turn_started" from="TurnState" to="Arena/ArenaTileMap" method="_on_turn_state_new_turn_started"]
 [connection signal="new_turn_started" from="TurnState" to="Arena/Selection" method="_on_turn_state_new_turn_started"]
