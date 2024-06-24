@@ -62,7 +62,6 @@ static var next_id := 1
 	set(new_selected):
 		selected = new_selected
 		moving = new_selected
-		_update_selection_tile()
 		if selected:
 			was_selected.emit(self)
 		else:
@@ -78,11 +77,19 @@ var stats := PlayerStats.new()
 	get:
 		return status == Status.OK and not acted_this_turn
 
+signal acted_this_turn_changed(player: Player, now_acted: bool)
 @export var acted_this_turn: bool:
 	set(new_acted_this_turn):
 		acted_this_turn = new_acted_this_turn
+		acted_this_turn_changed.emit(self, new_acted_this_turn)
 		if acted_this_turn:
 			selected = false
+
+signal is_on_active_team_changed(now_active: bool)
+@export var is_on_active_team: bool:
+	set(now_active):
+		is_on_active_team = now_active
+		is_on_active_team_changed.emit(now_active)
 
 signal free_moves_remaining_changed(new_remaining: int)
 @export var free_moves_remaining := 0:
@@ -99,12 +106,11 @@ signal dashes_used_changed(new_dashes_used: int)
 
 enum Status { OK, DAZED, KNOCKED_OUT }
 
+signal status_changed(player: Player, new_status: Status)
 @export var status := Status.OK:
 	set(new_status):
 		status = new_status
-		dazed_indicator.visible = new_status == Status.DAZED
-		knocked_out_indicator.visible = new_status == Status.KNOCKED_OUT
-		_update_selection_tile()
+		status_changed.emit(self, new_status)
 
 
 func _ready():
@@ -128,18 +134,18 @@ func _ready():
 	initialized.emit(self)
 
 func _turn_state_new_turn_started(_turn_state: TurnState) -> void:
-	if turn_state.active_team != team:
+	if turn_state.active_team == team:
+		acted_this_turn = false
+		if can_act:
+			if not is_beacon:
+				free_moves_remaining = stats.free_moves_per_turn
+		dashes_used = 0
+	else:
 		free_moves_remaining = 0
 		if status == Status.DAZED:
 			status = Status.OK
 			event_log.log('%s recovered from being dazed' % BB.player_name(self))
-		return
-	acted_this_turn = false
-	if can_act:
-		if not is_beacon:
-			free_moves_remaining = stats.free_moves_per_turn
-	dashes_used = 0
-	_update_selection_tile()
+	is_on_active_team = turn_state.active_team == team
 
 func _unhandled_input(event):
 	if not selected or not moving:
@@ -270,20 +276,7 @@ func _try_move_selected_player(destination_cell: Vector2i):
 		walk_path(walked_path)
 	if selected:
 		event_log.log('%s spent %s⚡ to move %s spaces' % [BB.player_name(self), power_spent, walked_path.size()])
-		_update_selection_tile()
 		_clear_path_preview()
-
-func _update_selection_tile():
-	if turn_state.active_team != team:
-		selection_tile.visible = false
-		return
-	selection_tile.visible = true
-	if not can_act:
-		selection_tile.mode = SelectionTile.Mode.CANNOT_ACT
-	elif selected:
-		selection_tile.mode = SelectionTile.Mode.THICK
-	else:
-		selection_tile.mode = SelectionTile.Mode.DEFAULT
 
 var tween: Tween
 

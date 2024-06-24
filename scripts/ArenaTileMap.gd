@@ -42,7 +42,6 @@ func _build_astar() -> void:
 	var tile_scale := Vector2(tile_set.tile_size.x, tile_set.tile_size.y)
 	for cell in cells:
 		astar.add_point(ArenaTileMap._cell_to_astar_id(cell), map_to_local(cell) / tile_scale)
-		print(ArenaTileMap._cell_to_astar_id(cell), ' ', map_to_local(cell) / tile_scale)
 	for cell in cells:
 		var cell_id := ArenaTileMap._cell_to_astar_id(cell)
 		var surrounding_cells := get_surrounding_cells(cell)
