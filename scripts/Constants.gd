@@ -10,6 +10,7 @@ const MAX_EXCESS_POWER := 6
 const POINTS_FOR_SACKING_BEACON := 3
 const MAX_TRAVEL_POINTS := 6
 
+const CLASH_DAMAGE := 1
 const OFF_ARENA := Vector2i(-40, -40)
 const OFF_ARENA_DAMAGE := 2
 

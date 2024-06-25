@@ -333,6 +333,11 @@ func push_to(cell: Vector2i) -> void:
 		tile_position = Constants.OFF_ARENA
 		take_damage(Constants.OFF_ARENA_DAMAGE, true)
 
+func daze_if_not_dazed() -> void:
+	if status == Status.OK:
+		status = Status.DAZED
+		event_log.log('%s is dazed!' % [BB.player_name(self)])
+
 func take_damage(damage: int, pierces_resolve: bool = false) -> void:
 	var remaining_damage := damage
 	if not pierces_resolve:
@@ -340,6 +345,7 @@ func take_damage(damage: int, pierces_resolve: bool = false) -> void:
 		resolve -= damage_absorbed_by_resolve
 		remaining_damage -= damage_absorbed_by_resolve
 	
+	event_log.log('%s took %s damage' % [BB.player_name(self), damage])
 	taken_damage.emit(self, damage)
 	
 	var status_altered := false
@@ -356,12 +362,84 @@ func take_damage(damage: int, pierces_resolve: bool = false) -> void:
 		pass
 	
 	if status_altered and status == Status.DAZED:
-		event_log.log.call_deferred('%s is dazed!' % [BB.player_name(self)])
+		event_log.log('%s is dazed by damage' % [BB.player_name(self)])
 	elif status_altered and status == Status.KNOCKED_OUT:
-		event_log.log.call_deferred('%s was knocked unconscious!' % [BB.player_name(self)])
+		event_log.log('%s was knocked unconscious by damage!' % [BB.player_name(self)])
 		if is_beacon:
 			round_root.end_round()
 			score_state.score_points(Constants.other_team(team), Constants.POINTS_FOR_SACKING_BEACON)
+
+enum PushOutcomeType { MOVED_TO, INTO_WALL, CLASHED_WITH, OUT_OF_ARENA }
+
+class PushOutcome:
+	var player: Player
+	var type: PushOutcomeType
+	var distance: int
+	var clashed_with: Player
+
+func report_outcome(outcome: PushOutcome) -> void:
+	match outcome.type:
+		PushOutcomeType.MOVED_TO:
+			event_log.log('%s pushed %s back %s spaces' % [BB.player_name(self), BB.player_name(outcome.player), outcome.distance])
+		PushOutcomeType.INTO_WALL:
+			event_log.log('%s pushed %s back %s spaces into a wall' % [BB.player_name(self), BB.player_name(outcome.player), outcome.distance])
+		PushOutcomeType.CLASHED_WITH:
+			event_log.log('%s pushed %s back %s spaces into %s' % [BB.player_name(self), BB.player_name(outcome.player), outcome.distance, BB.player_name(outcome.clashed_with)])
+		PushOutcomeType.OUT_OF_ARENA:
+			event_log.log('%s pushed %s back %s spaces, off the arena!' % [BB.player_name(self), BB.player_name(outcome.player), outcome.distance])
+
+func resolve_push(target: Player, direction: TileSet.CellNeighbor, force: int) -> void:
+	var current_cell := target.tile_position
+	var distance := 0
+	var clashed_with: Player = null
+	while force > 0:
+		distance += 1
+		var previous_cell := current_cell
+		current_cell = arena_tilemap.get_neighbor_cell(current_cell, direction)
+		if not arena_tilemap.is_cell_pathable(current_cell):
+			if arena_tilemap.is_cell_wall(current_cell):
+				target.push_to(previous_cell)
+				var wall_push_outcome := PushOutcome.new()
+				wall_push_outcome.player = target
+				wall_push_outcome.type = PushOutcomeType.INTO_WALL
+				wall_push_outcome.distance = distance - 1
+				report_outcome(wall_push_outcome)
+				target.take_damage(force)
+			else:
+				target.push_to(current_cell)
+				var ooa_push_outcome := PushOutcome.new()
+				ooa_push_outcome.player = target
+				ooa_push_outcome.type = PushOutcomeType.OUT_OF_ARENA
+				ooa_push_outcome.distance = distance
+				report_outcome(ooa_push_outcome)
+		var player_in_next_cell := players.player_in_cell(current_cell)
+		if player_in_next_cell:
+			# defer the damage until after we report the push
+			clashed_with = player_in_next_cell
+			break
+		# we've used up some force, we'll loop to push further if force remains
+		force -= 1
+	
+	target.push_to(current_cell)
+	
+	var push_outcome := PushOutcome.new()
+	push_outcome.player = target
+	if clashed_with:
+		push_outcome.type = PushOutcomeType.CLASHED_WITH
+		push_outcome.clashed_with = clashed_with
+	else:
+		push_outcome.type = PushOutcomeType.MOVED_TO
+	push_outcome.distance = distance
+	report_outcome(push_outcome)
+
+	if clashed_with:
+		# damage the original player now
+		target.take_damage(Constants.CLASH_DAMAGE)
+		# also damage the player they clashed with
+		clashed_with.take_damage(Constants.CLASH_DAMAGE)
+		# now also push the player already in that cell, transferring all remaining force to them
+		# use up an extra force (absorbed by the impact?) so that the preview is accurate to the final victim's final location
+		resolve_push(clashed_with, direction, maxi(force - 1, 1))
 
 func revive() -> void:
 	status = Status.OK

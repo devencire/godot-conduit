@@ -134,6 +134,7 @@ func _draw_hit_direction_selection_preview():
 			attack_dialog.position = player.arena_tilemap.map_to_local(player.tile_position) - Vector2(0, 150)
 	attack_dialog.power_cost = base_attack_cost
 	attack_dialog.success_chance = base_attack_chance
+	attack_dialog.target_is_unpowered = not selected_target.player.is_powered
 	attack_dialog.overcharge_activated = selected_target.overcharged
 	if selected_target.overcharged:
 		attack_dialog.max_power_cost = attack_dialog.power_cost
@@ -189,115 +190,31 @@ func get_valid_push_targets() -> Array[ValidTarget]:
 		valid_targets.append(target)
 	return valid_targets
 
-class PushAction:
-	var player: Player
-	var direction: TileSet.CellNeighbor
-	var direct_damage: int
-	var force: int # this is just a number of tiles for now
-
 func try_push(push_target: ValidTarget, overcharged: bool):
 	var attack_cost := ATTACK_COST
 	if not player.turn_state.try_spend_power(attack_cost):
 		player.event_log.log('%s tried to push %s back but didn\'t have %s⚡!' % [BB.player_name(player), BB.player_name(push_target.player), attack_cost])
 		player.selected = false
 		return
-	var push_action := PushAction.new()
-	push_action.player = push_target.player
-	push_action.direction = push_target.direction
-	push_action.force = 1
+	
+	var force := 1
 	if overcharged:
-		push_action.direct_damage = OVERCHARGED_DIRECT_DAMAGE
 		while player.turn_state.try_spend_power(OVERCHARGED_EXTRA_TILE_COST):
-			push_action.force += 1
+			force += 1
 			attack_cost += OVERCHARGED_EXTRA_TILE_COST
 	
-	var push_outcomes := resolve_push(push_action)
 	if overcharged:
-		player.event_log.log('%s spent %s⚡ on an overcharged push!' % [BB.player_name(player), attack_cost])
+		player.event_log.log('%s spent %s⚡ on an overcharged strike!' % [BB.player_name(player), attack_cost])
 	else:
-		player.event_log.log('%s spent %s⚡ on a push' % [BB.player_name(player), attack_cost])
-	for outcome in push_outcomes:
-		match outcome.type:
-			PushOutcomeType.MOVED_TO:
-				player.event_log.log('%s pushed %s back %s spaces, dealing %s damage' % [BB.player_name(player), BB.player_name(outcome.player), outcome.distance, outcome.damage])
-			PushOutcomeType.INTO_WALL:
-				player.event_log.log('%s pushed %s back %s spaces into a wall, dealing %s damage' % [BB.player_name(player), BB.player_name(outcome.player), outcome.distance, outcome.damage])
-			PushOutcomeType.CLASHED_WITH:
-				player.event_log.log('%s pushed %s back %s spaces into %s, dealing %s damage' % [BB.player_name(player), BB.player_name(outcome.player), outcome.distance, BB.player_name(outcome.clashed_with), outcome.damage])
-			PushOutcomeType.OUT_OF_ARENA:
-				player.event_log.log('%s pushed %s back %s spaces, off the arena!' % [BB.player_name(player), BB.player_name(outcome.player), outcome.distance])
+		player.event_log.log('%s spent %s⚡ on a strike' % [BB.player_name(player), attack_cost])
+	
+	if not push_target.player.is_powered:
+		push_target.player.daze_if_not_dazed()
+	if overcharged:
+		push_target.player.take_damage(OVERCHARGED_DIRECT_DAMAGE)
+	
+	player.resolve_push(push_target.player, push_target.direction, force)
+	
 	player.acted_this_turn = true
 	if overcharged:
 		player.selected = false
-
-enum PushOutcomeType { MOVED_TO, INTO_WALL, CLASHED_WITH, OUT_OF_ARENA }
-
-class PushOutcome:
-	var player: Player
-	var type: PushOutcomeType
-	var damage: int
-	var distance: int
-	var clashed_with: Player
-
-# TODO move this out of this specific weapon, it's a generic mechanic
-func resolve_push(push_action: PushAction) -> Array[PushOutcome]:
-	var new_push_results: Array[PushOutcome] = []
-	var current_cell := push_action.player.tile_position
-	var distance := 0
-	var total_damage := push_action.direct_damage
-	var clashed_with: Player = null
-	while push_action.force > 0:
-		distance += 1
-		var previous_cell := current_cell
-		current_cell = player.arena_tilemap.get_neighbor_cell(current_cell, push_action.direction)
-		if not player.arena_tilemap.is_cell_pathable(current_cell):
-			if player.arena_tilemap.is_cell_wall(current_cell):
-				total_damage += push_action.force
-				push_action.player.push_to(previous_cell)
-				push_action.player.take_damage(total_damage)
-				var wall_push_outcome := PushOutcome.new()
-				wall_push_outcome.player = push_action.player
-				wall_push_outcome.type = PushOutcomeType.INTO_WALL
-				wall_push_outcome.distance = distance - 1
-				wall_push_outcome.damage = total_damage
-				return [wall_push_outcome]
-			else:
-				push_action.player.push_to(current_cell)
-				var ooa_push_outcome := PushOutcome.new()
-				ooa_push_outcome.player = push_action.player
-				ooa_push_outcome.type = PushOutcomeType.OUT_OF_ARENA
-				ooa_push_outcome.distance = distance
-				return [ooa_push_outcome]
-		var player_in_next_cell := player.players.player_in_cell(current_cell)
-		if player_in_next_cell:
-			clashed_with = player_in_next_cell
-			# damage the original player now, the victim in its own push
-			total_damage += CLASH_DAMAGE
-			# now also push the player already in that cell, transferring all remaining force to them
-			var new_push_action := PushAction.new()
-			new_push_action.player = player_in_next_cell
-			new_push_action.direction = push_action.direction
-			new_push_action.direct_damage = CLASH_DAMAGE
-			# use up an extra force (absorbed by the impact?) so that the preview is accurate to the final victim's final location
-			new_push_action.force = maxi(push_action.force - 1, 1)
-			new_push_results = resolve_push(new_push_action)
-			break
-		# we've used up some force, we'll loop to push further if force remains
-		push_action.force -= 1
-	
-	push_action.player.push_to(current_cell)
-	push_action.player.take_damage(total_damage)
-	
-	var push_outcome := PushOutcome.new()
-	push_outcome.player = push_action.player
-	if clashed_with:
-		push_outcome.type = PushOutcomeType.CLASHED_WITH
-		push_outcome.clashed_with = clashed_with
-	else:
-		push_outcome.type = PushOutcomeType.MOVED_TO
-	push_outcome.distance = distance
-	push_outcome.damage = total_damage
-	# if this player was pushed into another player,
-	# prepend this result so it gets listed first
-	new_push_results.push_front(push_outcome)
-	return new_push_results

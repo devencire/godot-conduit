@@ -1,6 +1,6 @@
 [gd_scene load_steps=10 format=3 uid="uid://d1g51gpcf38kc"]
 
-[ext_resource type="Script" path="res://scripts/Player.gd" id="1_4vrrm"]
+[ext_resource type="Script" path="res://scripts/Player.gd" id="1_w7h0k"]
 [ext_resource type="Texture2D" uid="uid://rcrm0go6mclm" path="res://assets/player.png" id="2_bdnyk"]
 [ext_resource type="PackedScene" uid="uid://8r38rbtaivjs" path="res://scenes/selection_tile.tscn" id="3_77lfk"]
 [ext_resource type="Script" path="res://scripts/Hammer.gd" id="4_ek61n"]
@@ -21,7 +21,7 @@ animations = [{
 }]
 
 [node name="Player" type="Node2D" groups=["players"]]
-script = ExtResource("1_4vrrm")
+script = ExtResource("1_w7h0k")
 
 [node name="Hammer" type="Node2D" parent="." node_paths=PackedStringArray("player")]
 script = ExtResource("4_ek61n")
@@ -93,6 +93,7 @@ bbcode_enabled = true
 text = "[center]💫"
 scroll_active = false
 script = ExtResource("8_atm0m")
+visible_status = 1
 
 [node name="KnockedOutIndicator" type="RichTextLabel" parent="Graphic"]
 visible = false
@@ -106,6 +107,7 @@ bbcode_enabled = true
 text = "[center]😵‍"
 scroll_active = false
 script = ExtResource("8_atm0m")
+visible_status = 2
 
 [connection signal="acted_this_turn_changed" from="." to="Graphic/SelectionTile" method="_on_player_acted_this_turn_changed"]
 [connection signal="dashes_used_changed" from="." to="Graphic/FreeMoveDisplay" method="_on_player_dashes_used_changed"]
