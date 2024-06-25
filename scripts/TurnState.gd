@@ -20,6 +20,10 @@ signal new_turn_started(state: TurnState)
 	get:
 		return known_remaining_power + Constants.MAX_EXCESS_POWER
 
+@export var actual_remaining_power: int:
+	get:
+		return total_available_power - power_used
+
 var round_is_over: bool
 
 ## Starts a new turn for the given `team`.

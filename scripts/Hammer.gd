@@ -3,6 +3,7 @@ extends Node
 @export var player: Player
 
 const ATTACK_COST := 1
+const ATTACK_FORCE := 1
 
 const OVERCHARGED_ATTACK_BASE_COST := 2
 const OVERCHARGED_EXTRA_TILE_COST := 2
@@ -191,29 +192,38 @@ func get_valid_push_targets() -> Array[ValidTarget]:
 	return valid_targets
 
 func try_push(push_target: ValidTarget, overcharged: bool):
-	var attack_cost := ATTACK_COST
+	var attack_effects: Array[AttackEffect]
+	if overcharged:
+		attack_effects = [
+			DazeUnpoweredTargetEffect.new(player),
+			DirectDamageEffect.new(push_target.player, OVERCHARGED_DIRECT_DAMAGE),
+			OverchargedVariablePushEffect.new(player, push_target.player, OVERCHARGED_EXTRA_TILE_COST, push_target.direction)
+		]
+	else:
+		attack_effects = [
+			DazeUnpoweredTargetEffect.new(player),
+			FixedPushEffect.new(player, push_target.player, ATTACK_FORCE, push_target.direction),
+		]
+	
+	var attack_cost := ATTACK_COST if not overcharged else OVERCHARGED_ATTACK_BASE_COST
 	if not player.turn_state.try_spend_power(attack_cost):
 		player.event_log.log('%s tried to push %s back but didn\'t have %s⚡!' % [BB.player_name(player), BB.player_name(push_target.player), attack_cost])
 		player.selected = false
 		return
-	
-	var force := 1
-	if overcharged:
-		while player.turn_state.try_spend_power(OVERCHARGED_EXTRA_TILE_COST):
-			force += 1
-			attack_cost += OVERCHARGED_EXTRA_TILE_COST
 	
 	if overcharged:
 		player.event_log.log('%s spent %s⚡ on an overcharged strike!' % [BB.player_name(player), attack_cost])
 	else:
 		player.event_log.log('%s spent %s⚡ on a strike' % [BB.player_name(player), attack_cost])
 	
-	if not push_target.player.is_powered:
-		push_target.player.daze_if_not_dazed()
-	if overcharged:
-		push_target.player.take_damage(OVERCHARGED_DIRECT_DAMAGE)
-	
-	player.resolve_push(push_target.player, push_target.direction, force)
+	var excess_power_used := 0
+	for effect in attack_effects:
+		if effect.is_enabled():
+			excess_power_used = maxi(excess_power_used, effect.enact())
+
+	if excess_power_used > 0:
+		player.turn_state.try_spend_power(excess_power_used)
+		player.turn_state.end_turn()
 	
 	player.acted_this_turn = true
 	if overcharged:
