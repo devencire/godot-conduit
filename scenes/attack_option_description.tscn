@@ -18,7 +18,7 @@ metadata/_tab_index = 0
 
 [node name="EffectContainer" type="VBoxContainer" parent="."]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(300, 2.08165e-12)
+custom_minimum_size = Vector2(360, 2.08165e-12)
 layout_mode = 2
 theme = SubResource("Theme_utl7n")
 alignment = 1

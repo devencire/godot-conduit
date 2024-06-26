@@ -24,6 +24,10 @@ func _ready() -> void:
 	var effects := attack_option.get_effects(attacker, target, TileSet.CELL_NEIGHBOR_TOP_SIDE)
 	for effect in effects:
 		var new_label: RichTextLabel = attack_effect_label.duplicate()
-		new_label.text = effect.display_text()
+		if effect.is_enabled():
+			new_label.text = effect.display_text()
+		else:
+			new_label.text = '[s]%s[/s]' % effect.display_text()
+			new_label.modulate = Color(Color.WHITE, 0.6)
 		new_label.visible = true
 		effect_container.add_child(new_label)
