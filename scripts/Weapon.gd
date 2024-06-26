@@ -1,15 +1,8 @@
+class_name Weapon
+
 extends Node
 
 @export var player: Player
-
-const ATTACK_COST := 1
-const ATTACK_FORCE := 1
-
-const OVERCHARGED_ATTACK_BASE_COST := 2
-const OVERCHARGED_EXTRA_TILE_COST := 2
-const OVERCHARGED_DIRECT_DAMAGE := 1
-
-const CLASH_DAMAGE := 1
 
 var target_preview_tile_scene := preload("res://scenes/target_preview_tile.tscn")
 var target_preview: Node2D
