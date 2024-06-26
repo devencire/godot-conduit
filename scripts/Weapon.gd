@@ -42,16 +42,24 @@ func _draw_target_selection_preview():
 	if not player.is_powered:
 		return
 	target_preview = Node2D.new()
-	# show valid targets for the currently selected option
+	_draw_selectable_targets(target_preview)
+	add_child(target_preview)
+
+func _draw_selectable_targets(display_node: Node2D) -> void:
 	var valid_targets := get_valid_targets()
 	for target in valid_targets:
-		var preview_tile: TargetPreviewTile = target_preview_tile_scene.instantiate()
-		preview_tile.position = player.arena_tilemap.map_to_local(target.tile_position)
-		preview_tile.team = player.team
-		preview_tile.type = TargetPreviewTile.PreviewTileType.TEAM_CIRCLE
-		preview_tile.right_clicked.connect(func(): _select_target(target))
-		target_preview.add_child(preview_tile)
-	add_child(target_preview)
+		var target_tile: TargetPreviewTile = target_preview_tile_scene.instantiate()
+		target_tile.position = player.arena_tilemap.map_to_local(target.tile_position)
+		target_tile.team = player.team
+		if target == selected_target:
+			# show the opponent player as targeted and allow deselect
+			target_tile.type = TargetPreviewTile.PreviewTileType.SELECTED_CIRCLE
+			target_tile.right_clicked.connect(_clear_selected_target)
+		else:
+			# allow selecting the target
+			target_tile.type = TargetPreviewTile.PreviewTileType.TEAM_CIRCLE
+			target_tile.right_clicked.connect(func(): _select_target(target))
+		display_node.add_child(target_tile)
 
 func _select_target(target: Player) -> void:
 	selected_target = target
@@ -67,14 +75,7 @@ func _clear_selected_target() -> void:
 func _draw_hit_direction_selection_preview():
 	_clear_target_preview()
 	target_preview = Node2D.new()
-	# show the opponent player as targeted
-	var selected_target_tile: TargetPreviewTile = target_preview_tile_scene.instantiate()
-	selected_target_tile.position = player.arena_tilemap.map_to_local(selected_target.tile_position)
-	selected_target_tile.team = player.team
-	selected_target_tile.type = TargetPreviewTile.PreviewTileType.SELECTED_CIRCLE
-	selected_target_tile.right_clicked.connect(_clear_selected_target)
-	target_preview.add_child(selected_target_tile)
-	# show push directions for the currently selected option
+	_draw_selectable_targets(target_preview)
 	selected_option.display_directions(player, selected_target, target_preview, try_enacting_selected_option)
 	add_child(target_preview)
 
