@@ -14,7 +14,7 @@ func _init(init_attacker: Player, init_target: Player, init_force: int, init_dir
     direction = init_direction
 
 func display_text() -> String:
-    return 'push the target back %s tile%s' % [force, 's' if force > 1 else '']
+    return 'push the target %s tile%s' % [force, 's' if force > 1 else '']
 
 func enact() -> int:
     attacker.resolve_push(target, direction, force)

@@ -15,8 +15,16 @@ var target_preview_tile_scene := preload("res://scenes/target_preview_tile.tscn"
 var target_preview: Node2D
 
 var attack_dialog_scene := preload("res://scenes/attack_dialog.tscn")
+var attack_dialog: CanvasLayer
 
-var selected_target: ValidTarget
+var selected_target: Player
+
+var attack_options: Array[AttackOption] = [
+	HammerPushAttackOption.new(),
+	HammerOverchargedPushAttackOption.new()
+]
+
+var selected_option := attack_options[0]
 
 func _ready():
 	player.was_selected.connect(_player_was_selected)
@@ -29,6 +37,7 @@ func _player_was_selected(_player: Player) -> void:
 func _player_was_deselected(_player: Player) -> void:
 	_clear_selected_target()
 	_clear_target_preview()
+	_clear_attack_dialog()
 
 func _player_was_moved(_player: Player) -> void:
 	if player.selected:
@@ -51,21 +60,16 @@ func _unhandled_input(event):
 			# they may have clicked an opposing player to target them
 			var valid_targets := get_valid_targets()
 			for target in valid_targets:
-				if target.cell == clicked_cell:
+				if target.tile_position == clicked_cell:
 					selected_target = target
+					_draw_attack_dialog()
 					_draw_hit_direction_selection_preview()
 					player.moving = false
 		else:
 			# they may have clicked their target again to deselect them
-			if selected_target.cell == clicked_cell:
+			if selected_target.tile_position == clicked_cell:
 				_clear_selected_target()
 				return
-			# they may have clicked a direction to push their target in
-			var valid_push_targets = get_valid_push_targets()
-			for push_target in valid_push_targets:
-				if push_target.cell == clicked_cell:
-					try_push(push_target, selected_target.overcharged)
-					get_viewport().set_input_as_handled()
 			
 		
 func _draw_target_selection_preview():
@@ -77,7 +81,7 @@ func _draw_target_selection_preview():
 	var valid_targets := get_valid_targets()
 	for target in valid_targets:
 		var preview_tile: TargetPreviewTile = target_preview_tile_scene.instantiate()
-		preview_tile.position = player.arena_tilemap.map_to_local(target.cell)
+		preview_tile.position = player.arena_tilemap.map_to_local(target.tile_position)
 		preview_tile.team = player.team
 		preview_tile.type = TargetPreviewTile.PreviewTileType.TEAM_CIRCLE
 		target_preview.add_child(preview_tile)
@@ -88,143 +92,53 @@ func _draw_hit_direction_selection_preview():
 	# show the opponent player as targeted
 	target_preview = Node2D.new()
 	var selected_target_tile: TargetPreviewTile = target_preview_tile_scene.instantiate()
-	selected_target_tile.position = player.arena_tilemap.map_to_local(selected_target.cell)
+	selected_target_tile.position = player.arena_tilemap.map_to_local(selected_target.tile_position)
 	selected_target_tile.team = player.team
 	selected_target_tile.type = TargetPreviewTile.PreviewTileType.SELECTED_CIRCLE
 	target_preview.add_child(selected_target_tile)
 	# show push directions
-	var base_attack_cost := ATTACK_COST if not selected_target.overcharged else OVERCHARGED_ATTACK_BASE_COST
-	var base_attack_chance := player.turn_state.chance_that_power_available(base_attack_cost)
-	var valid_targets := get_valid_push_targets()
-	for target in valid_targets:
-		var preview_tile: TargetPreviewTile = target_preview_tile_scene.instantiate()
-		preview_tile.position = player.arena_tilemap.map_to_local(target.cell)
-		preview_tile.direction = target.direction
-		preview_tile.team = player.team
-		preview_tile.type = TargetPreviewTile.PreviewTileType.ARROW
-		preview_tile.success_chance = base_attack_chance
-		target_preview.add_child(preview_tile)
-		if selected_target.overcharged:
-			var further_push_cost := base_attack_cost
-			var further_push_chance := base_attack_chance
-			var further_push_cell := target.cell
-			while true:
-				further_push_cost += OVERCHARGED_EXTRA_TILE_COST
-				further_push_chance = player.turn_state.chance_that_power_available(further_push_cost)
-				if further_push_chance == 0:
-					break
-				further_push_cell = player.arena_tilemap.get_neighbor_cell(further_push_cell, target.direction)
-				var cell_pathable := player.arena_tilemap.is_cell_pathable(further_push_cell)
-				var further_push_preview_tile: TargetPreviewTile = target_preview_tile_scene.instantiate()
-				further_push_preview_tile.position = player.arena_tilemap.map_to_local(further_push_cell)
-				further_push_preview_tile.direction = target.direction
-				further_push_preview_tile.team = player.team
-				further_push_preview_tile.type = TargetPreviewTile.PreviewTileType.FADED_ARROW
-				further_push_preview_tile.success_chance = further_push_chance
-				target_preview.add_child(further_push_preview_tile)
-				# if we just previewed knocking the target off the arena, don't show any further-out previews
-				if not cell_pathable:
-					break
+	selected_option.display_directions(player, selected_target, target_preview, try_push)
 	# show attack dialog
-	var attack_dialog: AttackDialog = attack_dialog_scene.instantiate()
-	# TODO not just use a constant vector, or who am I kidding, all this UI code must be burned later
-	match selected_target.direction:
-		TileSet.CELL_NEIGHBOR_TOP_LEFT_SIDE, TileSet.CELL_NEIGHBOR_TOP_SIDE, TileSet.CELL_NEIGHBOR_TOP_RIGHT_SIDE:
-			attack_dialog.position = player.arena_tilemap.map_to_local(player.tile_position) + Vector2(0, 150)
-		_:
-			attack_dialog.position = player.arena_tilemap.map_to_local(player.tile_position) - Vector2(0, 150)
-	attack_dialog.power_cost = base_attack_cost
-	attack_dialog.success_chance = base_attack_chance
-	attack_dialog.target_is_unpowered = not selected_target.player.is_powered
-	attack_dialog.overcharge_activated = selected_target.overcharged
-	if selected_target.overcharged:
-		attack_dialog.max_power_cost = attack_dialog.power_cost
-		attack_dialog.direct_damage = OVERCHARGED_DIRECT_DAMAGE
-		while attack_dialog.max_power_cost + OVERCHARGED_EXTRA_TILE_COST <= player.turn_state.max_remaining_power:
-			attack_dialog.max_power_cost += OVERCHARGED_EXTRA_TILE_COST
-	attack_dialog.set_overcharge.connect(_set_overcharge)
-	target_preview.add_child(attack_dialog)
-	attack_dialog.owner = target_preview
 	add_child(target_preview)
-	target_preview.owner = self
 
-func _set_overcharge(toggled_on: bool):
-	if selected_target:
-		selected_target.overcharged = toggled_on
-		_draw_hit_direction_selection_preview()
+func _draw_attack_dialog():
+	_clear_attack_dialog()
+	attack_dialog = attack_dialog_scene.instantiate()
+	attack_dialog.attacker = player
+	attack_dialog.target = selected_target
+	attack_dialog.attack_options = attack_options
+	attack_dialog.option_selected.connect(_set_attack_option)
+	add_child(attack_dialog)
+
+func _clear_attack_dialog():
+	if attack_dialog:
+		attack_dialog.queue_free()
+	attack_dialog = null
+
+func _set_attack_option(option: AttackOption):
+	selected_option = option
+	_draw_hit_direction_selection_preview()
 
 func _clear_target_preview():
 	if target_preview:
 		target_preview.queue_free()
 	target_preview = null
 
-class ValidTarget:
-	var direction: TileSet.CellNeighbor
-	var cell: Vector2i
-	var player: Player
-	var overcharged: bool
+func get_valid_targets() -> Array[Player]:
+	return selected_option.get_valid_targets(player)
 
-func get_valid_targets() -> Array[ValidTarget]:
-	var valid_targets: Array[ValidTarget] = []
-	var possible_cells := player.arena_tilemap.get_aligned_cells_at_range(player.tile_position, 1)
-	for direction in possible_cells:
-		var cell: Vector2i = possible_cells[direction]
-		var player_in_cell := player.players.player_in_cell(cell, Constants.other_team(player.team))
-		if player_in_cell:
-			var target := ValidTarget.new()
-			target.direction = direction
-			target.cell = cell
-			target.player = player_in_cell
-			valid_targets.append(target)
-	return valid_targets
-
-# this is kinda a mis-reuse of ValidTarget but whatever
-func get_valid_push_targets() -> Array[ValidTarget]:
-	var valid_directions := Constants.adjacent_directions(selected_target.direction)
-	valid_directions.append(selected_target.direction)
-	var valid_targets: Array[ValidTarget] = []
-	for direction in valid_directions:
-		var target := ValidTarget.new()
-		target.direction = direction
-		target.cell = player.arena_tilemap.get_neighbor_cell(selected_target.cell, direction)
-		target.player = selected_target.player
-		valid_targets.append(target)
-	return valid_targets
-
-func try_push(push_target: ValidTarget, overcharged: bool):
-	var attack_effects: Array[AttackEffect]
-	if overcharged:
-		attack_effects = [
-			DazeUnpoweredTargetEffect.new(player),
-			DirectDamageEffect.new(push_target.player, OVERCHARGED_DIRECT_DAMAGE),
-			OverchargedVariablePushEffect.new(player, push_target.player, OVERCHARGED_EXTRA_TILE_COST, push_target.direction)
-		]
-	else:
-		attack_effects = [
-			DazeUnpoweredTargetEffect.new(player),
-			FixedPushEffect.new(player, push_target.player, ATTACK_FORCE, push_target.direction),
-		]
-	
-	var attack_cost := ATTACK_COST if not overcharged else OVERCHARGED_ATTACK_BASE_COST
+func try_push(direction: TileSet.CellNeighbor):
+	var attack_cost := selected_option.get_base_power_cost()
 	if not player.turn_state.try_spend_power(attack_cost):
-		player.event_log.log('%s tried to push %s back but didn\'t have %s⚡!' % [BB.player_name(player), BB.player_name(push_target.player), attack_cost])
+		player.event_log.log('%s tried to %s but didn\'t have %s⚡!' % [BB.player_name(player), selected_option.get_display_name(), attack_cost])
 		player.selected = false
 		return
 	
-	if overcharged:
-		player.event_log.log('%s spent %s⚡ on an overcharged strike!' % [BB.player_name(player), attack_cost])
-	else:
-		player.event_log.log('%s spent %s⚡ on a strike' % [BB.player_name(player), attack_cost])
+	player.event_log.log('%s spent %s⚡ to %s' % [BB.player_name(player), attack_cost, selected_option.get_display_name()])
 	
 	var excess_power_used := 0
-	for effect in attack_effects:
+	for effect in selected_option.get_effects(player, selected_target, direction):
 		if effect.is_enabled():
 			excess_power_used = maxi(excess_power_used, effect.enact())
-
-	if excess_power_used > 0:
-		player.turn_state.try_spend_power(excess_power_used)
-		player.turn_state.end_turn()
 	
 	player.acted_this_turn = true
-	if overcharged:
-		player.selected = false

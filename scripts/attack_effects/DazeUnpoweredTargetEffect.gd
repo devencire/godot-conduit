@@ -14,5 +14,7 @@ func is_enabled() -> bool:
     return not target.is_powered
 
 func enact() -> int:
-    target.status = Player.Status.DAZED
+    if target.status == Player.Status.OK:
+        target.event_log.log('%s was dazed' % [BB.player_name(target)])
+        target.status = Player.Status.DAZED
     return 0

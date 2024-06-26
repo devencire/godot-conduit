@@ -2,6 +2,8 @@ class_name TargetPreviewTile
 
 extends Node2D
 
+signal right_clicked
+
 @onready var sprite: AnimatedSprite2D = $Sprite
 
 enum PreviewTileType { TEAM_CIRCLE, SELECTED_CIRCLE, ARROW, FADED_ARROW }
@@ -60,3 +62,10 @@ func _on_mouse_entered():
 func _on_mouse_exited():
 	if type == PreviewTileType.ARROW or type == PreviewTileType.TEAM_CIRCLE:
 		$Sprite.modulate = Constants.team_color(team)
+
+func _on_mouse_over_area_input_event(viewport: Node, event: InputEvent, shape_idx: int) -> void:
+	if event is InputEventMouseButton:
+		if not event.pressed or not event.button_index == MOUSE_BUTTON_RIGHT:
+			return
+		right_clicked.emit()
+		viewport.set_input_as_handled()

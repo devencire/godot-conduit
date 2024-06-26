@@ -18,10 +18,10 @@ signal next_round_requested(round_root: RoundRoot)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	players.add_player(Constants.Team.ONE, Vector2i(-3, 2), true)
+	players.add_player(Constants.Team.ONE, Vector2i(-1, 3), true)
 	players.add_player(Constants.Team.ONE, Vector2i(-3, 0))
 	players.add_player(Constants.Team.ONE, Vector2i(-1, 2))
-	players.add_player(Constants.Team.ONE, Vector2i(-1, 0))
+	players.add_player(Constants.Team.ONE, Vector2i(-1, -1))
 	
 	players.add_player(Constants.Team.TWO, Vector2i(0, -1))
 	players.add_player(Constants.Team.TWO, Vector2i(0, -3))

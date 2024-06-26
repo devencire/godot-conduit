@@ -1,0 +1,60 @@
+[gd_scene load_steps=4 format=3 uid="uid://bghlajm5i0yk"]
+
+[ext_resource type="Script" path="res://scripts/AttackOptionDescription.gd" id="1_m2250"]
+
+[sub_resource type="Theme" id="Theme_utl7n"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_tjyrl"]
+
+[node name="AttackOptionDescription" type="MarginContainer"]
+offset_right = 360.0
+offset_bottom = 62.0
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+script = ExtResource("1_m2250")
+metadata/_tab_index = 0
+
+[node name="EffectContainer" type="VBoxContainer" parent="."]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 2.08165e-12)
+layout_mode = 2
+theme = SubResource("Theme_utl7n")
+alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="EffectContainer"]
+layout_mode = 2
+
+[node name="PowerCostLabel" type="RichTextLabel" parent="EffectContainer/HBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(2.08165e-12, 2.08165e-12)
+layout_mode = 2
+size_flags_horizontal = 3
+bbcode_enabled = true
+text = "2⚡"
+fit_content = true
+scroll_active = false
+
+[node name="VSeparator" type="VSeparator" parent="EffectContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+theme_override_styles/separator = SubResource("StyleBoxEmpty_tjyrl")
+
+[node name="SuccessChanceLabel" type="RichTextLabel" parent="EffectContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+bbcode_enabled = true
+text = "100% chance"
+fit_content = true
+scroll_active = false
+
+[node name="AttackEffectLabel" type="RichTextLabel" parent="EffectContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+bbcode_enabled = true
+text = " ✅ if target is not [color=yellow]powered[/color], daze them"
+fit_content = true

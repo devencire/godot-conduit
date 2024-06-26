@@ -95,7 +95,7 @@ func is_cell_wall(cell: Vector2i) -> bool:
 func get_hovered_cell(event: InputEventMouse) -> Vector2i:
 	return local_to_map(make_input_local(event).position)
 	
-const hex_cell_neighbors: Array[TileSet.CellNeighbor] = [
+const HEX_CELL_NEIGHBORS: Array[TileSet.CellNeighbor] = [
 	TileSet.CELL_NEIGHBOR_TOP_SIDE,
 	TileSet.CELL_NEIGHBOR_TOP_RIGHT_SIDE,
 	TileSet.CELL_NEIGHBOR_BOTTOM_RIGHT_SIDE,
@@ -106,7 +106,7 @@ const hex_cell_neighbors: Array[TileSet.CellNeighbor] = [
 
 func get_aligned_cells_by_direction(center_cell: Vector2i) -> Dictionary: # Dictionary[TileSet.CellNeighbor, Array[Vector2i]]
 	var aligned_cells_by_direction := {}
-	for hex_cell_neighbor in hex_cell_neighbors:
+	for hex_cell_neighbor in HEX_CELL_NEIGHBORS:
 		var aligned_cells: Array[Vector2i] = []
 		var current_cell := center_cell
 		while true:
@@ -121,7 +121,7 @@ func get_aligned_cells_by_direction(center_cell: Vector2i) -> Dictionary: # Dict
 ## Lines are blocked only by non-pathable tiles (i.e. walls but not players).
 func get_aligned_cells(center_cell: Vector2i) -> Array[Vector2i]:
 	var aligned_cells: Array[Vector2i] = [center_cell]
-	for hex_cell_neighbor in hex_cell_neighbors:
+	for hex_cell_neighbor in HEX_CELL_NEIGHBORS:
 		var current_cell := center_cell
 		while true:
 			current_cell = get_neighbor_cell(current_cell, hex_cell_neighbor)
@@ -135,7 +135,7 @@ func get_aligned_cells(center_cell: Vector2i) -> Array[Vector2i]:
 ## Cells for directions that are, or are blocked by, non-pathable tiles are not returned.
 func get_aligned_cells_at_range(center_cell: Vector2i, distance: int) -> Dictionary:
 	var aligned_cells: Dictionary = {} # Dictionary[TileSet.CellNeighbor, Vector2i]
-	for hex_cell_neighbor in hex_cell_neighbors:
+	for hex_cell_neighbor in HEX_CELL_NEIGHBORS:
 		var current_cell := center_cell
 		var obstructed := false
 		for n in distance:
@@ -155,6 +155,15 @@ func are_cells_aligned(first: Vector2i, second: Vector2i) -> bool:
 ## Positive distances are towards team two's starting positions.
 func distance_from_halfway_line(cell: Vector2i) -> int:
 	return cell.x - cell.y
+
+## Get which direction goes from `from` to `to`.
+## Only valid for adjacent cells.
+func direction_of_cell(from: Vector2i, to: Vector2i) -> TileSet.CellNeighbor:
+	for hex_cell_neighbor in HEX_CELL_NEIGHBORS:
+		if get_neighbor_cell(from, hex_cell_neighbor) == to:
+			return hex_cell_neighbor
+	assert(false, '%s not adjacent to %s' % [from, to])
+	return HEX_CELL_NEIGHBORS[0] as TileSet.CellNeighbor
 
 ## Remove all existing pathfinding obstacles and create up-to-date ones.
 ## TODO do this incrementally instead?
