@@ -63,7 +63,7 @@ func _on_mouse_exited():
 	if type == PreviewTileType.ARROW or type == PreviewTileType.TEAM_CIRCLE:
 		$Sprite.modulate = Constants.team_color(team)
 
-func _on_mouse_over_area_input_event(viewport: Node, event: InputEvent, shape_idx: int) -> void:
+func _on_mouse_over_area_input_event(viewport: Node, event: InputEvent, _shape_idx: int) -> void:
 	if event is InputEventMouseButton:
 		if not event.pressed or not event.button_index == MOUSE_BUTTON_RIGHT:
 			return

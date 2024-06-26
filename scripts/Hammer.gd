@@ -42,63 +42,47 @@ func _player_was_deselected(_player: Player) -> void:
 func _player_was_moved(_player: Player) -> void:
 	if player.selected:
 		_clear_selected_target()
-
-func _clear_selected_target() -> void:
-	selected_target = null
-	player.moving = true
-	_draw_target_selection_preview()
-
-func _unhandled_input(event):
-	if not player.selected or not player.is_powered:
-		return
-	
-	if event is InputEventMouseButton:
-		if not event.pressed or not event.button_index == MOUSE_BUTTON_RIGHT:
-			return
-		var clicked_cell := player.arena_tilemap.get_hovered_cell(event)
-		if not selected_target:
-			# they may have clicked an opposing player to target them
-			var valid_targets := get_valid_targets()
-			for target in valid_targets:
-				if target.tile_position == clicked_cell:
-					selected_target = target
-					_draw_attack_dialog()
-					_draw_hit_direction_selection_preview()
-					player.moving = false
-		else:
-			# they may have clicked their target again to deselect them
-			if selected_target.tile_position == clicked_cell:
-				_clear_selected_target()
-				return
-			
 		
 func _draw_target_selection_preview():
-	# TODO retain and re-use the preview tiles for performance?
 	_clear_target_preview()
+	# TODO replace this when unpowered attacks are possible
 	if not player.is_powered:
 		return
 	target_preview = Node2D.new()
+	# show valid targets for the currently selected option
 	var valid_targets := get_valid_targets()
 	for target in valid_targets:
 		var preview_tile: TargetPreviewTile = target_preview_tile_scene.instantiate()
 		preview_tile.position = player.arena_tilemap.map_to_local(target.tile_position)
 		preview_tile.team = player.team
 		preview_tile.type = TargetPreviewTile.PreviewTileType.TEAM_CIRCLE
+		preview_tile.right_clicked.connect(func(): _select_target(target))
 		target_preview.add_child(preview_tile)
 	add_child(target_preview)
 
+func _select_target(target: Player) -> void:
+	selected_target = target
+	_draw_attack_dialog()
+	_draw_hit_direction_selection_preview()
+	player.moving = false
+
+func _clear_selected_target() -> void:
+	selected_target = null
+	player.moving = true
+	_draw_target_selection_preview()
+
 func _draw_hit_direction_selection_preview():
 	_clear_target_preview()
-	# show the opponent player as targeted
 	target_preview = Node2D.new()
+	# show the opponent player as targeted
 	var selected_target_tile: TargetPreviewTile = target_preview_tile_scene.instantiate()
 	selected_target_tile.position = player.arena_tilemap.map_to_local(selected_target.tile_position)
 	selected_target_tile.team = player.team
 	selected_target_tile.type = TargetPreviewTile.PreviewTileType.SELECTED_CIRCLE
+	selected_target_tile.right_clicked.connect(_clear_selected_target)
 	target_preview.add_child(selected_target_tile)
-	# show push directions
-	selected_option.display_directions(player, selected_target, target_preview, try_push)
-	# show attack dialog
+	# show push directions for the currently selected option
+	selected_option.display_directions(player, selected_target, target_preview, try_enacting_selected_option)
 	add_child(target_preview)
 
 func _draw_attack_dialog():
@@ -127,7 +111,7 @@ func _clear_target_preview():
 func get_valid_targets() -> Array[Player]:
 	return selected_option.get_valid_targets(player)
 
-func try_push(direction: TileSet.CellNeighbor):
+func try_enacting_selected_option(direction: TileSet.CellNeighbor):
 	var attack_cost := selected_option.get_base_power_cost()
 	if not player.turn_state.try_spend_power(attack_cost):
 		player.event_log.log('%s tried to %s but didn\'t have %s⚡!' % [BB.player_name(player), selected_option.get_display_name(), attack_cost])
