@@ -26,6 +26,7 @@ func _ready():
 
 func _player_was_selected(_player: Player) -> void:
 	_draw_target_selection_preview()
+	_draw_attack_dialog()
 
 func _player_was_deselected(_player: Player) -> void:
 	_clear_selected_target()
@@ -70,6 +71,7 @@ func _select_target(target: Player) -> void:
 func _clear_selected_target() -> void:
 	selected_target = null
 	player.moving = true
+	_draw_attack_dialog()
 	_draw_target_selection_preview()
 
 func _draw_hit_direction_selection_preview():
@@ -80,7 +82,9 @@ func _draw_hit_direction_selection_preview():
 	add_child(target_preview)
 
 func _draw_attack_dialog():
-	_clear_attack_dialog()
+	if attack_dialog:
+		attack_dialog.target = selected_target
+		return
 	attack_dialog = attack_dialog_scene.instantiate()
 	attack_dialog.attacker = player
 	attack_dialog.target = selected_target
@@ -95,7 +99,8 @@ func _clear_attack_dialog():
 
 func _set_attack_option(option: AttackOption):
 	selected_option = option
-	_draw_hit_direction_selection_preview()
+	if selected_target:
+		_draw_hit_direction_selection_preview()
 
 func _clear_target_preview():
 	if target_preview:
