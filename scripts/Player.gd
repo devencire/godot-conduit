@@ -146,6 +146,7 @@ func _turn_state_new_turn_started(_turn_state: TurnState) -> void:
 		dashes_used = 0
 	else:
 		free_moves_remaining = 0
+		dashes_used = 0
 		if status == Status.DAZED:
 			status = Status.OK
 			event_log.log('%s recovered from being dazed' % BB.player_name(self))

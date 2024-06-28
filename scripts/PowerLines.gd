@@ -91,6 +91,7 @@ func _set_inactive_power_lines_from_player(player: Player, ref: TeamLayersRef) -
 		var atlas_coords: Vector2i = ATLAS_COORDS_FOR_DIRECTION[direction]
 		var opposite_atlas_coords: Vector2i = ATLAS_COORDS_FOR_DIRECTION[opposite_direction]
 		var aligned_cells: Array[Vector2i] = aligned_cells_by_direction[direction]
+		inactive_layer.set_cell(player.tile_position, 0, atlas_coords)
 		for cell in aligned_cells:
 			inactive_layer.set_cell(cell, 0, atlas_coords)
 			opposite_inactive_layer.set_cell(cell, 0, opposite_atlas_coords)
