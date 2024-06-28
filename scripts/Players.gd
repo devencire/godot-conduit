@@ -25,7 +25,7 @@ func _player_is_beacon_changed(_player: Player, is_beacon: bool):
 	if is_beacon: # only emit once, for the receiver of the throw
 		_update_players()
 
-func _player_status_changed(_player: Player, status: Player.Status):
+func _player_status_changed(_player: Player, _status: Player.Status):
 	_update_players()
 
 # only recalculate once an action has finished all player moves

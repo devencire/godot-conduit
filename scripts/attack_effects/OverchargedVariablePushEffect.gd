@@ -18,6 +18,7 @@ func _init(init_attacker: Player, init_target: Player, init_base_force: int, ini
 	direction = init_direction
 
 func _calc_max_force(max_remaining_power: int) -> int:
+	@warning_ignore("integer_division")
 	return base_force + (max_remaining_power - base_power_cost) / power_per_force
 
 func display_text() -> String:
@@ -27,6 +28,7 @@ func display_text() -> String:
 	return 'push the target %s-%s tile%s (%s⚡ per extra tile)' % [base_force, max_force, 's' if max_force > 1 else '', power_per_force]
 
 func enact() -> int:
+	@warning_ignore("integer_division")
 	var force := base_force + attacker.turn_state.actual_remaining_power / power_per_force
 	if force == 0:
 		return 0
