@@ -1,0 +1,20 @@
+[gd_scene load_steps=2 format=3 uid="uid://cjqxrgta6sj1p"]
+
+[ext_resource type="Script" path="res://scripts/PowerLines.gd" id="1_7y1qe"]
+
+[node name="PowerLines" type="Node2D"]
+script = ExtResource("1_7y1qe")
+
+[node name="TeamOne" type="Node2D" parent="."]
+
+[node name="Inactive" type="Node2D" parent="TeamOne"]
+modulate = Color(1, 1, 1, 0.117647)
+
+[node name="Active" type="Node2D" parent="TeamOne"]
+
+[node name="TeamTwo" type="Node2D" parent="."]
+
+[node name="Inactive" type="Node2D" parent="TeamTwo"]
+modulate = Color(1, 1, 1, 0.117647)
+
+[node name="Active" type="Node2D" parent="TeamTwo"]

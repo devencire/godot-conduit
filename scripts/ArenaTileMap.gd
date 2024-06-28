@@ -156,14 +156,28 @@ func are_cells_aligned(first: Vector2i, second: Vector2i) -> bool:
 func distance_from_halfway_line(cell: Vector2i) -> int:
 	return cell.x - cell.y
 
+const DIRECTION_FOR_CELL_DELTA := {
+	Vector2i(-1, -1): TileSet.CELL_NEIGHBOR_TOP_SIDE,
+	Vector2i(0, -1): TileSet.CELL_NEIGHBOR_TOP_RIGHT_SIDE,
+	Vector2i(1, 0): TileSet.CELL_NEIGHBOR_BOTTOM_RIGHT_SIDE,
+	Vector2i(1, 1): TileSet.CELL_NEIGHBOR_BOTTOM_SIDE,
+	Vector2i(0, 1): TileSet.CELL_NEIGHBOR_BOTTOM_LEFT_SIDE,
+	Vector2i(-1, 0): TileSet.CELL_NEIGHBOR_TOP_LEFT_SIDE,
+}
+
 ## Get which direction goes from `from` to `to`.
-## Only valid for adjacent cells.
+## Only valid for aligned cells.
 func direction_of_cell(from: Vector2i, to: Vector2i) -> TileSet.CellNeighbor:
-	for hex_cell_neighbor in HEX_CELL_NEIGHBORS:
-		if get_neighbor_cell(from, hex_cell_neighbor) == to:
-			return hex_cell_neighbor
-	assert(false, '%s not adjacent to %s' % [from, to])
-	return HEX_CELL_NEIGHBORS[0] as TileSet.CellNeighbor
+	var delta := to - from
+	if delta.x != 0 and delta.y != 0 and absi(delta.x) != absi(delta.y):
+		assert(false, '%s not aligned with %s' % [from, to])
+		return 0 as TileSet.CellNeighbor
+	delta /= maxi(absi(delta.x), absi(delta.y))
+	var direction: TileSet.CellNeighbor = DIRECTION_FOR_CELL_DELTA[delta]
+	if not direction:
+		assert(false, '%s not aligned with %s' % [from, to])
+		return 0 as TileSet.CellNeighbor
+	return direction
 
 ## Remove all existing pathfinding obstacles and create up-to-date ones.
 ## TODO do this incrementally instead?
@@ -179,8 +193,7 @@ func update_obstacles(players: Array[Player]):
 		var astar_id := ArenaTileMap._cell_to_astar_id(player.tile_position)
 		if astar.has_point(astar_id): # not true for out-of-arena players
 			astar.set_point_disabled(astar_id, true)
-		disabled_point_ids.append(astar_id)
-
+			disabled_point_ids.append(astar_id)
 
 func _on_players_changed(players: Players):
 	update_obstacles(players.all_players)

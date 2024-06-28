@@ -1,0 +1,49 @@
+[gd_scene load_steps=7 format=3 uid="uid://dxxmf1dm70jy3"]
+
+[ext_resource type="Script" path="res://scripts/ControlZones.gd" id="1_h77wy"]
+[ext_resource type="Texture2D" uid="uid://bu0j2ljbdu4jy" path="res://assets/hexes_2px_outline.png" id="2_5v033"]
+[ext_resource type="Texture2D" uid="uid://d08nigucg6b24" path="res://assets/power_line_hexes.png" id="3_e85r4"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_uchfg"]
+texture = ExtResource("2_5v033")
+texture_region_size = Vector2i(128, 128)
+use_texture_padding = false
+0:0/next_alternative_id = 4
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+3:1/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_1h532"]
+texture = ExtResource("3_e85r4")
+texture_region_size = Vector2i(128, 128)
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+0:1/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_dxrrb"]
+tile_shape = 3
+tile_layout = 5
+tile_offset_axis = 1
+tile_size = Vector2i(128, 128)
+sources/0 = SubResource("TileSetAtlasSource_uchfg")
+sources/1 = SubResource("TileSetAtlasSource_1h532")
+
+[node name="ControlZones" type="Node2D"]
+script = ExtResource("1_h77wy")
+
+[node name="TeamOneZones" type="TileMap" parent="."]
+modulate = Color(0, 0, 1, 1)
+tile_set = SubResource("TileSet_dxrrb")
+format = 2
+
+[node name="TeamTwoZones" type="TileMap" parent="."]
+modulate = Color(1, 0.54902, 0, 1)
+tile_set = SubResource("TileSet_dxrrb")
+format = 2

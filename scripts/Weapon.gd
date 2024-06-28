@@ -23,6 +23,7 @@ func _ready():
 	player.was_selected.connect(_player_was_selected)
 	player.was_deselected.connect(_player_was_deselected)
 	player.was_moved.connect(_player_was_moved)
+	player.is_powered_changed.connect(_player_is_powered_changed)
 
 func _player_was_selected(_player: Player) -> void:
 	_draw_target_selection_preview()
@@ -36,11 +37,14 @@ func _player_was_deselected(_player: Player) -> void:
 func _player_was_moved(_player: Player) -> void:
 	if player.selected:
 		_clear_selected_target()
+
+func _player_is_powered_changed(_player: Player, _is_powered: bool) -> void:
+	_draw_target_selection_preview()
 		
 func _draw_target_selection_preview():
 	_clear_target_preview()
 	# TODO replace this when unpowered attacks are possible
-	if not player.is_powered:
+	if not player.selected or not player.is_powered:
 		return
 	target_preview = Node2D.new()
 	_draw_selectable_targets(target_preview)

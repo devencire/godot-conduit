@@ -1,6 +1,0 @@
-[gd_scene load_steps=2 format=3 uid="uid://dxxmf1dm70jy3"]
-
-[ext_resource type="Script" path="res://scripts/PoweredTiles.gd" id="1_h7lcu"]
-
-[node name="PoweredTiles" type="Node2D"]
-script = ExtResource("1_h7lcu")

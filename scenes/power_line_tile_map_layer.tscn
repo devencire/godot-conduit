@@ -1,0 +1,23 @@
+[gd_scene load_steps=4 format=3 uid="uid://oacxxabaayvt"]
+
+[ext_resource type="Texture2D" uid="uid://dafnq1wwftw6m" path="res://assets/power_line_partials.png" id="1_185x0"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_w8864"]
+texture = ExtResource("1_185x0")
+texture_region_size = Vector2i(128, 128)
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_my0kd"]
+tile_shape = 3
+tile_layout = 5
+tile_offset_axis = 1
+tile_size = Vector2i(128, 128)
+sources/0 = SubResource("TileSetAtlasSource_w8864")
+
+[node name="PowerLineTileMapLayer" type="TileMapLayer"]
+tile_set = SubResource("TileSet_my0kd")

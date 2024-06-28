@@ -47,14 +47,12 @@ signal is_beacon_changed(player: Player, new_is_beacon: bool)
 			free_moves_remaining = 0
 		is_beacon_changed.emit(self, is_beacon)
 
+signal is_powered_changed(player: Player, new_is_powered: bool)
+
 @export var is_powered: bool:
-	get:
-		if is_beacon:
-			return true
-		var beacon_player := players.beacon_for_team(team)
-		if not beacon_player:
-			return false
-		return arena_tilemap.are_cells_aligned(tile_position, beacon_player.tile_position)
+	set(new_is_powered):
+		is_powered = new_is_powered
+		is_powered_changed.emit(self, is_powered)
 
 # A name, just used for debugging for now
 @export var debug_name: String
@@ -78,6 +76,10 @@ var stats := PlayerStats.new()
 @export var can_act: bool:
 	get:
 		return status == Status.OK and not acted_this_turn
+
+@export var conscious: bool:
+	get:
+		return status != Status.KNOCKED_OUT
 
 signal acted_this_turn_changed(player: Player, now_acted: bool)
 @export var acted_this_turn: bool:
@@ -327,10 +329,8 @@ func push_to(cell: Vector2i) -> void:
 	tween = create_tween()
 	var position := arena_tilemap.map_to_local(cell)
 	tween.tween_property(graphic, 'position', position, PUSH_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	if arena_tilemap.is_cell_pathable(cell):
-		tile_position = cell
-	else:
-		tile_position = Constants.OFF_ARENA
+	tile_position = cell
+	if not arena_tilemap.is_cell_pathable(cell):
 		take_damage(Constants.OFF_ARENA_DAMAGE, true)
 
 func daze_if_not_dazed() -> void:
@@ -406,12 +406,12 @@ func resolve_push(target: Player, direction: TileSet.CellNeighbor, force: int) -
 				report_outcome(wall_push_outcome)
 				target.take_damage(force)
 			else:
-				target.push_to(current_cell)
 				var ooa_push_outcome := PushOutcome.new()
 				ooa_push_outcome.player = target
 				ooa_push_outcome.type = PushOutcomeType.OUT_OF_ARENA
 				ooa_push_outcome.distance = distance
 				report_outcome(ooa_push_outcome)
+				break
 		var player_in_next_cell := players.player_in_cell(current_cell)
 		if player_in_next_cell:
 			# defer the damage until after we report the push
