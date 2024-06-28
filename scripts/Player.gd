@@ -321,7 +321,7 @@ func _try_pass_to_player(receiving_player: Player) -> void:
 
 const PUSH_DURATION := 0.2
 
-func push_to(cell: Vector2i) -> void:
+func push_to(cell: Vector2i, pusher: Player) -> void:
 	# TEMP: reset the position so we're always animating from the last true location
 	_move_graphic_to_tile_position()
 	if tween:
@@ -331,22 +331,22 @@ func push_to(cell: Vector2i) -> void:
 	tween.tween_property(graphic, 'position', position, PUSH_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	tile_position = cell
 	if not arena_tilemap.is_cell_pathable(cell):
-		take_damage(Constants.OFF_ARENA_DAMAGE, true)
+		take_damage(DamageSource.OutOfArena.new(pusher))
 
 func daze_if_not_dazed() -> void:
 	if status == Status.OK:
 		status = Status.DAZED
 		event_log.log('%s is dazed!' % [BB.player_name(self)])
 
-func take_damage(damage: int, pierces_resolve: bool = false) -> void:
-	var remaining_damage := damage
-	if not pierces_resolve:
-		var damage_absorbed_by_resolve := mini(resolve, damage)
+func take_damage(source: DamageSource) -> void:
+	var remaining_damage := source.amount
+	if not source.pierces_resolve:
+		var damage_absorbed_by_resolve := mini(resolve, remaining_damage)
 		resolve -= damage_absorbed_by_resolve
 		remaining_damage -= damage_absorbed_by_resolve
 	
-	event_log.log('%s took %s damage' % [BB.player_name(self), damage])
-	taken_damage.emit(self, damage)
+	event_log.log('%s took %s damage %s' % [BB.player_name(self), source.amount, source.display_text])
+	taken_damage.emit(self, source.amount)
 	
 	var status_altered := false
 	if remaining_damage > 0 and status == Status.OK:
@@ -382,7 +382,10 @@ func report_outcome(outcome: PushOutcome) -> void:
 		PushOutcomeType.MOVED_TO:
 			event_log.log('%s pushed %s back %s spaces' % [BB.player_name(self), BB.player_name(outcome.player), outcome.distance])
 		PushOutcomeType.INTO_WALL:
-			event_log.log('%s pushed %s back %s spaces into a wall' % [BB.player_name(self), BB.player_name(outcome.player), outcome.distance])
+			if outcome.distance > 0:
+				event_log.log('%s pushed %s back %s spaces into a wall' % [BB.player_name(self), BB.player_name(outcome.player), outcome.distance])
+			else:
+				event_log.log('%s pushed %s back into a wall' % [BB.player_name(self), BB.player_name(outcome.player)])
 		PushOutcomeType.CLASHED_WITH:
 			event_log.log('%s pushed %s back %s spaces into %s' % [BB.player_name(self), BB.player_name(outcome.player), outcome.distance, BB.player_name(outcome.clashed_with)])
 		PushOutcomeType.OUT_OF_ARENA:
@@ -398,13 +401,14 @@ func resolve_push(target: Player, direction: TileSet.CellNeighbor, force: int) -
 		current_cell = arena_tilemap.get_neighbor_cell(current_cell, direction)
 		if not arena_tilemap.is_cell_pathable(current_cell):
 			if arena_tilemap.is_cell_wall(current_cell):
-				target.push_to(previous_cell)
+				target.push_to(previous_cell, self)
 				var wall_push_outcome := PushOutcome.new()
 				wall_push_outcome.player = target
 				wall_push_outcome.type = PushOutcomeType.INTO_WALL
 				wall_push_outcome.distance = distance - 1
 				report_outcome(wall_push_outcome)
-				target.take_damage(force)
+				target.take_damage(DamageSource.PushedIntoWall.new(self, force))
+				return
 			else:
 				var ooa_push_outcome := PushOutcome.new()
 				ooa_push_outcome.player = target
@@ -420,7 +424,7 @@ func resolve_push(target: Player, direction: TileSet.CellNeighbor, force: int) -
 		# we've used up some force, we'll loop to push further if force remains
 		force -= 1
 	
-	target.push_to(current_cell)
+	target.push_to(current_cell, self)
 	
 	var push_outcome := PushOutcome.new()
 	push_outcome.player = target
@@ -434,9 +438,9 @@ func resolve_push(target: Player, direction: TileSet.CellNeighbor, force: int) -
 
 	if clashed_with:
 		# damage the original player now
-		target.take_damage(Constants.CLASH_DAMAGE)
+		target.take_damage(DamageSource.PushedIntoPlayer.new(self, clashed_with))
 		# also damage the player they clashed with
-		clashed_with.take_damage(Constants.CLASH_DAMAGE)
+		clashed_with.take_damage(DamageSource.HitByPushedPlayer.new(self, target))
 		# now also push the player already in that cell, transferring all remaining force to them
 		# use up an extra force (absorbed by the impact?) so that the preview is accurate to the final victim's final location
 		resolve_push(clashed_with, direction, maxi(force - 1, 1))

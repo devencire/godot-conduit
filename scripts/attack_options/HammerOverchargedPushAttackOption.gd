@@ -39,7 +39,7 @@ func display_directions(attacker: Player, target: Player, display_node: Node2D, 
 func get_effects(attacker: Player, target: Player, direction: TileSet.CellNeighbor) -> Array[AttackEffect]:
 	return [
 		DazeUnpoweredTargetEffect.new(target),
-		DirectDamageEffect.new(target, OC_DIRECT_DAMAGE),
+		DirectDamageEffect.new(attacker, target, OC_DIRECT_DAMAGE, get_display_name()),
 		OverchargedVariablePushEffect.new(attacker, target, PUSH_FORCE, OC_POWER_COST, OC_POWER_PER_TILE, direction),
 		EndTurnEffect.new(attacker.turn_state)
 	]
