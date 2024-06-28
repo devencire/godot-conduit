@@ -36,6 +36,8 @@ func _set_control_zones_for_team(team: Constants.Team) -> void:
 	
 	var powered_players := players.powered_players_on_team(team)
 	for player in powered_players:
+		if not player.status == Player.Status.OK:
+			continue
 		var zone_cells_by_direction := arena_tilemap.get_aligned_cells_at_range(player.tile_position, 1)
 		var zone_cells = zone_cells_by_direction.values()
 		zone_cells.push_back(player.tile_position)
