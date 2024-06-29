@@ -55,7 +55,7 @@ func start_turn(team: Constants.Team) -> void:
 func try_spend_power(amount: int) -> bool:
 	if power_used + amount > total_available_power:
 		# TODO: using call_deferred to time this is very very dodgy, do something better
-		start_turn.call_deferred(Constants.other_team(active_team))
+		end_turn()
 		return false
 	else:
 		power_used += amount
@@ -71,8 +71,17 @@ func chance_that_power_available(power_cost: int) -> float:
 		return 0.0
 	return 1.0 - (float(power_cost - maxi(0, known_remaining_power)) / (mini(Constants.MAX_EXCESS_POWER, max_remaining_power) + 1))
 
-## Ends the current turn and starts the opposing team's turn.
+var turn_ending: bool
+
+## Ends the current turn and starts the opposing team's turn once the frame ends.
+## Multiple calls in the same frame are amalgamated into one.
 func end_turn() -> void:
+	if not turn_ending:
+		turn_ending = true
+		_actually_end_turn.call_deferred()
+
+func _actually_end_turn() -> void:
+	turn_ending = false
 	start_turn(Constants.other_team(active_team))
 
 func _on_round_root_round_ended(_round_root: RoundRoot):

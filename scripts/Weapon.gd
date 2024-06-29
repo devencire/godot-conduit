@@ -93,6 +93,7 @@ func _draw_attack_dialog():
 	attack_dialog.attacker = player
 	attack_dialog.target = selected_target
 	attack_dialog.attack_options = attack_options
+	attack_dialog.selected_option = selected_option
 	attack_dialog.option_selected.connect(_set_attack_option)
 	add_child(attack_dialog)
 
@@ -127,5 +128,9 @@ func try_enacting_selected_option(direction: TileSet.CellNeighbor):
 	for effect in selected_option.get_effects(player, selected_target, direction):
 		if effect.is_enabled():
 			excess_power_used = maxi(excess_power_used, effect.enact())
+	if excess_power_used > 0:
+		assert(player.turn_state.try_spend_power(excess_power_used), 'attack used more power than was available')
+		player.event_log.log('%s spent an additional %s⚡ to overcharge %s' % [BB.player_name(player), excess_power_used, selected_option.get_display_name()])
 	
 	player.acted_this_turn = true
+	selected_option = attack_options[0]

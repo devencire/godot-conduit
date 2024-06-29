@@ -29,9 +29,10 @@ func display_text() -> String:
 
 func enact() -> int:
 	@warning_ignore("integer_division")
-	var force := base_force + attacker.turn_state.actual_remaining_power / power_per_force
+	var extra_force := attacker.turn_state.actual_remaining_power / power_per_force
+	var force := base_force + extra_force
 	if force == 0:
 		return 0
-	var power_spent := force * power_per_force
+	var extra_power_spent := extra_force * power_per_force
 	attacker.resolve_push(target, direction, force)
-	return power_spent
+	return extra_power_spent
