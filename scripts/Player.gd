@@ -153,22 +153,24 @@ func _turn_state_new_turn_started(_turn_state: TurnState) -> void:
 	is_on_active_team = turn_state.active_team == team
 
 func _unhandled_input(event):
-	if not selected or not moving:
-		return
-
 	if event is InputEventMouseMotion:
 		var new_hovered_cell := arena_tilemap.get_hovered_cell(event)
 		if hovered_cell == new_hovered_cell:
 			return
 		hovered_cell = new_hovered_cell
 		
+		if not selected or not moving:
+			if status == Status.DAZED:
+				if tile_position == hovered_cell and is_powered:
+					_update_revive_preview()
+				else:
+					_clear_path_preview()
+			return
+
 		if is_beacon and tile_position != hovered_cell and arena_tilemap.are_cells_aligned(tile_position, hovered_cell):
 			var hovered_player := players.player_in_cell(hovered_cell)
-			if hovered_player and hovered_player.team == team:
-				if hovered_player.status == Status.DAZED:
-					_update_revive_preview(hovered_player)
-				elif hovered_player.status == Status.OK:
-					_update_pass_preview(hovered_player)
+			if hovered_player and hovered_player.team == team and hovered_player.status == Status.OK:
+				_update_pass_preview(hovered_player)
 				return
 		
 		var cell_path := arena_tilemap.get_cell_path(tile_position, hovered_cell)
@@ -179,23 +181,29 @@ func _unhandled_input(event):
 	
 	if event is InputEventMouseButton:
 		if event.pressed and event.button_index == MOUSE_BUTTON_RIGHT:
-			var clicked_cell := arena_tilemap.get_hovered_cell(event)
-			if tile_position == clicked_cell:
-				selected = false
-				get_viewport().set_input_as_handled()
-				return
-			if is_beacon and arena_tilemap.are_cells_aligned(tile_position, clicked_cell):
-				var clicked_player := players.player_in_cell(clicked_cell)
-				if clicked_player and clicked_player.team == team:
-					if clicked_player.status == Status.DAZED:
-						_try_revive_player(clicked_player)
-						get_viewport().set_input_as_handled()
-						return
-					elif clicked_player.status == Status.OK:
-						_try_pass_to_player(clicked_player)
-						get_viewport().set_input_as_handled()
-						return
-			_try_move_selected_player(clicked_cell)
+			_handle_right_click(event)
+
+func _handle_right_click(event: InputEventMouseButton) -> void:
+	var clicked_cell := arena_tilemap.get_hovered_cell(event)
+
+	if not selected or not moving:
+		if status == Status.DAZED and is_powered and clicked_cell == tile_position:
+			_try_revive_player()
+			get_viewport().set_input_as_handled()
+			return
+		return
+	
+	if tile_position == clicked_cell:
+		selected = false
+		get_viewport().set_input_as_handled()
+		return
+	if is_beacon and arena_tilemap.are_cells_aligned(tile_position, clicked_cell):
+		var clicked_player := players.player_in_cell(clicked_cell)
+		if clicked_player and clicked_player.team == team and clicked_player.status == Status.OK:
+			_try_pass_to_player(clicked_player)
+			get_viewport().set_input_as_handled()
+			return
+	_try_move_selected_player(clicked_cell)
 
 # TODO replace this once move costs are worked out
 const DASH_COST := 1
@@ -223,12 +231,12 @@ func _update_path_preview(cell_path: Array[Vector2i]):
 		path_preview.add_child(preview_tile)
 	add_child(path_preview)
 
-func _update_revive_preview(revivable_player: Player) -> void:
+func _update_revive_preview() -> void:
 	_clear_path_preview()
 	path_preview = Node2D.new()
 	var preview_tile: PathPreviewTile = path_preview_tile_scene.instantiate()
-	preview_tile.position = arena_tilemap.map_to_local(revivable_player.tile_position)
-	preview_tile.power_cost = revivable_player.stats.dazed_revive_cost
+	preview_tile.position = arena_tilemap.map_to_local(tile_position)
+	preview_tile.power_cost = stats.dazed_revive_cost
 	preview_tile.success_chance = turn_state.chance_that_power_available(preview_tile.power_cost)
 	path_preview.add_child(preview_tile)
 	add_child(path_preview)
@@ -298,13 +306,13 @@ func walk_path(cell_path: Array[Vector2i]) -> void:
 		tween.tween_property(graphic, 'position', position, WALK_DURATION_PER_TILE).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	tile_position = cell_path.back()
 
-func _try_revive_player(revivable_player: Player) -> void:
-	var power_cost := revivable_player.stats.dazed_revive_cost
+func _try_revive_player() -> void:
+	var power_cost := stats.dazed_revive_cost
 	if not turn_state.try_spend_power(power_cost):
-		event_log.log('%s tried to revive %s but ran out of power!' % [BB.player_name(self), BB.player_name(revivable_player)])
+		event_log.log('%s tried to recover from being dazed but ran out of power!' % [BB.player_name(self)])
 		return
-	revivable_player.revive()
-	event_log.log('%s spent %s⚡ to revive %s' % [BB.player_name(self), power_cost, BB.player_name(revivable_player)])
+	revive()
+	event_log.log('%s spent %s⚡ to recover from being dazed' % [BB.player_name(self), power_cost])
 	_clear_path_preview()
 
 func _try_pass_to_player(receiving_player: Player) -> void:
