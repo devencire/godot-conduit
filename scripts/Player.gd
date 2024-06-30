@@ -152,7 +152,7 @@ func _turn_state_new_turn_started(_turn_state: TurnState) -> void:
 			event_log.log('%s recovered from being dazed' % BB.player_name(self))
 	is_on_active_team = turn_state.active_team == team
 
-func _unhandled_input(event):
+func _unhandled_input(event: InputEvent):
 	if event is InputEventMouseMotion:
 		var new_hovered_cell := arena_tilemap.get_hovered_cell(event)
 		if hovered_cell == new_hovered_cell:
@@ -161,7 +161,7 @@ func _unhandled_input(event):
 		
 		if not selected or not moving:
 			if status == Status.DAZED:
-				if tile_position == hovered_cell and is_powered:
+				if team == turn_state.active_team and tile_position == hovered_cell and is_powered:
 					_update_revive_preview()
 				else:
 					_clear_path_preview()
@@ -187,7 +187,7 @@ func _handle_right_click(event: InputEventMouseButton) -> void:
 	var clicked_cell := arena_tilemap.get_hovered_cell(event)
 
 	if not selected or not moving:
-		if status == Status.DAZED and is_powered and clicked_cell == tile_position:
+		if team == turn_state.active_team and status == Status.DAZED and is_powered and clicked_cell == tile_position:
 			_try_revive_player()
 			get_viewport().set_input_as_handled()
 			return
