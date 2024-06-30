@@ -7,7 +7,7 @@
 [ext_resource type="Script" path="res://scripts/HealthBar.gd" id="5_byicf"]
 [ext_resource type="Script" path="res://scripts/FreeMoveDisplay.gd" id="6_fma3s"]
 [ext_resource type="Script" path="res://scripts/BeaconIndicator.gd" id="7_0054y"]
-[ext_resource type="Script" path="res://scenes/StatusIndicator.gd" id="8_atm0m"]
+[ext_resource type="Script" path="res://scripts/StatusIndicator.gd" id="8_atm0m"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_8dflb"]
 animations = [{

@@ -2,11 +2,11 @@ class_name BB
 
 const OUTLINE_SIZE := 8 # pixels
 
-static func set_centered_outlined_text(node: RichTextLabel, text: String, color: Color = Color.WHITE, outline_color: Color = Color.BLACK) -> void:
+static func set_centered_outlined_text(node: RichTextLabel, text: String, color: Color = Color.WHITE, outline_color: Color = Color.BLACK, outline_size: int = OUTLINE_SIZE) -> void:
 	node.clear()
 	node.text = ''
 	node.push_paragraph(HORIZONTAL_ALIGNMENT_CENTER)
-	node.push_outline_size(OUTLINE_SIZE)
+	node.push_outline_size(outline_size)
 	node.push_outline_color(outline_color)
 	if color != Color.WHITE:
 		node.push_color(color)

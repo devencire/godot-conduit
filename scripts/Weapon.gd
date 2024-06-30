@@ -132,5 +132,9 @@ func try_enacting_selected_option(direction: TileSet.CellNeighbor):
 		assert(player.turn_state.try_spend_power(excess_power_used), 'attack used more power than was available')
 		player.event_log.log('%s spent an additional %s⚡ to overcharge %s' % [BB.player_name(player), excess_power_used, selected_option.get_display_name()])
 	
+	var total_power_used := attack_cost + excess_power_used
+	var popup_position := player.arena_tilemap.map_to_local(player.tile_position) - Vector2(0, 60)
+	player.popups.spawn_resource_popup("-%s⚡" % total_power_used, popup_position)
+	
 	player.acted_this_turn = true
 	selected_option = attack_options[0]

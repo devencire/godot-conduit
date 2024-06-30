@@ -1,0 +1,18 @@
+[gd_scene load_steps=2 format=3 uid="uid://dc55gx8m4aj81"]
+
+[ext_resource type="Script" path="res://scripts/ResourcePopup.gd" id="1_r072r"]
+
+[node name="ResourcePopup" type="CenterContainer"]
+offset_right = 200.0
+offset_bottom = 40.0
+use_top_left = true
+script = ExtResource("1_r072r")
+
+[node name="RichTextLabel" type="RichTextLabel" parent="."]
+custom_minimum_size = Vector2(100, 2.08165e-12)
+layout_mode = 2
+size_flags_horizontal = 2
+theme_override_font_sizes/normal_font_size = 40
+bbcode_enabled = true
+text = "[center][outline_size=8]1⚡"
+fit_content = true

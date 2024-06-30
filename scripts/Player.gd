@@ -17,6 +17,7 @@ var turn_state: TurnState
 var event_log: EventLog
 var score_state: ScoreState
 var control_zones: ControlZones
+var popups: Popups
 
 @onready var graphic: Node2D = $Graphic
 @onready var sprite: AnimatedSprite2D = $Graphic/Sprite
@@ -123,6 +124,7 @@ func _ready():
 	event_log = round_root.event_log
 	score_state = round_root.score_state
 	control_zones = round_root.control_zones
+	popups = round_root.popups
 	
 	players = get_parent()
 
@@ -268,12 +270,15 @@ func _try_move_selected_player(destination_cell: Vector2i):
 	if cell_path.size() == 0:
 		return # there is no valid path
 	var walked_path: Array[Vector2i] = []
+	var power_costs: Array[int] = []
 	var power_spent := 0
 	while cell_path.size() > 0:
 		if free_moves_remaining > 0:
 			free_moves_remaining -= 1
+			power_costs.push_back(0)
 		else:
 			var dash_cost := DASH_COST if dashes_used < stats.dashes_before_cost_increase else INCREASED_DASH_COST
+			power_costs.push_back(dash_cost)
 			if not turn_state.try_spend_power(dash_cost):
 				if walked_path.size() == 0:
 					event_log.log('%s tried to move but ran out of power!' % BB.player_name(self))
@@ -286,7 +291,7 @@ func _try_move_selected_player(destination_cell: Vector2i):
 		walked_path.push_back(cell_path[0])
 		cell_path = cell_path.slice(1)
 	if walked_path.size() > 0:
-		walk_path(walked_path)
+		walk_path(walked_path, power_costs)
 	if selected:
 		event_log.log('%s spent %s⚡ to move %s spaces' % [BB.player_name(self), power_spent, walked_path.size()])
 		_clear_path_preview()
@@ -295,16 +300,23 @@ var tween: Tween
 
 const WALK_DURATION_PER_TILE := 0.2
 
-func walk_path(cell_path: Array[Vector2i]) -> void:
+func walk_path(cell_path: Array[Vector2i], power_costs: Array[int]) -> void:
 	# TEMP: reset the position so we're always animating from the last true location
 	_move_graphic_to_tile_position()
 	if tween:
 		tween.kill()
 	tween = create_tween()
-	for cell in cell_path:
+	for idx in range(cell_path.size()):
+		var cell := cell_path[idx]
 		var position := arena_tilemap.map_to_local(cell)
 		tween.tween_property(graphic, 'position', position, WALK_DURATION_PER_TILE).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+		var power_cost := power_costs[idx]
+		if power_cost > 0:
+			tween.tween_callback(_spawn_popup_at_sprite.bind("-%s⚡" % power_cost))
 	tile_position = cell_path.back()
+
+func _spawn_popup_at_sprite(text: String) -> void:
+	popups.spawn_resource_popup(text, graphic.position - Vector2(0, 60))
 
 func _try_revive_player() -> void:
 	var power_cost := stats.dazed_revive_cost
@@ -313,6 +325,7 @@ func _try_revive_player() -> void:
 		return
 	revive()
 	event_log.log('%s spent %s⚡ to recover from being dazed' % [BB.player_name(self), power_cost])
+	_spawn_popup_at_sprite("-%s⚡" % power_cost)
 	_clear_path_preview()
 
 func _try_pass_to_player(receiving_player: Player) -> void:
@@ -325,7 +338,7 @@ func _try_pass_to_player(receiving_player: Player) -> void:
 	is_beacon = false
 	receiving_player.is_beacon = true
 	event_log.log('%s spent %s⚡ to pass the beacon to %s' % [BB.player_name(self), power_cost, BB.player_name(receiving_player)])
-	# they probably don't want the old ball carrier still selected
+	_spawn_popup_at_sprite("-%s⚡" % power_cost)
 	acted_this_turn = true
 
 const PUSH_DURATION := 0.2

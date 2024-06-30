@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://c3nygxpkibi84"]
+[gd_scene load_steps=20 format=3 uid="uid://c3nygxpkibi84"]
 
 [ext_resource type="Script" path="res://scripts/RoundRoot.gd" id="1_01v7h"]
 [ext_resource type="Script" path="res://scripts/TurnState.gd" id="2_rsc10"]
@@ -14,6 +14,7 @@
 [ext_resource type="Script" path="res://scripts/DebugShowTileLabel.gd" id="10_gxg42"]
 [ext_resource type="Script" path="res://scripts/EventLog.gd" id="11_on58r"]
 [ext_resource type="PackedScene" uid="uid://c04vm1q3ssoxd" path="res://scenes/round_ui.tscn" id="12_v5fyg"]
+[ext_resource type="Script" path="res://scripts/Popups.gd" id="13_0y3ig"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ksyh7"]
 texture = ExtResource("4_r6741")
@@ -117,6 +118,10 @@ text = "Hovered tile: {}"
 label_settings = SubResource("LabelSettings_8os5q")
 script = ExtResource("10_gxg42")
 arena_tilemap = NodePath("../ArenaTileMap")
+
+[node name="Popups" type="Node2D" parent="Arena"]
+unique_name_in_owner = true
+script = ExtResource("13_0y3ig")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 offset = Vector2(2.08165e-12, 2.08165e-12)

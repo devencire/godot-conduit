@@ -11,6 +11,7 @@ signal next_round_requested(round_root: RoundRoot)
 @onready var event_log: EventLog = %EventLog
 @onready var control_zones: ControlZones = %ControlZones
 @onready var players: Players = %Players
+@onready var popups: Popups = %Popups
 @onready var score_state: ScoreState = %ScoreState
 @onready var round_over_ui: CanvasLayer = %RoundOverUI
 
