@@ -17,7 +17,7 @@ func score_points(team: Constants.Team, points: int) -> void:
 	changed.emit(self)
 
 func _ready():
-	(func(): changed.emit(self)).call_deferred()
+	changed.emit.bind(self).call_deferred()
 	start_new_round()
 
 func _on_round_root_points_scored(team: Constants.Team, points: int):
