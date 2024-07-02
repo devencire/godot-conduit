@@ -41,6 +41,6 @@ func get_valid_directions(attacker: Player, target: Player) -> Array[TileSet.Cel
 
 func get_effects(attacker: Player, target: Player, direction: TileSet.CellNeighbor) -> Array[AttackEffect]:
     return [
-        DazeUnpoweredTargetEffect.new(target),
+        TargetNotPoweredMetaEffect.new(DazeTargetEffect.new(target), target),
         FixedPushEffect.new(attacker, target, PUSH_FORCE, direction),
     ]

@@ -1,4 +1,4 @@
-class_name DazeUnpoweredTargetEffect
+class_name DazeTargetEffect
 
 extends AttackEffect
 
@@ -8,12 +8,7 @@ func _init(init_target: Player) -> void:
     target = init_target
 
 func display_text() -> String:
-    return 'if target is not [color=yellow]powered[/color], daze them'
-
-func is_enabled() -> bool:
-    if not target:
-        return true
-    return not target.is_powered
+    return 'daze the target'
 
 func enact() -> int:
     if target.status == Player.Status.OK:
