@@ -1,4 +1,4 @@
-class_name Weapon
+class_name WeaponNode
 
 extends Node
 
@@ -8,22 +8,19 @@ var target_preview_tile_scene := preload("res://scenes/target_preview_tile.tscn"
 var target_preview: Node2D
 
 var attack_dialog_scene := preload("res://scenes/attack_dialog.tscn")
-var attack_dialog: CanvasLayer
+var attack_dialog: AttackDialog
 
 var selected_target: Player
 
-var attack_options: Array[AttackOption] = [
-    HammerPushAttackOption.new(),
-    HammerOverchargedPushAttackOption.new()
-]
-
-var selected_option := attack_options[0]
+var selected_option: AttackOption
 
 func _ready():
     player.was_selected.connect(_player_was_selected)
     player.was_deselected.connect(_player_was_deselected)
     player.was_moved.connect(_player_was_moved)
     player.is_powered_changed.connect(_player_is_powered_changed)
+
+    selected_option = player.weapon.get_attack_options()[0]
 
 func _player_was_selected(_player: Player) -> void:
     _draw_target_selection_preview()
@@ -68,6 +65,13 @@ func _draw_selectable_targets(display_node: Node2D) -> void:
 
 func _select_target(target: Player) -> void:
     selected_target = target
+
+    if not selected_option.get_valid_targets(player).has(selected_target):
+        for option in player.weapon.get_attack_options():
+            if option.get_valid_targets(player).has(selected_target):
+                selected_option = option
+                break
+
     _draw_attack_dialog()
     _draw_hit_direction_selection_preview()
     player.moving = false
@@ -87,12 +91,13 @@ func _draw_hit_direction_selection_preview():
 
 func _draw_attack_dialog():
     if attack_dialog:
+        attack_dialog.selected_option = selected_option
         attack_dialog.target = selected_target
         return
     attack_dialog = attack_dialog_scene.instantiate()
     attack_dialog.attacker = player
     attack_dialog.target = selected_target
-    attack_dialog.attack_options = attack_options
+    attack_dialog.attack_options = player.weapon.get_attack_options()
     attack_dialog.selected_option = selected_option
     attack_dialog.option_selected.connect(_set_attack_option)
     add_child(attack_dialog)
@@ -105,7 +110,10 @@ func _clear_attack_dialog():
 func _set_attack_option(option: AttackOption):
     selected_option = option
     if selected_target:
-        _draw_hit_direction_selection_preview()
+        if selected_option.get_valid_targets(player).has(selected_target):
+            _draw_hit_direction_selection_preview()
+        else:
+            _clear_selected_target()
 
 func _clear_target_preview():
     if target_preview:
@@ -113,7 +121,12 @@ func _clear_target_preview():
     target_preview = null
 
 func get_valid_targets() -> Array[Player]:
-    return selected_option.get_valid_targets(player)
+    var targets: Array[Player] = []
+    for option in player.weapon.get_attack_options():
+        for new_target in option.get_valid_targets(player):
+            if not targets.has(new_target):
+                targets.push_back(new_target)
+    return targets
 
 func try_enacting_selected_option(direction: TileSet.CellNeighbor):
     var attack_cost := selected_option.get_base_power_cost()
@@ -137,4 +150,4 @@ func try_enacting_selected_option(direction: TileSet.CellNeighbor):
     player.popups.spawn_resource_popup("-%s⚡" % total_power_used, popup_position)
 
     player.acted_this_turn = true
-    selected_option = attack_options[0]
+    selected_option = player.weapon.get_attack_options()[0]

@@ -1,7 +1,7 @@
 class_name AttackEffect
 
 func display_text() -> String:
-    return ''
+    return 'Missing name'
 
 func is_enabled() -> bool:
     return true

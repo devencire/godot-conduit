@@ -13,8 +13,9 @@ func get_base_power_cost() -> int:
 
 func display_directions(attacker: Player, target: Player, display_node: Node2D, attack_callback: Callable) -> void:
     var valid_directions := get_valid_directions(attacker, target)
+    var power_cost := get_base_power_cost()
     for direction in valid_directions:
-        var preview_tile := create_clickable_direction_node(attacker, target, direction, attack_callback)
+        var preview_tile := create_clickable_direction_node(attacker, target, direction, power_cost, attack_callback)
         display_node.add_child(preview_tile)
         var further_push_cost := OC_POWER_COST
         var further_push_cell := attacker.arena_tilemap.get_neighbor_cell(target.tile_position, direction)
@@ -37,9 +38,10 @@ func display_directions(attacker: Player, target: Player, display_node: Node2D, 
                 break
 
 func get_effects(attacker: Player, target: Player, direction: TileSet.CellNeighbor) -> Array[AttackEffect]:
+    var display_name := get_display_name()
     return [
-        TargetNotPoweredMetaEffect.new(DazeTargetEffect.new(target), target),
-        DirectDamageEffect.new(attacker, target, OC_DIRECT_DAMAGE, get_display_name()),
+        TargetNotPoweredMetaEffect.new(DazeTargetEffect.new(attacker, target, display_name), target),
+        DirectDamageEffect.new(attacker, target, OC_DIRECT_DAMAGE, display_name),
         OverchargedVariablePushEffect.new(attacker, target, PUSH_FORCE, OC_POWER_COST, OC_POWER_PER_TILE, direction),
         EndTurnEffect.new(attacker.turn_state)
     ]

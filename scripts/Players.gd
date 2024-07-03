@@ -43,11 +43,12 @@ func _perform_update():
     _set_is_powered_on_players()
     changed.emit(self)
 
-func add_player(team: Constants.Team, tile_position: Vector2i, is_beacon: bool = false):
+func add_player(team: Constants.Team, tile_position: Vector2i, weapon: Weapon, is_beacon: bool = false):
     var player: Player = player_scene.instantiate()
     player.round_root = round_root
     player.team = team
     player.tile_position = tile_position
+    player.weapon = weapon
     player.is_beacon = is_beacon
     player.was_moved.connect(_player_was_moved)
     player.is_beacon_changed.connect(_player_is_beacon_changed)

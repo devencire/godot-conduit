@@ -71,7 +71,8 @@ static var next_id := 1
 
 @export var moving: bool
 
-var stats := PlayerStats.new()
+@export var weapon: Weapon
+@export var stats := PlayerStats.new()
 
 @export var resolve: int
 @export var can_act: bool:

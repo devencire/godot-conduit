@@ -1,5 +1,7 @@
 class_name PlayerStats
 
+extends Resource
+
 @export var free_moves_per_turn: int = 2
 @export var dashes_before_cost_increase: int = 2
 

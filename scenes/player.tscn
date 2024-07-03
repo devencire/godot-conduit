@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://scripts/Player.gd" id="1_w7h0k"]
 [ext_resource type="Texture2D" uid="uid://rcrm0go6mclm" path="res://assets/player.png" id="2_bdnyk"]
 [ext_resource type="PackedScene" uid="uid://8r38rbtaivjs" path="res://scenes/selection_tile.tscn" id="3_77lfk"]
-[ext_resource type="Script" path="res://scripts/Weapon.gd" id="4_ek61n"]
+[ext_resource type="Script" path="res://scripts/WeaponNode.gd" id="4_ek61n"]
 [ext_resource type="Script" path="res://scripts/HealthBar.gd" id="5_byicf"]
 [ext_resource type="Script" path="res://scripts/FreeMoveDisplay.gd" id="6_fma3s"]
 [ext_resource type="Script" path="res://scripts/BeaconIndicator.gd" id="7_0054y"]
@@ -23,7 +23,7 @@ animations = [{
 [node name="Player" type="Node2D" groups=["players"]]
 script = ExtResource("1_w7h0k")
 
-[node name="Weapon" type="Node2D" parent="." node_paths=PackedStringArray("player")]
+[node name="WeaponNode" type="Node2D" parent="." node_paths=PackedStringArray("player")]
 script = ExtResource("4_ek61n")
 player = NodePath("..")
 

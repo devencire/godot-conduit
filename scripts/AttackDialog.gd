@@ -13,7 +13,11 @@ signal option_selected(option: AttackOption)
         if is_inside_tree():
             _regenerate_attack_option_tabs()
 
-@export var selected_option: AttackOption
+@export var selected_option: AttackOption:
+    set(new_option):
+        selected_option = new_option
+        if is_inside_tree():
+            _regenerate_attack_option_tabs()
 
 @onready var tab_container: TabContainer = %TabContainer
 

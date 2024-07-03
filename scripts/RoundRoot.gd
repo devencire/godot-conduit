@@ -19,15 +19,15 @@ signal next_round_requested(round_root: RoundRoot)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-    players.add_player(Constants.Team.ONE, Vector2i(-3, 2), true)
-    players.add_player(Constants.Team.ONE, Vector2i(-3, 0))
-    players.add_player(Constants.Team.ONE, Vector2i(-1, 2))
-    players.add_player(Constants.Team.ONE, Vector2i(-1, 0))
+    players.add_player(Constants.Team.ONE, Vector2i(-3, 2), Hammer.base, true)
+    players.add_player(Constants.Team.ONE, Vector2i(-3, 0), Hammer.base)
+    players.add_player(Constants.Team.ONE, Vector2i(-1, 2), Blade.base)
+    players.add_player(Constants.Team.ONE, Vector2i(-1, 0), Blade.base)
 
-    players.add_player(Constants.Team.TWO, Vector2i(0, -1))
-    players.add_player(Constants.Team.TWO, Vector2i(0, -3))
-    players.add_player(Constants.Team.TWO, Vector2i(2, -1))
-    players.add_player(Constants.Team.TWO, Vector2i(2, -3), true)
+    players.add_player(Constants.Team.TWO, Vector2i(0, -1), Hammer.base)
+    players.add_player(Constants.Team.TWO, Vector2i(0, -3), Hammer.base)
+    players.add_player(Constants.Team.TWO, Vector2i(2, -1), Blade.base)
+    players.add_player(Constants.Team.TWO, Vector2i(2, -3), Blade.base, true)
 
     turn_state.start_turn(Constants.Team.ONE)
 
