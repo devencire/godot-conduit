@@ -1,6 +1,6 @@
 [gd_scene load_steps=6 format=3 uid="uid://c04vm1q3ssoxd"]
 
-[ext_resource type="Script" path="res://scripts/RoundUI.gd" id="1_7pbux"]
+[ext_resource type="Script" path="res://scripts/RoundUI.cs" id="1_23voe"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_76cn4"]
 font_size = 32
@@ -17,7 +17,7 @@ font_size = 24
 font_size = 24
 
 [node name="RoundUI" type="CanvasLayer"]
-script = ExtResource("1_7pbux")
+script = ExtResource("1_23voe")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 offset_left = 16.0
@@ -76,5 +76,4 @@ size_flags_horizontal = 0
 theme_override_font_sizes/font_size = 32
 text = " End turn "
 
-[connection signal="pressed" from="VBoxContainer/EndTurnButton" to="." method="_on_end_turn_button_pressed"]
-[connection signal="pressed" from="VBoxContainer/EndTurnButton" to="VBoxContainer/EndTurnButton" method="_on_pressed"]
+[connection signal="pressed" from="VBoxContainer/EndTurnButton" to="." method="_onEndTurnButtonPressed"]

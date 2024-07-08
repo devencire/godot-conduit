@@ -1,16 +1,16 @@
 [gd_scene load_steps=3 format=3 uid="uid://d1t087k7mdxvb"]
 
-[ext_resource type="Script" path="res://world.gd" id="1_4avd2"]
-[ext_resource type="Script" path="res://scripts/MatchUI.gd" id="12_1lrdw"]
+[ext_resource type="Script" path="res://scripts/MatchRoot.cs" id="1_4q2ja"]
+[ext_resource type="Script" path="res://scripts/MatchUI.cs" id="2_m1d73"]
 
 [node name="MatchRoot" type="Node"]
-script = ExtResource("1_4avd2")
+script = ExtResource("1_4q2ja")
 
 [node name="Camera" type="Camera2D" parent="."]
 unique_name_in_owner = true
 
 [node name="MatchUI" type="CanvasLayer" parent="."]
-script = ExtResource("12_1lrdw")
+script = ExtResource("2_m1d73")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MatchUI"]
 anchors_preset = 5
@@ -29,4 +29,4 @@ text = "[center][outline_size=8][outline_color=black]0 - 0"
 fit_content = true
 scroll_active = false
 
-[connection signal="changed" from="." to="MatchUI" method="_on_match_root_changed"]
+[connection signal="TeamScoreChanged" from="." to="MatchUI" method="_onMatchRootTeamScoreChanged"]

@@ -1,13 +1,13 @@
 [gd_scene load_steps=10 format=3 uid="uid://d1g51gpcf38kc"]
 
-[ext_resource type="Script" path="res://scripts/Player.gd" id="1_w7h0k"]
+[ext_resource type="Script" path="res://scripts/Player.cs" id="1_vib72"]
 [ext_resource type="Texture2D" uid="uid://rcrm0go6mclm" path="res://assets/player.png" id="2_bdnyk"]
+[ext_resource type="Script" path="res://scripts/WeaponNode.cs" id="2_mye5k"]
 [ext_resource type="PackedScene" uid="uid://8r38rbtaivjs" path="res://scenes/selection_tile.tscn" id="3_77lfk"]
-[ext_resource type="Script" path="res://scripts/WeaponNode.gd" id="4_ek61n"]
-[ext_resource type="Script" path="res://scripts/HealthBar.gd" id="5_byicf"]
-[ext_resource type="Script" path="res://scripts/FreeMoveDisplay.gd" id="6_fma3s"]
-[ext_resource type="Script" path="res://scripts/BeaconIndicator.gd" id="7_0054y"]
-[ext_resource type="Script" path="res://scripts/StatusIndicator.gd" id="8_atm0m"]
+[ext_resource type="Script" path="res://scripts/HealthBar.cs" id="4_dqe4q"]
+[ext_resource type="Script" path="res://scripts/FreeMoveDisplay.cs" id="5_qq2gi"]
+[ext_resource type="Script" path="res://scripts/BeaconIndicator.cs" id="6_thjk7"]
+[ext_resource type="Script" path="res://scripts/StatusIndicator.cs" id="8_qry54"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_8dflb"]
 animations = [{
@@ -21,11 +21,11 @@ animations = [{
 }]
 
 [node name="Player" type="Node2D" groups=["players"]]
-script = ExtResource("1_w7h0k")
+script = ExtResource("1_vib72")
 
-[node name="WeaponNode" type="Node2D" parent="." node_paths=PackedStringArray("player")]
-script = ExtResource("4_ek61n")
-player = NodePath("..")
+[node name="WeaponNode" type="Node2D" parent="." node_paths=PackedStringArray("Player")]
+script = ExtResource("2_mye5k")
+Player = NodePath("..")
 
 [node name="Graphic" type="Node2D" parent="."]
 
@@ -36,7 +36,7 @@ sprite_frames = SubResource("SpriteFrames_8dflb")
 [node name="HealthBar" type="Node2D" parent="Graphic"]
 z_index = 2
 position = Vector2(0, -42)
-script = ExtResource("5_byicf")
+script = ExtResource("4_dqe4q")
 
 [node name="HealthBackRect" type="ColorRect" parent="Graphic/HealthBar"]
 z_index = -1
@@ -66,7 +66,7 @@ theme_override_font_sizes/bold_font_size = 24
 bbcode_enabled = true
 text = "[center][b][outline_size=8][outline_color=black]>[color=#ffffff30]>"
 scroll_active = false
-script = ExtResource("6_fma3s")
+script = ExtResource("5_qq2gi")
 
 [node name="BeaconIndicator" type="RichTextLabel" parent="Graphic"]
 offset_left = -20.0
@@ -77,7 +77,7 @@ theme_override_font_sizes/normal_font_size = 24
 bbcode_enabled = true
 text = "[center]💡"
 scroll_active = false
-script = ExtResource("7_0054y")
+script = ExtResource("6_thjk7")
 
 [node name="SelectionTile" parent="Graphic" instance=ExtResource("3_77lfk")]
 
@@ -92,8 +92,8 @@ theme_override_font_sizes/normal_font_size = 32
 bbcode_enabled = true
 text = "[center]💫"
 scroll_active = false
-script = ExtResource("8_atm0m")
-visible_status = 1
+script = ExtResource("8_qry54")
+_visibleStatus = 1
 
 [node name="KnockedOutIndicator" type="RichTextLabel" parent="Graphic"]
 visible = false
@@ -106,20 +106,22 @@ theme_override_font_sizes/normal_font_size = 32
 bbcode_enabled = true
 text = "[center]😵‍"
 scroll_active = false
-script = ExtResource("8_atm0m")
-visible_status = 2
+script = ExtResource("8_qry54")
+_visibleStatus = 2
 
-[connection signal="acted_this_turn_changed" from="." to="Graphic/SelectionTile" method="_on_player_acted_this_turn_changed"]
-[connection signal="dashes_used_changed" from="." to="Graphic/FreeMoveDisplay" method="_on_player_dashes_used_changed"]
-[connection signal="free_moves_remaining_changed" from="." to="Graphic/FreeMoveDisplay" method="_on_player_free_moves_remaining_changed"]
-[connection signal="initialized" from="." to="Graphic/HealthBar" method="_on_player_initialized"]
-[connection signal="initialized" from="." to="Graphic/FreeMoveDisplay" method="_on_player_initialized"]
-[connection signal="is_beacon_changed" from="." to="Graphic/FreeMoveDisplay" method="_on_player_is_beacon_changed"]
-[connection signal="is_beacon_changed" from="." to="Graphic/BeaconIndicator" method="_on_player_is_beacon_changed"]
-[connection signal="is_on_active_team_changed" from="." to="Graphic/SelectionTile" method="_on_player_is_on_active_team_changed"]
-[connection signal="status_changed" from="." to="Graphic/SelectionTile" method="_on_player_status_changed"]
-[connection signal="status_changed" from="." to="Graphic/DazedIndicator" method="_on_player_status_changed"]
-[connection signal="status_changed" from="." to="Graphic/KnockedOutIndicator" method="_on_player_status_changed"]
-[connection signal="taken_damage" from="." to="Graphic/HealthBar" method="_on_player_taken_damage"]
-[connection signal="was_deselected" from="." to="Graphic/SelectionTile" method="_on_player_was_deselected"]
-[connection signal="was_selected" from="." to="Graphic/SelectionTile" method="_on_player_was_selected"]
+[connection signal="ActedThisTurnChanged" from="." to="Graphic/SelectionTile" method="_UpdateSprite" unbinds=1]
+[connection signal="CellChanged" from="." to="WeaponNode" method="_playerCellChanged"]
+[connection signal="CurrentStatusChanged" from="." to="Graphic/DazedIndicator" method="_OnPlayerStatusChanged"]
+[connection signal="CurrentStatusChanged" from="." to="Graphic/KnockedOutIndicator" method="_OnPlayerStatusChanged"]
+[connection signal="CurrentStatusChanged" from="." to="Graphic/SelectionTile" method="_UpdateSprite" unbinds=1]
+[connection signal="DashesUsedChanged" from="." to="Graphic/FreeMoveDisplay" method="_updateVisual" unbinds=1]
+[connection signal="FreeMovesRemainingChanged" from="." to="Graphic/FreeMoveDisplay" method="_updateVisual" unbinds=1]
+[connection signal="Initialized" from="." to="Graphic/HealthBar" method="_onPlayerInitialized"]
+[connection signal="Initialized" from="." to="Graphic/FreeMoveDisplay" method="_updateVisual"]
+[connection signal="IsBeaconChanged" from="." to="Graphic/FreeMoveDisplay" method="_onPlayerIsBeaconChanged"]
+[connection signal="IsBeaconChanged" from="." to="Graphic/BeaconIndicator" method="_onPlayerIsBeaconChanged"]
+[connection signal="IsOnActiveTeamChanged" from="." to="Graphic/SelectionTile" method="_UpdateSprite" unbinds=1]
+[connection signal="IsPoweredChanged" from="." to="WeaponNode" method="_playerIsPoweredChanged"]
+[connection signal="ResolveChanged" from="." to="Graphic/HealthBar" method="_onPlayerResolveChanged"]
+[connection signal="SelectedChanged" from="." to="WeaponNode" method="_playerSelectedChanged"]
+[connection signal="SelectedChanged" from="." to="Graphic/SelectionTile" method="_UpdateSprite" unbinds=1]

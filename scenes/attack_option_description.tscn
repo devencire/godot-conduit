@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://bghlajm5i0yk"]
 
-[ext_resource type="Script" path="res://scripts/AttackOptionDescription.gd" id="1_m2250"]
+[ext_resource type="Script" path="res://scripts/AttackOptionDescription.cs" id="1_auwyf"]
 
 [sub_resource type="Theme" id="Theme_utl7n"]
 
@@ -13,7 +13,7 @@ theme_override_constants/margin_left = 8
 theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
-script = ExtResource("1_m2250")
+script = ExtResource("1_auwyf")
 metadata/_tab_index = 0
 
 [node name="EffectContainer" type="VBoxContainer" parent="."]

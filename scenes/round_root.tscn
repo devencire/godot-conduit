@@ -1,20 +1,19 @@
-[gd_scene load_steps=20 format=3 uid="uid://c3nygxpkibi84"]
+[gd_scene load_steps=18 format=3 uid="uid://c3nygxpkibi84"]
 
-[ext_resource type="Script" path="res://scripts/RoundRoot.gd" id="1_01v7h"]
-[ext_resource type="Script" path="res://scripts/TurnState.gd" id="2_rsc10"]
-[ext_resource type="Script" path="res://scripts/ScoreState.gd" id="3_3xp15"]
+[ext_resource type="Script" path="res://scripts/RoundRoot.cs" id="1_vyyr4"]
+[ext_resource type="Script" path="res://scripts/TurnState.cs" id="2_juqob"]
+[ext_resource type="Script" path="res://scripts/ScoreState.cs" id="3_12rri"]
 [ext_resource type="Texture2D" uid="uid://bu0j2ljbdu4jy" path="res://assets/hexes_2px_outline.png" id="4_r6741"]
 [ext_resource type="Texture2D" uid="uid://d08nigucg6b24" path="res://assets/power_line_hexes.png" id="5_44h0t"]
-[ext_resource type="Script" path="res://scripts/ArenaTileMap.gd" id="5_ivx7d"]
 [ext_resource type="PackedScene" uid="uid://dvuatsyki3ehj" path="res://scenes/selection.tscn" id="6_pdv55"]
+[ext_resource type="Script" path="res://scripts/ArenaTileMap.cs" id="6_s6dqj"]
 [ext_resource type="PackedScene" uid="uid://dxxmf1dm70jy3" path="res://scenes/control_zones.tscn" id="7_56j7m"]
-[ext_resource type="Script" path="res://scripts/TravelBoundaries.gd" id="8_e6aus"]
-[ext_resource type="Script" path="res://scripts/Players.gd" id="9_08gjo"]
+[ext_resource type="Script" path="res://scripts/TravelBoundaries.cs" id="8_117rj"]
 [ext_resource type="PackedScene" uid="uid://cjqxrgta6sj1p" path="res://scenes/power_lines.tscn" id="9_b7n2a"]
-[ext_resource type="Script" path="res://scripts/DebugShowTileLabel.gd" id="10_gxg42"]
-[ext_resource type="Script" path="res://scripts/EventLog.gd" id="11_on58r"]
+[ext_resource type="Script" path="res://scripts/Players.cs" id="11_qbb7j"]
+[ext_resource type="Script" path="res://scripts/Popups.cs" id="12_3veqt"]
 [ext_resource type="PackedScene" uid="uid://c04vm1q3ssoxd" path="res://scenes/round_ui.tscn" id="12_v5fyg"]
-[ext_resource type="Script" path="res://scripts/Popups.gd" id="13_0y3ig"]
+[ext_resource type="Script" path="res://scripts/EventLog.cs" id="13_o2rht"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ksyh7"]
 texture = ExtResource("4_r6741")
@@ -47,27 +46,24 @@ tile_size = Vector2i(128, 128)
 sources/0 = SubResource("TileSetAtlasSource_ksyh7")
 sources/1 = SubResource("TileSetAtlasSource_83nbx")
 
-[sub_resource type="LabelSettings" id="LabelSettings_8os5q"]
-font_size = 24
-
 [node name="RoundRoot" type="Node"]
-script = ExtResource("1_01v7h")
+script = ExtResource("1_vyyr4")
 
 [node name="TurnState" type="Node" parent="."]
 unique_name_in_owner = true
-script = ExtResource("2_rsc10")
+script = ExtResource("2_juqob")
 
-[node name="ScoreState" type="Node" parent="." node_paths=PackedStringArray("round_root", "event_log")]
+[node name="ScoreState" type="Node" parent="." node_paths=PackedStringArray("_eventLog", "_roundRoot")]
 unique_name_in_owner = true
-script = ExtResource("3_3xp15")
-round_root = NodePath("..")
-event_log = NodePath("../CanvasLayer/MarginContainer/EventLog")
+script = ExtResource("3_12rri")
+_eventLog = NodePath("../CanvasLayer/MarginContainer/EventLog")
+_roundRoot = NodePath("..")
 
 [node name="Arena" type="Node2D" parent="."]
 position = Vector2(-48, 32)
 scale = Vector2(0.75, 0.75)
 
-[node name="ArenaTileMap" type="TileMap" parent="Arena" node_paths=PackedStringArray("control_zones")]
+[node name="ArenaTileMap" type="TileMap" parent="Arena" node_paths=PackedStringArray("_controlZones")]
 unique_name_in_owner = true
 tile_set = SubResource("TileSet_ce3eq")
 format = 2
@@ -79,15 +75,15 @@ layer_1/tile_data = PackedInt32Array(327682, 65536, 0, 327683, 65536, 0, 196612,
 layer_2/name = "art"
 layer_2/navigation_enabled = false
 layer_2/tile_data = PackedInt32Array(-393219, 0, 1, -262149, 0, 1, -131079, 0, 1, 131066, 0, 1, 196603, 0, 1, 262140, 0, 1, 327677, 0, 1, 393214, 0, 1, 393218, 0, 1, 262148, 0, 1, 131078, 0, 1, -131067, 0, 1, -393215, 0, 1, -196604, 0, 1, -262141, 0, 1, -327678, 0, 1)
-script = ExtResource("5_ivx7d")
-control_zones = NodePath("../ControlZones")
+script = ExtResource("6_s6dqj")
+_controlZones = NodePath("../ControlZones")
 
 [node name="Selection" parent="Arena" instance=ExtResource("6_pdv55")]
 
-[node name="TravelBoundaries" type="Node2D" parent="Arena" node_paths=PackedStringArray("score_state", "arena_tilemap")]
-script = ExtResource("8_e6aus")
-score_state = NodePath("../../ScoreState")
-arena_tilemap = NodePath("../ArenaTileMap")
+[node name="TravelBoundaries" type="Node2D" parent="Arena" node_paths=PackedStringArray("_scoreState", "_arenaTileMap")]
+script = ExtResource("8_117rj")
+_scoreState = NodePath("../../ScoreState")
+_arenaTileMap = NodePath("../ArenaTileMap")
 
 [node name="TeamOneBoundary" type="TileMap" parent="Arena/TravelBoundaries"]
 modulate = Color(0, 0, 1, 1)
@@ -99,29 +95,25 @@ modulate = Color(1, 0.54902, 0, 1)
 tile_set = SubResource("TileSet_ce3eq")
 format = 2
 
-[node name="ControlZones" parent="Arena" instance=ExtResource("7_56j7m")]
+[node name="ControlZones" parent="Arena" node_paths=PackedStringArray("_arenaTileMap", "_turnState", "players") instance=ExtResource("7_56j7m")]
 unique_name_in_owner = true
+_arenaTileMap = NodePath("../ArenaTileMap")
+_turnState = NodePath("../../TurnState")
+players = NodePath("../Players")
 
-[node name="PowerLines" parent="Arena" instance=ExtResource("9_b7n2a")]
+[node name="PowerLines" parent="Arena" node_paths=PackedStringArray("_arenaTileMap", "_players", "_turnState") instance=ExtResource("9_b7n2a")]
+_arenaTileMap = NodePath("../ArenaTileMap")
+_players = NodePath("../Players")
+_turnState = NodePath("../../TurnState")
 
-[node name="Players" type="Node2D" parent="Arena" node_paths=PackedStringArray("round_root")]
+[node name="Players" type="Node2D" parent="Arena" node_paths=PackedStringArray("_roundRoot")]
 unique_name_in_owner = true
-script = ExtResource("9_08gjo")
-round_root = NodePath("../..")
-
-[node name="DebugShowTileLabel" type="Label" parent="Arena" node_paths=PackedStringArray("arena_tilemap")]
-offset_left = 722.0
-offset_top = 486.0
-offset_right = 895.0
-offset_bottom = 520.0
-text = "Hovered tile: {}"
-label_settings = SubResource("LabelSettings_8os5q")
-script = ExtResource("10_gxg42")
-arena_tilemap = NodePath("../ArenaTileMap")
+script = ExtResource("11_qbb7j")
+_roundRoot = NodePath("../..")
 
 [node name="Popups" type="Node2D" parent="Arena"]
 unique_name_in_owner = true
-script = ExtResource("13_0y3ig")
+script = ExtResource("12_3veqt")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 offset = Vector2(2.08165e-12, 2.08165e-12)
@@ -148,7 +140,7 @@ bbcode_enabled = true
 text = "[b]The game begins![/b]"
 scroll_following = true
 selection_enabled = true
-script = ExtResource("11_on58r")
+script = ExtResource("13_o2rht")
 
 [node name="RoundUI" parent="." instance=ExtResource("12_v5fyg")]
 
@@ -192,16 +184,16 @@ size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 24
 text = "Next round"
 
-[connection signal="round_ended" from="." to="TurnState" method="_on_round_root_round_ended"]
-[connection signal="changed" from="TurnState" to="RoundUI" method="_on_turn_state_changed"]
-[connection signal="new_turn_started" from="TurnState" to="Arena/ArenaTileMap" method="_on_turn_state_new_turn_started"]
-[connection signal="new_turn_started" from="TurnState" to="Arena/Selection" method="_on_turn_state_new_turn_started"]
-[connection signal="new_turn_started" from="TurnState" to="Arena/ControlZones" method="_on_turn_state_new_turn_started"]
-[connection signal="new_turn_started" from="TurnState" to="Arena/PowerLines" method="_on_turn_state_new_turn_started"]
-[connection signal="changed" from="ScoreState" to="Arena/TravelBoundaries" method="_on_score_state_changed"]
-[connection signal="changed" from="Arena/Players" to="ScoreState" method="_on_players_changed"]
-[connection signal="changed" from="Arena/Players" to="Arena/ArenaTileMap" method="_on_players_changed"]
-[connection signal="changed" from="Arena/Players" to="Arena/ControlZones" method="_on_players_changed"]
-[connection signal="changed" from="Arena/Players" to="Arena/PowerLines" method="_on_players_changed"]
-[connection signal="child_order_changed" from="Arena/Players" to="Arena/Players" method="_on_child_order_changed"]
-[connection signal="pressed" from="RoundOverUI/VBoxContainer/NextRoundButton" to="." method="_on_next_round_button_pressed"]
+[connection signal="RoundEnded" from="." to="TurnState" method="_onRoundRootRoundEnded"]
+[connection signal="Changed" from="TurnState" to="RoundUI" method="_onTurnStateChanged"]
+[connection signal="NewTurnStarted" from="TurnState" to="Arena/ArenaTileMap" method="_onTurnStateNewTurnStarted"]
+[connection signal="NewTurnStarted" from="TurnState" to="Arena/Selection" method="_onTurnStateNewTurnStarted"]
+[connection signal="NewTurnStarted" from="TurnState" to="Arena/ControlZones" method="_setControlZones" unbinds=1]
+[connection signal="NewTurnStarted" from="TurnState" to="Arena/PowerLines" method="_setPowerLines" unbinds=1]
+[connection signal="Changed" from="ScoreState" to="Arena/TravelBoundaries" method="_onScoreStateChanged"]
+[connection signal="Changed" from="Arena/Players" to="ScoreState" method="_onPlayersChanged"]
+[connection signal="Changed" from="Arena/Players" to="Arena/ArenaTileMap" method="_onPlayersChanged"]
+[connection signal="Changed" from="Arena/Players" to="Arena/ControlZones" method="_setControlZones" unbinds=1]
+[connection signal="Changed" from="Arena/Players" to="Arena/PowerLines" method="_setPowerLines" unbinds=1]
+[connection signal="EndTurnButtonPressed" from="RoundUI" to="TurnState" method="EndTurn"]
+[connection signal="pressed" from="RoundOverUI/VBoxContainer/NextRoundButton" to="." method="_onNextRoundButtonPressed"]

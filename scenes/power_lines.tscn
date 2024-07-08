@@ -1,9 +1,9 @@
 [gd_scene load_steps=2 format=3 uid="uid://cjqxrgta6sj1p"]
 
-[ext_resource type="Script" path="res://scripts/PowerLines.gd" id="1_7y1qe"]
+[ext_resource type="Script" path="res://scripts/PowerLines.cs" id="1_pr2he"]
 
 [node name="PowerLines" type="Node2D"]
-script = ExtResource("1_7y1qe")
+script = ExtResource("1_pr2he")
 
 [node name="TeamOne" type="Node2D" parent="."]
 

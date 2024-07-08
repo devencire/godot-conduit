@@ -1,9 +1,9 @@
 [gd_scene load_steps=2 format=3 uid="uid://bcnjeg326gugc"]
 
-[ext_resource type="Script" path="res://scripts/AttackDialog.gd" id="1_y66o4"]
+[ext_resource type="Script" path="res://scripts/AttackDialog.cs" id="1_nde7j"]
 
 [node name="AttackDialog" type="CanvasLayer"]
-script = ExtResource("1_y66o4")
+script = ExtResource("1_nde7j")
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
 top_level = true
@@ -24,4 +24,4 @@ layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
 
-[connection signal="tab_changed" from="PanelContainer/TabContainer" to="." method="_on_tab_container_tab_changed"]
+[connection signal="tab_changed" from="PanelContainer/TabContainer" to="." method="_onTabContainerTabChanged"]
