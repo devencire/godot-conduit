@@ -580,7 +580,7 @@ public partial class Player : Node
         {
             distance += 1;
             var previousCell = currentCell;
-            currentCell = ArenaTileMap.GetNeighborCell(currentCell, direction);
+            currentCell = ArenaTileMap.AdjacentCellInDirection(currentCell, direction);
             if (!ArenaTileMap.CellIsPathable(currentCell))
             {
                 if (ArenaTileMap.CellIsWall(currentCell))

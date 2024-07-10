@@ -5,10 +5,10 @@ using Godot;
 
 namespace conduit.scripts;
 
-public partial class ArenaTileMap : TileMap
+public partial class ArenaTileMap : Node2D
 {
-    private const int GroundLayer = 0;
-    private const int WallLayer = 1;
+    private TileMapLayer _groundLayer;
+    private TileMapLayer _wallsLayer;
 
     public static readonly TileSet.CellNeighbor[] HexCellNeighbors =
     {
@@ -16,6 +16,7 @@ public partial class ArenaTileMap : TileMap
         TileSet.CellNeighbor.BottomSide, TileSet.CellNeighbor.BottomLeftSide, TileSet.CellNeighbor.TopLeftSide
     };
 
+    // (X, Y) => (-s, r)
     private static readonly Dictionary<Vector2I, TileSet.CellNeighbor> DirectionForCellDelta = new()
     {
         { new Vector2I(-1, -1), TileSet.CellNeighbor.TopSide },
@@ -40,20 +41,22 @@ public partial class ArenaTileMap : TileMap
 
     public override void _Ready()
     {
+        _groundLayer = GetNode<TileMapLayer>("Ground");
+        _wallsLayer = GetNode<TileMapLayer>("Walls");
         _aStar = _buildAStar();
     }
 
     private ZoneRespectingAStar2D _buildAStar()
     {
-        var cells = GetUsedCells(GroundLayer);
+        var cells = _groundLayer.GetUsedCells();
         var aStar = new ZoneRespectingAStar2D(_controlZones);
         aStar.ReserveSpace(cells.Count);
-        var tileScale = new Vector2(TileSet.TileSize.X, TileSet.TileSize.Y);
-        foreach (var cell in cells) aStar.AddPoint(_cellToAStarId(cell), MapToLocal(cell) / tileScale);
+        var tileScale = new Vector2(_groundLayer.TileSet.TileSize.X, _groundLayer.TileSet.TileSize.Y);
+        foreach (var cell in cells) aStar.AddPoint(_cellToAStarId(cell), _groundLayer.MapToLocal(cell) / tileScale);
         foreach (var cell in cells)
         {
             var cellId = _cellToAStarId(cell);
-            foreach (var surroundingCell in GetSurroundingCells(cell))
+            foreach (var surroundingCell in _groundLayer.GetSurroundingCells(cell))
             {
                 var surroundingCellId = _cellToAStarId(surroundingCell);
                 if (aStar.HasPoint(surroundingCellId)) aStar.ConnectPoints(cellId, surroundingCellId);
@@ -105,8 +108,8 @@ public partial class ArenaTileMap : TileMap
 
     public Vector2I GetHoveredCell(InputEventMouse evt)
     {
-        var localEvt = (InputEventMouse)MakeInputLocal(evt);
-        return LocalToMap(localEvt.Position);
+        var localEvt = (InputEventMouse)_groundLayer.MakeInputLocal(evt);
+        return _groundLayer.LocalToMap(localEvt.Position);
     }
 
     /**
@@ -124,7 +127,7 @@ public partial class ArenaTileMap : TileMap
             var currentCell = centerCell;
             while (true)
             {
-                currentCell = GetNeighborCell(currentCell, direction);
+                currentCell = _groundLayer.GetNeighborCell(currentCell, direction);
                 if (!CellIsGround(currentCell)) break;
 
                 cells.Add(currentCell);
@@ -146,7 +149,7 @@ public partial class ArenaTileMap : TileMap
             var obstructed = false;
             for (var n = 0; n < distance; n++)
             {
-                currentCell = GetNeighborCell(currentCell, direction);
+                currentCell = _groundLayer.GetNeighborCell(currentCell, direction);
                 if (!CellIsGround(currentCell))
                 {
                     obstructed = true;
@@ -162,12 +165,12 @@ public partial class ArenaTileMap : TileMap
 
     public bool CellIsGround(Vector2I cell)
     {
-        return GetCellSourceId(GroundLayer, cell) != -1;
+        return _groundLayer.GetCellSourceId(cell) != -1;
     }
 
     public bool CellIsWall(Vector2I cell)
     {
-        return GetCellSourceId(WallLayer, cell) != -1;
+        return _wallsLayer.GetCellSourceId(cell) != -1;
     }
 
     public bool CellIsPathable(Vector2I cell)
@@ -225,6 +228,11 @@ public partial class ArenaTileMap : TileMap
     private void _onTurnStateNewTurnStarted(TurnState state)
     {
         _aStar.MovingTeam = state.ActiveTeam;
+    }
+
+    public Vector2 MapToLocal(Vector2I cell)
+    {
+        return _groundLayer.MapToLocal(cell);
     }
 
     /**

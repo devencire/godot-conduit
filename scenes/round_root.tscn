@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://c3nygxpkibi84"]
+[gd_scene load_steps=19 format=4 uid="uid://c3nygxpkibi84"]
 
 [ext_resource type="Script" path="res://scripts/RoundRoot.cs" id="1_vyyr4"]
 [ext_resource type="Script" path="res://scripts/TurnState.cs" id="2_juqob"]
@@ -64,20 +64,27 @@ _roundRoot = NodePath("..")
 position = Vector2(-48, 32)
 scale = Vector2(0.75, 0.75)
 
-[node name="ArenaTileMap" type="TileMap" parent="Arena" node_paths=PackedStringArray("_controlZones")]
+[node name="ArenaTileMap" type="Node2D" parent="Arena" node_paths=PackedStringArray("_controlZones")]
 unique_name_in_owner = true
-tile_set = SubResource("TileSet_ce3eq")
-format = 2
-layer_0/name = "ground"
-layer_0/tile_data = PackedInt32Array(65537, 0, 0, 0, 0, 0, -1, 0, 0, -65538, 0, 0, -196610, 0, 0, -131073, 0, 0, -131072, 0, 0, -65535, 0, 0, -65534, 0, 0, 2, 0, 0, 3, 0, 0, 65539, 0, 0, -131071, 0, 0, -196607, 0, 0, -196608, 0, 0, -262144, 0, 0, -196609, 0, 0, -262146, 0, 0, -327682, 0, 0, -262145, 0, 0, -196606, 0, 0, -131070, 0, 0, -131069, 0, 0, -65533, 0, 0, 4, 0, 0, 65540, 0, 0, 65541, 0, 0, 5, 0, 0, -65531, 0, 0, -65532, 0, 0, -131068, 0, 0, -196605, 0, 0, -262142, 0, 0, -262143, 0, 0, -327680, 0, 0, -327681, 0, 0, -393216, 0, 0, -327679, 0, 0, -262147, 0, 0, -131075, 0, 0, -65539, 0, 0, 131076, 0, 0, 131074, 0, 0, 131073, 0, 0, 65536, 0, 0, 65535, 0, 0, -2, 0, 0, 196611, 0, 0, 196610, 0, 0, 262146, 0, 0, 262145, 0, 0, 327681, 0, 0, 327680, 0, 0, 393215, 0, 0, 262141, 0, 0, 196604, 0, 0, 131067, 0, 0, 65530, 0, 0, -6, 0, 0, -65542, 0, 0, -5, 0, 0, 65532, 0, 0, 131068, 0, 0, 196605, 0, 0, 327678, 0, 0, 327679, 0, 0, 262142, 0, 0, 131069, 0, 0, 65531, 0, 0, -65541, 0, 0, -65540, 0, 0, -131077, 0, 0, -131076, 0, 0, -196612, 0, 0, -4, 0, 0, -3, 0, 0, 65533, 0, 0, 65534, 0, 0, 131071, 0, 0, 196607, 0, 0, 196606, 0, 0, 131070, 0, 0, 262143, 0, 0, 196608, 0, 0, 262144, 0, 0, 131072, 0, 0, 196609, 0, 0, 131075, 0, 0, 65538, 0, 0, 1, 0, 0, -65536, 0, 0, -65537, 0, 0, -131074, 0, 0, -196611, 0, 0)
-layer_1/name = "walls"
-layer_1/navigation_enabled = false
-layer_1/tile_data = PackedInt32Array(327682, 65536, 0, 327683, 65536, 0, 196612, 65536, 0, 196613, 65536, 0, 131077, 65536, 0, 65542, 65536, 0, 6, 65536, 0, -65530, 65536, 0, -458752, 65536, 0, -393217, 65536, 0, -393218, 65536, 0, -327683, 65536, 0, -327684, 65536, 0, -196613, 65536, 0, -196614, 65536, 0, -131078, 65536, 0, -65543, 65536, 0, -7, 65536, 0, 458751, 65536, 0, 393216, 65536, 0, 393217, 65536, 0, 262147, 65536, 0, -262148, 65536, 0, 65529, 65536, 0)
-layer_2/name = "art"
-layer_2/navigation_enabled = false
-layer_2/tile_data = PackedInt32Array(-393219, 0, 1, -262149, 0, 1, -131079, 0, 1, 131066, 0, 1, 196603, 0, 1, 262140, 0, 1, 327677, 0, 1, 393214, 0, 1, 393218, 0, 1, 262148, 0, 1, 131078, 0, 1, -131067, 0, 1, -393215, 0, 1, -196604, 0, 1, -262141, 0, 1, -327678, 0, 1)
 script = ExtResource("6_s6dqj")
 _controlZones = NodePath("../ControlZones")
+
+[node name="Ground" type="TileMapLayer" parent="Arena/ArenaTileMap"]
+use_parent_material = true
+tile_map_data = PackedByteArray("AAABAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAD/////AAAAAAAAAAD+//7/AAAAAAAAAAD+//z/AAAAAAAAAAD///3/AAAAAAAAAAAAAP7/AAAAAAAAAAABAP//AAAAAAAAAAACAP//AAAAAAAAAAACAAAAAAAAAAAAAAADAAAAAAAAAAAAAAADAAEAAAAAAAAAAAABAP7/AAAAAAAAAAABAP3/AAAAAAAAAAAAAP3/AAAAAAAAAAAAAPz/AAAAAAAAAAD///z/AAAAAAAAAAD+//v/AAAAAAAAAAD+//r/AAAAAAAAAAD///v/AAAAAAAAAAACAP3/AAAAAAAAAAACAP7/AAAAAAAAAAADAP7/AAAAAAAAAAADAP//AAAAAAAAAAAEAAAAAAAAAAAAAAAEAAEAAAAAAAAAAAAFAAEAAAAAAAAAAAAFAAAAAAAAAAAAAAAFAP//AAAAAAAAAAAEAP//AAAAAAAAAAAEAP7/AAAAAAAAAAADAP3/AAAAAAAAAAACAPz/AAAAAAAAAAABAPz/AAAAAAAAAAAAAPv/AAAAAAAAAAD///r/AAAAAAAAAAAAAPr/AAAAAAAAAAABAPv/AAAAAAAAAAD9//v/AAAAAAAAAAD9//3/AAAAAAAAAAD9//7/AAAAAAAAAAAEAAIAAAAAAAAAAAACAAIAAAAAAAAAAAABAAIAAAAAAAAAAAAAAAEAAAAAAAAAAAD//wAAAAAAAAAAAAD+////AAAAAAAAAAADAAMAAAAAAAAAAAACAAMAAAAAAAAAAAACAAQAAAAAAAAAAAABAAQAAAAAAAAAAAABAAUAAAAAAAAAAAAAAAUAAAAAAAAAAAD//wUAAAAAAAAAAAD9/wMAAAAAAAAAAAD8/wIAAAAAAAAAAAD7/wEAAAAAAAAAAAD6/wAAAAAAAAAAAAD6////AAAAAAAAAAD6//7/AAAAAAAAAAD7////AAAAAAAAAAD8/wAAAAAAAAAAAAD8/wEAAAAAAAAAAAD9/wIAAAAAAAAAAAD+/wQAAAAAAAAAAAD//wQAAAAAAAAAAAD+/wMAAAAAAAAAAAD9/wEAAAAAAAAAAAD7/wAAAAAAAAAAAAD7//7/AAAAAAAAAAD8//7/AAAAAAAAAAD7//3/AAAAAAAAAAD8//3/AAAAAAAAAAD8//z/AAAAAAAAAAD8////AAAAAAAAAAD9////AAAAAAAAAAD9/wAAAAAAAAAAAAD+/wAAAAAAAAAAAAD//wEAAAAAAAAAAAD//wIAAAAAAAAAAAD+/wIAAAAAAAAAAAD+/wEAAAAAAAAAAAD//wMAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAIAAAAAAAAAAAABAAMAAAAAAAAAAAADAAIAAAAAAAAAAAACAAEAAAAAAAAAAAABAAAAAAAAAAAAAAAAAP//AAAAAAAAAAD///7/AAAAAAAAAAD+//3/AAAAAAAAAAD9//z/AAAAAAAAAAA=")
+tile_set = SubResource("TileSet_ce3eq")
+
+[node name="Walls" type="TileMapLayer" parent="Arena/ArenaTileMap"]
+use_parent_material = true
+tile_map_data = PackedByteArray("AAACAAUAAAABAAAAAAADAAUAAAABAAAAAAAEAAMAAAABAAAAAAAFAAMAAAABAAAAAAAFAAIAAAABAAAAAAAGAAEAAAABAAAAAAAGAAAAAAABAAAAAAAGAP//AAABAAAAAAAAAPn/AAABAAAAAAD///n/AAABAAAAAAD+//n/AAABAAAAAAD9//r/AAABAAAAAAD8//r/AAABAAAAAAD7//z/AAABAAAAAAD6//z/AAABAAAAAAD6//3/AAABAAAAAAD5//7/AAABAAAAAAD5////AAABAAAAAAD//wYAAAABAAAAAAAAAAYAAAABAAAAAAABAAYAAAABAAAAAAADAAQAAAABAAAAAAD8//v/AAABAAAAAAD5/wAAAAABAAAAAAA=")
+tile_set = SubResource("TileSet_ce3eq")
+navigation_enabled = false
+
+[node name="Art" type="TileMapLayer" parent="Arena/ArenaTileMap"]
+use_parent_material = true
+tile_map_data = PackedByteArray("AAD9//n/AAAAAAEAAAD7//v/AAAAAAEAAAD5//3/AAAAAAEAAAD6/wEAAAAAAAEAAAD7/wIAAAAAAAEAAAD8/wMAAAAAAAEAAAD9/wQAAAAAAAEAAAD+/wUAAAAAAAEAAAACAAYAAAAAAAEAAAAEAAQAAAAAAAEAAAAGAAIAAAAAAAEAAAAFAP7/AAAAAAEAAAABAPr/AAAAAAEAAAAEAP3/AAAAAAEAAAADAPz/AAAAAAEAAAACAPv/AAAAAAEAAAA=")
+tile_set = SubResource("TileSet_ce3eq")
+navigation_enabled = false
 
 [node name="Selection" parent="Arena" instance=ExtResource("6_pdv55")]
 
@@ -197,8 +204,8 @@ text = "Next round"
 
 [connection signal="RoundEnded" from="." to="TurnState" method="_onRoundRootRoundEnded"]
 [connection signal="Changed" from="TurnState" to="RoundUI" method="_onTurnStateChanged"]
-[connection signal="NewTurnStarted" from="TurnState" to="Arena/ArenaTileMap" method="_onTurnStateNewTurnStarted"]
 [connection signal="NewTurnStarted" from="TurnState" to="Arena/Selection" method="_onTurnStateNewTurnStarted"]
+[connection signal="NewTurnStarted" from="TurnState" to="Arena/ArenaTileMap" method="_onTurnStateNewTurnStarted"]
 [connection signal="NewTurnStarted" from="TurnState" to="Arena/ControlZones" method="_setControlZones" unbinds=1]
 [connection signal="NewTurnStarted" from="TurnState" to="Arena/PowerLines" method="_setPowerLines" unbinds=1]
 [connection signal="Changed" from="ScoreState" to="Arena/TravelBoundaries" method="_onScoreStateChanged"]
